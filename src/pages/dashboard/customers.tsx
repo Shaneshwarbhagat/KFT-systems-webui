@@ -1,0 +1,277 @@
+"use client"
+
+import { useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { customerApi } from "@/lib/api"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight, Users } from "lucide-react"
+import { CustomerModal } from "@/components/customers/customer-modal"
+import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
+import { formatDate } from "@/lib/utils"
+
+interface Customer {
+  id: string
+  address: string
+  city: string
+  country: string
+  contactPersonName: string
+  companyName: string
+  mobileNumber: string
+  emailId: string
+  businessRegistrationNumber: string
+  createdAt: string
+  updatedAt: string
+}
+
+export default function CustomersPage() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [modalMode, setModalMode] = useState<"create" | "edit">("create")
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
+
+  const limit = 10
+
+  // Fetch customers
+  const {
+    data: customersData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["customers", currentPage, searchTerm],
+    queryFn: () =>
+      customerApi.getCustomers({
+        page: currentPage - 1, // API uses 0-based pagination
+        limit,
+        search: searchTerm || undefined,
+      }),
+  })
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: customerApi.deleteCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] })
+      toast({
+        title: "Success",
+        description: "Customer deleted successfully",
+        className: "bg-success text-white",
+      })
+      setIsDeleteDialogOpen(false)
+      setSelectedCustomer(null)
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to delete customer",
+        variant: "destructive",
+      })
+    },
+  })
+
+  const customers = customersData?.customers || []
+  const total = customersData?.total || 0
+  const totalPages = Math.ceil(total / limit)
+
+  const handleCreate = () => {
+    setModalMode("create")
+    setSelectedCustomer(null)
+    setIsModalOpen(true)
+  }
+
+  const handleEdit = (customer: Customer) => {
+    setModalMode("edit")
+    setSelectedCustomer(customer)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (selectedCustomer) {
+      deleteMutation.mutate(selectedCustomer.id)
+    }
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-gray-900">Error loading customers</h3>
+          <p className="text-gray-600">Please try again later</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Customers</h1>
+          <p className="text-gray-600">Manage your customer database</p>
+        </div>
+        <Button onClick={handleCreate} className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg">
+          <Plus className="h-4 w-4 mr-2" />
+          Create Customer
+        </Button>
+      </div>
+
+      {/* Search and Stats */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full sm:w-96">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Search customers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="text-sm text-gray-600">Total: {total} customers</div>
+      </div>
+
+      {/* Customers Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Customer List
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-12 bg-gray-200 rounded animate-pulse"></div>
+              ))}
+            </div>
+          ) : customers.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No customers found</h3>
+              <p className="text-gray-600 mb-4">Get started by creating your first customer</p>
+              <Button onClick={handleCreate} className="bg-brand-primary hover:bg-brand-dark text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Customer
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Company Name</TableHead>
+                    <TableHead>Contact Person</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>City</TableHead>
+                    <TableHead>Country</TableHead>
+                    <TableHead>BRN</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {customers.map((customer: Customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell className="font-medium">{customer.companyName}</TableCell>
+                      <TableCell>{customer.contactPersonName}</TableCell>
+                      <TableCell>{customer.emailId}</TableCell>
+                      <TableCell>{customer.city}</TableCell>
+                      <TableCell>{customer.country}</TableCell>
+                      <TableCell>{customer.businessRegistrationNumber}</TableCell>
+                      <TableCell>{formatDate(customer.createdAt)}</TableCell>
+                      <TableCell>{formatDate(customer.updatedAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(customer)}
+                            className="h-8 w-8 p-0"
+                            title="Edit Customer"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(customer)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Delete Customer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-gray-600">
+                Showing {(currentPage - 1) * limit + 1} to {Math.min(currentPage * limit, total)} of {total} customers
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Modals */}
+      <CustomerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        customer={selectedCustomer}
+        mode={modalMode}
+      />
+
+      <DeleteCustomerDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+        customerName={selectedCustomer?.companyName || ""}
+        isLoading={deleteMutation.isPending}
+      />
+    </div>
+  )
+}
