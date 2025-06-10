@@ -165,15 +165,6 @@ export default function LoginPage() {
               </Form>
             )}
           </Formik>
-
-          <div className="text-center pt-4">
-            <p className="text-sm text-brand-dark/60">Secure access to your business management platform</p>
-            <div className="mt-2 text-xs text-gray-500">
-              <p>Demo credentials:</p>
-              <p>Email: sam@brightdiva.com</p>
-              <p>Password: Sam123789</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
