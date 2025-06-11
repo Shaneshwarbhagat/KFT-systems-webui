@@ -1,7 +1,8 @@
 import axios from "axios"
 
-const API_BASE_URL = "http://8.218.174.70:3000/api"
-// const API_BASE_URL = "https://kft-systems-webui.vercel.app/api" // temprory proxy api call from vercel to allow http request
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://8.218.174.70:3000/api"
+
+console.log("API_BASE_URL:", API_BASE_URL)
 
 const api = axios.create({
   baseURL: API_BASE_URL,
