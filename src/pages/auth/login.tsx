@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { useToast } from "../../hooks/use-toast"
 import { useAuth } from "../../hooks/use-auth"
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
-import { Eye, EyeOff, LogIn, Building2 } from "lucide-react"
+import { Eye, EyeOff, LogIn } from "lucide-react"
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -54,10 +54,8 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-sm relative z-10">
         <CardHeader className="space-y-1 text-center pb-8">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-2xl shadow-lg">
-              <Building2 className="h-10 w-10 text-white" aria-hidden="true" />
-            </div>
+          <div className="flex justify-center mb-2">
+            <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
             Welcome

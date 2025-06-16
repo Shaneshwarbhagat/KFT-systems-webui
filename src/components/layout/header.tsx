@@ -104,7 +104,7 @@ export function Header({ onSearch }: HeaderProps) {
           </div>
 
           <div className="flex items-center space-x-4">
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
 
             {/* Settings Dropdown */}
             <DropdownMenu>

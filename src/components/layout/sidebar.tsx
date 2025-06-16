@@ -14,7 +14,6 @@ import {
   Receipt,
   Truck,
   Calendar,
-  Building2,
 } from "lucide-react"
 
 const navigation = [
@@ -64,7 +63,7 @@ export function Sidebar() {
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-brand-primary to-brand-secondary">
         {!collapsed && (
           <div className="flex items-center space-x-2">
-            <Building2 className="h-8 w-8 text-white" />
+            <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-[22%] bg-white border-2 border-[#c6c6c6] rounded-sm"/>
             <h2 className="text-lg font-bold text-white">KFT System</h2>
           </div>
         )}

@@ -10,7 +10,7 @@ import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { useToast } from "../../hooks/use-toast"
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
-import { Mail, ArrowLeft, Building2, Shield, Lock } from "lucide-react"
+import { Mail, ArrowLeft, Shield, Lock } from "lucide-react"
 import { authApi } from "../../lib/api"
 // import { UserProfileDropdown } from "../../components/user-profile-dropdown"
 // import { DateRangePicker } from "../../components/date-range-picker"
@@ -116,10 +116,8 @@ export default function ForgotPasswordPage() {
         return (
           <>
             <CardHeader className="space-y-1 text-center pb-8">
-              <div className="flex justify-center mb-6">
-                <div className="p-4 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-2xl shadow-lg">
-                  <Building2 className="h-10 w-10 text-white" aria-hidden="true" />
-                </div>
+              <div className="flex justify-center mb-2">
+                <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
               </div>
               <CardTitle className="text-3xl font-bold text-brand-dark">Forgot Password?</CardTitle>
               <CardDescription className="text-brand-dark/70 text-base">

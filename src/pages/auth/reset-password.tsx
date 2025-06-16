@@ -10,7 +10,7 @@ import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { useToast } from "../../hooks/use-toast"
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
-import { Lock, Eye, EyeOff, Building2 } from "lucide-react"
+import { Lock, Eye, EyeOff } from "lucide-react"
 import { authApi } from "../../lib/api"
 
 const resetPasswordSchema = Yup.object().shape({
@@ -85,10 +85,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-light via-white to-brand-secondary/20 p-4">
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
         <CardHeader className="space-y-1 text-center pb-8">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-2xl shadow-lg">
-              <Building2 className="h-10 w-10 text-white" aria-hidden="true" />
-            </div>
+          <div className="flex justify-center mb-2">
+            <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
           </div>
           <CardTitle className="text-3xl font-bold text-brand-dark">Reset Password</CardTitle>
           <CardDescription className="text-brand-dark/70 text-base">Enter your new password below.</CardDescription>
