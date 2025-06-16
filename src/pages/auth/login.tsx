@@ -55,7 +55,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-sm relative z-10">
         <CardHeader className="space-y-1 text-center pb-8">
           <div className="flex justify-center mb-2">
-            <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
+            <img src="../../../KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
             Welcome

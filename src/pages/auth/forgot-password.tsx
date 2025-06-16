@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
           <>
             <CardHeader className="space-y-1 text-center pb-8">
               <div className="flex justify-center mb-2">
-                <img src="../../../public/KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
+                <img src="../../../KFT-logo.png" alt= "KFT management systems logo" className="w-20 mx-auto"/>
               </div>
               <CardTitle className="text-3xl font-bold text-brand-dark">Forgot Password?</CardTitle>
               <CardDescription className="text-brand-dark/70 text-base">
