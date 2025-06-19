@@ -6,7 +6,7 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useToast } from "../../hooks/use-toast"
-import { invoiceApi, customerApi } from "../../lib/api"
+import { invoiceApi } from "../../lib/api"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 
@@ -17,6 +17,14 @@ const invoiceSchema = Yup.object().shape({
   currency: Yup.string().required("Currency is required"),
   totalUnits: Yup.number().positive("Units must be positive").required("Total units is required"),
 })
+
+interface InvoiceFormValues {
+  invoiceNumber: string;
+  customerId: string;
+  amount: number | string;
+  currency: string;
+  totalUnits: number | string;
+}
 
 interface InvoiceModalProps {
   open: boolean
@@ -32,13 +40,19 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
   // Fetch customers for dropdown
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
-    queryFn: () => customerApi.getList({ page: 1, limit: 100 }),
+    queryFn: () => invoiceApi.getInvoices({ page: 1, limit: 100 }),
     enabled: open,
   })
 
   // Create/Update mutation
   const mutation = useMutation({
-    mutationFn: isEditing ? invoiceApi.update : invoiceApi.create,
+    mutationFn: (values: any) => {
+      if (isEditing) {
+        return invoiceApi.updateInvoice(invoice.id, values)
+      } else {
+        return invoiceApi.createInvoice(values)
+      }
+    },
     onSuccess: () => {
       toast({
         title: "Success",
@@ -55,6 +69,7 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
     },
   })
 
+
   const handleSubmit = (values: any) => {
     if (isEditing) {
       mutation.mutate({ id: invoice.id, ...values })
@@ -67,14 +82,14 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <DialogContent className="sm:max-w-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-gray-900 dark:text-white">
             {isEditing ? "Edit Invoice" : "Create New Invoice"}
           </DialogTitle>
         </DialogHeader>
 
-        <Formik
+        <Formik<InvoiceFormValues> 
           initialValues={{
             invoiceNumber: invoice?.invoiceNumber || "",
             customerId: invoice?.customerId || "",

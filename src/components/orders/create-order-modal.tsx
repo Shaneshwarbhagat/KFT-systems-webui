@@ -4,14 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { orderApi } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/hooks/use-toast"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { orderApi } from "../../lib/api"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { Checkbox } from "../../components/ui/checkbox"
+import { useToast } from "../../hooks/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog"
 
 interface Invoice {
   id: string
@@ -104,7 +104,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[98vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">Create New Order</DialogTitle>
         </DialogHeader>
@@ -115,7 +115,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
             <Label htmlFor="invoice">Invoice Number *</Label>
             <Select
               value={formData.invoiceId}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, invoiceId: value }))}
+              onValueChange={(value: any) => setFormData((prev) => ({ ...prev, invoiceId: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select an invoice" />
@@ -173,7 +173,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
               type="number"
               placeholder="Enter delivery units"
               value={formData.deliveryUnits}
-              onChange={(e) => setFormData((prev) => ({ ...prev, deliveryUnits: e.target.value }))}
+              onChange={(e:any) => setFormData((prev) => ({ ...prev, deliveryUnits: e.target.value }))}
               min="0"
             />
           </div>
@@ -183,7 +183,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
             <Label htmlFor="currency">Currency *</Label>
             <Select
               value={formData.currency}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, currency: value }))}
+              onValueChange={(value: any) => setFormData((prev) => ({ ...prev, currency: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select currency" />
@@ -205,7 +205,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
               step="0.01"
               placeholder="Enter delivery value"
               value={formData.deliveryValue}
-              onChange={(e) => setFormData((prev) => ({ ...prev, deliveryValue: e.target.value }))}
+              onChange={(e: any) => setFormData((prev) => ({ ...prev, deliveryValue: e.target.value }))}
               min="0"
             />
           </div>

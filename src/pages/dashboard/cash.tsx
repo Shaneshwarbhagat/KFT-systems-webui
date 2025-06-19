@@ -12,10 +12,11 @@ import { cashApi } from "../../lib/api"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { CashModal } from "../../components/cash/cash-modal"
 import { DeleteCashDialog } from "../../components/cash/delete-cash-dialog"
+import { LoadingSpinner } from "../../components/ui/loading-spinner"
 
 export default function CashPage() {
   const [page, setPage] = useState(0)
-  const [search, setSearch] = useState("")
+  // const [search, setSearch] = useState("")
   const [selectedCash, setSelectedCash] = useState<any>(null)
   const [showModal, setShowModal] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -25,9 +26,11 @@ export default function CashPage() {
 
   // Fetch cash list
   const { data: cashData, isLoading } = useQuery({
-    queryKey: ["cash", page, search],
-    queryFn: () => cashApi.getCashList({ page, limit: 10, search }),
+    queryKey: ["cash", page],
+    queryFn: () => cashApi.getCashList({ page, limit: 10 }),
   })
+
+  console.log("Cash Data:", cashData)
 
   const handleEdit = (cash: any) => {
     setSelectedCash(cash)
@@ -55,7 +58,7 @@ export default function CashPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading...</div>
+        <LoadingSpinner />
       </div>
     )
   }
@@ -77,7 +80,8 @@ export default function CashPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Cash Receipts</CardTitle>
-            <div className="relative w-72">
+            <div className="flex items-center space-x-2">
+            {/* <div className="relative w-72">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search receipts..."
@@ -85,6 +89,8 @@ export default function CashPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
               />
+            </div> */}
+              Total Receipts: &nbsp;<span className="font-semibold">{cashData?.total || 0}</span>
             </div>
           </div>
         </CardHeader>
@@ -117,7 +123,8 @@ export default function CashPage() {
                     <TableCell>{cash.pickedBy}</TableCell>
                     <TableCell>{formatDate(cash.cashPickupDate)}</TableCell>
                     <TableCell>
-                      <Badge variant={cash.partialDelivery ? "secondary" : "default"}>
+                      <Badge variant={cash.partialDelivery ? "default" : "secondary"}
+                       className={cash.partialDelivery ? "bg-brand-secondary text-white" : ""}>
                         {cash.partialDelivery ? "Partial" : "Complete"}
                       </Badge>
                     </TableCell>

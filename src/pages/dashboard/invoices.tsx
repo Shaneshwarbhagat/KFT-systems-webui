@@ -15,7 +15,7 @@ import { DeleteInvoiceDialog } from "../../components/invoices/delete-invoice-di
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
 
 export default function InvoicesPage() {
-  const [searchQuery, setSearchQuery] = useState("")
+  // const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<any>(null)
@@ -28,20 +28,17 @@ export default function InvoicesPage() {
 
   // Fetch invoices
   const { data: invoicesData, isLoading } = useQuery({
-    queryKey: ["invoices", currentPage, searchQuery, sortField, sortOrder],
+    queryKey: ["invoices", currentPage],
     queryFn: () =>
-      invoiceApi.getList({
+      invoiceApi.getInvoices({
         page: currentPage,
         limit: 10,
-        search: searchQuery,
-        sortBy: sortField,
-        sortOrder,
       }),
   })
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: invoiceApi.delete,
+    mutationFn: invoiceApi.deleteInvoice,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -73,7 +70,7 @@ export default function InvoicesPage() {
     window.print()
   }
 
-  const invoices = invoicesData?.data || []
+  const invoices = invoicesData?.invoices || []
   const totalPages = Math.ceil((invoicesData?.total || 0) / 10)
 
   if (isLoading) {
@@ -102,7 +99,7 @@ export default function InvoicesPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-gray-900 dark:text-white">Invoice List</CardTitle>
             <div className="flex items-center space-x-2">
-              <div className="relative">
+              {/* <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search invoices..."
@@ -110,7 +107,8 @@ export default function InvoicesPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                 />
-              </div>
+              </div> */}
+              Total Invoices: &nbsp;<span className="font-semibold text-gray-900 dark:text-white"> {invoicesData?.total || 0}</span>
             </div>
           </div>
         </CardHeader>
@@ -125,6 +123,24 @@ export default function InvoicesPage() {
                   >
                     <div className="flex items-center">
                       Invoice Number
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                    onClick={() => handleSort("customer")}
+                  >
+                    <div className="flex items-center">
+                      Customer Email ID
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                    onClick={() => handleSort("customer")}
+                  >
+                    <div className="flex items-center">
+                      Customer Mobile No.
                       <ArrowUpDown className="ml-2 h-4 w-4" />
                     </div>
                   </TableHead>
@@ -161,10 +177,16 @@ export default function InvoicesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoices.map((invoice: any) => (
+                { invoices && invoices.length ?  invoices.map((invoice: any) => (
                   <TableRow key={invoice.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       {invoice.invoiceNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">
+                      {invoice.customer?.emailId}
+                    </TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">
+                      {invoice.customer?.mobileNumber}
                     </TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-300">
                       {invoice.customer?.companyName || invoice.customer?.contactPersonName}
@@ -182,7 +204,7 @@ export default function InvoicesPage() {
                     </TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-300">{invoice.totalUnits}</TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-300">
-                      {new Date(invoice.createdAt).toLocaleDateString()}
+                      {new Date(invoice.createdAt).toLocaleDateString('en-GB')}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
@@ -213,7 +235,7 @@ export default function InvoicesPage() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : <div className="p-5">No invoices found.</div>}
               </TableBody>
             </Table>
           </div>

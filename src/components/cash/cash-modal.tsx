@@ -24,6 +24,18 @@ const cashSchema = Yup.object().shape({
   pickupTime: Yup.string().required("Pickup time is required"),
 })
 
+interface CashFormValues {
+  receiptNumber: string;
+  invoiceNumber: string;
+  customerId: string;
+  amount: number | string;
+  currency: string;
+  pickedBy: string;
+  cashPickupDate: string; // ISO date string
+  pickupTime: string;
+  partialDelivery: boolean;
+}
+
 interface CashModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -102,7 +114,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
           <DialogDescription>{cash ? "Update cash receipt details" : "Create a new cash receipt"}</DialogDescription>
         </DialogHeader>
 
-        <Formik
+        <Formik<CashFormValues>
           initialValues={{
             receiptNumber: cash?.receiptNumber || "",
             invoiceNumber: cash?.invoiceNumber || "",

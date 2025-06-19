@@ -151,7 +151,7 @@ export const currencyApi = {
 
 // Cash API
 export const cashApi = {
-  getCashList: async (params: { page: number; limit: number; search?: string }) => {
+  getCashList: async (params: { page: number; limit: number}) => {
     const response = await api.get("/v1/cash/list", { params })
     return response.data
   },
@@ -191,7 +191,7 @@ export const misApi = {
 
 // Invoice API
 export const invoiceApi = {
-  getInvoices: async (params: { page: number; limit: number; search?: string }) => {
+  getInvoices: async (params: { page: number; limit: number }) => {
     const response = await api.get("/v1/invoice/list", { params })
     return response.data
   },
