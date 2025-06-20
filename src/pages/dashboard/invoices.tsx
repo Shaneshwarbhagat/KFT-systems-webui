@@ -9,7 +9,7 @@ import { Badge } from "../../components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import { useToast } from "../../hooks/use-toast"
 import { invoiceApi } from "../../lib/api"
-import { Plus, Search, Edit, Trash2, Printer, ArrowUpDown } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Printer, ArrowUpDown, Package } from "lucide-react"
 import { InvoiceModal } from "../../components/invoices/invoice-modal"
 import { DeleteInvoiceDialog } from "../../components/invoices/delete-invoice-dialog"
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
@@ -94,7 +94,7 @@ export default function InvoicesPage() {
         </Button>
       </div>
 
-      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      {invoices?.length !== 0 ? <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-gray-900 dark:text-white">Invoice List</CardTitle>
@@ -273,7 +273,20 @@ export default function InvoicesPage() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card> :
+      <Card className="p-12 text-center">
+        <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">No invoice found</h3>
+        <p className="text-gray-600 mb-4">Get started by creating your first invoice</p>
+        <Button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Invoice
+        </Button>
+      </Card>  
+      }
 
       {/* Modals */}
       <InvoiceModal

@@ -67,7 +67,7 @@ export function MisReportSection() {
       type: values.reportType,
       fromDate: format(values.startDate, "yyyy-MM-dd"),
       toDate: format(values.endDate, "yyyy-MM-dd"),
-      customerName: values.customerName,
+      customerId: values.customerName,
     })
   }
 
@@ -164,7 +164,7 @@ export function MisReportSection() {
                   </SelectTrigger>
                   <SelectContent>
                     {customersData?.customers?.map((customer: any) => (
-                      <SelectItem key={customer.id} value={customer.companyName}>
+                      <SelectItem key={customer.id} value={customer.id}>
                         {customer.companyName}
                       </SelectItem>
                     ))}

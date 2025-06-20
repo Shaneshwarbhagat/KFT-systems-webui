@@ -16,7 +16,6 @@ import OrdersPage from "./pages/dashboard/orders"
 import CustomersPage from "./pages/dashboard/customers"
 import CashPage from "./pages/dashboard/cash"
 import AdminPage from "./pages/dashboard/admin"
-import SettingsPage from "./pages/dashboard/settings"
 import ExpectedPaymentsPage from "./pages/dashboard/expected-payments"
 import CreateUserPage from "./pages/dashboard/create-user"
 import ProtectedRoute from "./components/auth/protected-route"
@@ -49,7 +48,6 @@ function App() {
                   <Route path="customers" element={<CustomersPage />} />
                   <Route path="cash" element={<CashPage />} />
                   <Route path="admin" element={<AdminPage />} />
-                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="expected-payments" element={<ExpectedPaymentsPage />} />
                   <Route path="create-user" element={<CreateUserPage />} />
                 </Route>

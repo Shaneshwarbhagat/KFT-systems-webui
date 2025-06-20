@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Badge } from "../../components/ui/badge"
 import { useToast } from "../../hooks/use-toast"
 import { cashApi } from "../../lib/api"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { Search, Plus, Edit, Trash2, Package } from "lucide-react"
 import { CashModal } from "../../components/cash/cash-modal"
 import { DeleteCashDialog } from "../../components/cash/delete-cash-dialog"
 import { LoadingSpinner } from "../../components/ui/loading-spinner"
@@ -29,8 +29,6 @@ export default function CashPage() {
     queryKey: ["cash", page],
     queryFn: () => cashApi.getCashList({ page, limit: 10 }),
   })
-
-  console.log("Cash Data:", cashData)
 
   const handleEdit = (cash: any) => {
     setSelectedCash(cash)
@@ -76,7 +74,7 @@ export default function CashPage() {
         </Button>
       </div>
 
-      <Card>
+      {cashData?.data?.length !== 0 ? <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Cash Receipts</CardTitle>
@@ -181,7 +179,20 @@ export default function CashPage() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card> :
+      <Card className="p-12 text-center">
+        <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">No cash receipt found</h3>
+        <p className="text-gray-600 mb-4">Get started by creating your first cash receipt</p>
+        <Button
+          onClick={() => setShowModal(true)}
+          className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Cash Receipt
+        </Button>
+      </Card>      
+      }
 
       {/* Modals */}
       <CashModal open={showModal} onOpenChange={setShowModal} cash={selectedCash} />

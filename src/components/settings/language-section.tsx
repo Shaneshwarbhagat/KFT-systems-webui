@@ -1,22 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useToast } from "../../hooks/use-toast"
 import { Globe } from "lucide-react"
+import i18n from "../../lib/i18n"
 
 export function LanguageSection() {
-  const [selectedLanguage, setSelectedLanguage] = useState("en")
+  let languageSelected = localStorage.getItem("selectedLanguage");
+  const [selectedLanguage, setSelectedLanguage] = useState(!languageSelected ? "en" : languageSelected);
   const { toast } = useToast()
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language)
     localStorage.setItem("selectedLanguage", language)
+    i18n.changeLanguage(language)
     toast({
       title: "Language Updated",
-      description: `Language changed to ${language === "en" ? "English" : language === "ko" ? "Korean" : "Chinese"}`,
+      description: `Language changed to ${language === "en" ? "English" : "Chinese"}`,
       className: "bg-success text-white",
     })
   }
@@ -39,7 +42,6 @@ export function LanguageSection() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">English</SelectItem>
-                <SelectItem value="ko">Korean (한국어)</SelectItem>
                 <SelectItem value="zh">Chinese (中文)</SelectItem>
               </SelectContent>
             </Select>

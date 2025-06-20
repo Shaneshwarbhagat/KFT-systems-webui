@@ -16,6 +16,7 @@ import { Calendar as CalendarComponent } from "../../components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "../../lib/utils"
 import { Input } from "../../components/ui/input"
+import { useTranslation } from "react-i18next"
 
 const expectedPaymentSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
@@ -24,6 +25,7 @@ const expectedPaymentSchema = Yup.object().shape({
 })
 
 export default function ExpectedPaymentsPage() {
+  const { t } = useTranslation()
   const [expectedDate, setExpectedDate] = useState<Date>()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -81,8 +83,12 @@ export default function ExpectedPaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Expected Payment Date</h1>
-          <p className="text-gray-600 dark:text-gray-400">Set expected payment dates for invoices</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            {t("expectedPayment.title")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("expectedPayment.subtitle")}
+          </p>
         </div>
       </div>
 
@@ -90,7 +96,7 @@ export default function ExpectedPaymentsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Set Expected Payment Date
+            {t("expectedPayment.cardTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -106,7 +112,7 @@ export default function ExpectedPaymentsPage() {
             {({ errors, touched, setFieldValue, values }) => (
               <Form className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="invoiceNumber">Invoice Number *</Label>
+                  <Label htmlFor="invoiceNumber">{t("expectedPayment.invoiceNumberLabel")}</Label>
                   <Select
                     value={values.invoiceNumber}
                     onValueChange={(value) => {
@@ -116,15 +122,19 @@ export default function ExpectedPaymentsPage() {
                     }}
                   >
                     <SelectTrigger className={errors.invoiceNumber && touched.invoiceNumber ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Select invoice number" />
+                      <SelectValue placeholder={t("expectedPayment.selectInvoicePlaceholder")}/>
                     </SelectTrigger>
-                    <SelectContent>
-                      {invoicesData?.invoices?.map((invoice: any) => (
-                        <SelectItem key={invoice.id} value={invoice.invoiceNumber}>
-                          {invoice.invoiceNumber}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    {invoicesData?.invoices && invoicesData?.invoices?.length  ? <SelectContent>
+                        {invoicesData?.invoices?.map((invoice: any) => (
+                          <SelectItem key={invoice.id} value={invoice.invoiceNumber}>
+                            {invoice.invoiceNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectContent> : 
+                      <SelectContent>
+                        <p className="text-sm p-2">{t("expectedPayment.noInvoices")}</p>
+                      </SelectContent>
+                    }
                   </Select>
                   {errors.invoiceNumber && touched.invoiceNumber && (
                     <p className="text-sm text-red-500">{errors.invoiceNumber}</p>
@@ -132,19 +142,19 @@ export default function ExpectedPaymentsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="customerName">Customer Name</Label>
+                  <Label htmlFor="customerName">{t("expectedPayment.customerNameLabel")}</Label>
                   <Input
                     id="customerName"
                     name="customerName"
                     value={values.customerName}
                     disabled
                     className="bg-gray-100 dark:bg-gray-800"
-                    placeholder="Customer name will auto-populate"
+                    placeholder={t("expectedPayment.customerNamePlaceholder")}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Expected Payment Date *</Label>
+                  <Label>{t("expectedPayment.dateLabel")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -156,7 +166,7 @@ export default function ExpectedPaymentsPage() {
                         )}
                       >
                         <Calendar className="mr-2 h-4 w-4" />
-                        {expectedDate ? format(expectedDate, "PPP") : "Pick expected payment date"}
+                        {expectedDate ? format(expectedDate, "PPP") : t("expectedPayment.pickDatePlaceholder")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -182,7 +192,7 @@ export default function ExpectedPaymentsPage() {
                   className="w-full bg-brand-primary hover:bg-brand-dark text-white"
                 >
                   <Save className="mr-2 h-4 w-4" />
-                  {saveExpectedPaymentMutation.isPending ? "Saving..." : "Save Expected Payment Date"}
+                  {saveExpectedPaymentMutation.isPending ? t("expectedPayment.saving") : t("expectedPayment.saveButton")}
                 </Button>
               </Form>
             )}

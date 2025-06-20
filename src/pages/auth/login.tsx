@@ -28,7 +28,6 @@ export default function LoginPage() {
   const handleSubmit = async (values: { email: string; password: string }) => {
     setIsLoading(true)
     try {
-      console.log("Login attempt with:", values)
       await login(values.email, values.password)
       toast({
         title: "Welcome !",

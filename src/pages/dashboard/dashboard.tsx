@@ -31,37 +31,37 @@ export default function DashboardPage() {
   const stats = [
     {
       title: "Total Orders",
-      value: dashboardData?.totalOrders || 0,
+      value: dashboardData?.totalOrderValue || 0,
       icon: Package,
       color: "from-blue-500 to-blue-600",
     },
     {
       title: "Delivered Orders",
-      value: dashboardData?.deliveredOrders || 0,
+      value: dashboardData?.totalDeliveredValue || 0,
       icon: FileText,
       color: "from-green-500 to-green-600",
     },
     {
       title: "Non-Delivered Orders",
-      value: dashboardData?.nonDeliveredOrders || 0,
+      value: dashboardData?.nonDeliveredValue || 0,
       icon: Package,
       color: "from-red-500 to-red-600",
     },
     {
       title: "Total Order Value",
-      value: formatCurrency(dashboardData?.totalOrderValue || 0),
+      value: formatCurrency(dashboardData?.totalCashPickup || 0),
       icon: DollarSign,
       color: "from-brand-primary to-brand-secondary",
     },
     {
       title: "Cash Picked Up",
-      value: formatCurrency(dashboardData?.cashPickedUp || 0),
+      value: formatCurrency(dashboardData?.deliveredCashPickup || 0),
       icon: DollarSign,
       color: "from-purple-500 to-purple-600",
     },
     {
       title: "Cash Not Picked Up",
-      value: formatCurrency(dashboardData?.cashNotPickedUp || 0),
+      value: formatCurrency(dashboardData?.totalNetDue || 0),
       icon: DollarSign,
       color: "from-orange-500 to-orange-600",
     },

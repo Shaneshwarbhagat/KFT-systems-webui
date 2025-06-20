@@ -2,16 +2,16 @@
 
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { customerApi } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { customerApi } from "../../lib/api"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Input } from "../../components/ui/input"
+import { useToast } from "../../hooks/use-toast"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import { Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight, Users } from "lucide-react"
-import { CustomerModal } from "@/components/customers/customer-modal"
-import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
-import { formatDate } from "@/lib/utils"
+import { CustomerModal } from "../../components/customers/customer-modal"
+import { DeleteCustomerDialog } from "../../components/customers/delete-customer-dialog"
+import { formatDate } from "../../lib/utils"
 
 interface Customer {
   id: string
@@ -131,15 +131,15 @@ export default function CustomersPage() {
       {/* Search and Stats */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-96">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
-          />
+          /> */}
         </div>
-        <div className="text-sm text-gray-600">Total: {total} customers</div>
+        <div className="font-semibold text-gray-900 dark:text-white">Total: {total} customers</div>
       </div>
 
       {/* Customers Table */}

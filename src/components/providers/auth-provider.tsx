@@ -61,9 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("Attempting login with:", { email, password })
       const response = await authApi.login({ email, password })
-      console.log("Login response:", response)
+      // console.log("Login response:", response)
 
       if (response.success && response.token) {
         localStorage.setItem("token", response.token)

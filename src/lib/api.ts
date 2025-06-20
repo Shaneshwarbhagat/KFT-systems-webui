@@ -2,9 +2,6 @@ import axios from "axios"
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api' : "http://8.218.174.70:3000/api"
 
-console.log("API_BASE_URL:", API_BASE_URL)
-console.log("NODE_ENV:", process.env.NODE_ENV)
-
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -45,9 +42,7 @@ api.interceptors.response.use(
 export const authApi = {
   login: async (credentials: { email: string; password: string }) => {
     try {
-      console.log("Making login request to:", `${API_BASE_URL}/v1/admin/login`)
       const response = await api.post("/v1/admin/login", credentials)
-      console.log("API Response:", response.data)
       return response.data
     } catch (error: any) {
       console.error("Login API Error:", error.response?.data || error.message)
@@ -172,18 +167,19 @@ export const cashApi = {
 // Expected Payment API
 export const expectedPaymentApi = {
   saveExpectedPayment: async (data: any) => {
-    const response = await api.post("/v1/expected-payment/save", data)
+    console.log("Saving expected payment data:", data)
+    const response = await api.post(`/v1/invoice/`, data)
     return response.data
   },
-  getExpectedPayments: async (params: { page: number; limit: number }) => {
-    const response = await api.get("/v1/expected-payment/list", { params })
-    return response.data
-  },
+  // getExpectedPayments: async (params: { page: number; limit: number }) => {
+  //   const response = await api.get("/v1/expected-payment/list", { params })
+  //   return response.data
+  // },
 }
 
 // MIS API
 export const misApi = {
-  generateReport: async (params: { type: string; fromDate: string; toDate: string; customerName?: string }) => {
+  generateReport: async (params: { type: string; fromDate: string; toDate: string; customerId?: string }) => {
     const response = await api.get("/v1/mis/generate-mis-report", { params })
     return response.data
   },
