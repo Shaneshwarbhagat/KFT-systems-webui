@@ -1,0 +1,16 @@
+{
+  "expectedPayment": {
+    "title": "预期付款日期",
+    "subtitle": "为发票设置预期付款日期",
+    "cardTitle": "设置预期付款日期",
+    "invoiceNumberLabel": "发票编号 *",
+    "selectInvoicePlaceholder": "选择发票编号",
+    "noInvoices": "没有可用的发票",
+    "customerNameLabel": "客户名称",
+    "customerNamePlaceholder": "客户名称将自动填写",
+    "dateLabel": "预期付款日期 *",
+    "pickDatePlaceholder": "选择预期付款日期",
+    "saving": "保存中...",
+    "saveButton": "保存预期付款日期"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "expectedPayment": {
+    "title": "Expected Payment Date",
+    "subtitle": "Set expected payment dates for invoices",
+    "cardTitle": "Set Expected Payment Date",
+    "invoiceNumberLabel": "Invoice Number *",
+    "selectInvoicePlaceholder": "Select invoice number",
+    "noInvoices": "No invoices available",
+    "customerNameLabel": "Customer Name",
+    "customerNamePlaceholder": "Customer name will auto-populate",
+    "dateLabel": "Expected Payment Date *",
+    "pickDatePlaceholder": "Pick expected payment date",
+    "saving": "Saving...",
+    "saveButton": "Save Expected Payment Date"
+  }
+}
