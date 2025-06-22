@@ -12,5 +12,203 @@
     "pickDatePlaceholder": "Pick expected payment date",
     "saving": "Saving...",
     "saveButton": "Save Expected Payment Date"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Welcome ! Here's what's happening with your business.",
+    "card1":"Total Orders",
+    "card2":"Delivered Orders",
+    "card3":"Non-Delivered Orders",
+    "card4":"Total Order Value",
+    "card5":"Cash Picked Up",
+    "card6":"Cash Not Picked Up"
+  },
+  "Invoices":{
+    "title":"Invoices",
+    "subTitle":"Manage your invoices and track payments",
+    "invoiceButton":"Add Invoice",
+    "modal": {
+      "tile":"Create New Invoice",
+      "inputInvoiceNumber":"Invoice Number *",
+      "inputCustomer":"Customer *",
+      "numberAmount":"Amount *",
+      "numberTotalUnits":"Total Units *",
+      "inputInvoiceNumberError":"Invoice number is required",
+      "inputCustomerError":"Customer is required",
+      "numberAmountError":"Amount is required",
+      "inputCurrency":"Currency *",
+      "numberTotalUnitsError":"Total units is required"
+    },
+    "table":{
+      "tableTitle":"Invoice List",
+      "column1":"Invoice Number",
+      "column2":"Customer Email ID",
+      "column3":"Customer Mobile No.",
+      "column4":"Customer",
+      "column5":"Amount",
+      "column6":"Currency",
+      "column7":"Units",
+      "column8":"Date",
+      "column9":"Actions"
+    }
+  },
+  "Orders": {
+    "title":"Orders",
+    "subTitle":"Manage your orders and track deliveries",
+    "orderButton":"Create Order",
+    "modal":{
+      "title":"Create New Order",
+      "selectInvoice":"Invoice Number *",
+      "singleSelect":{
+        "yes":"Yes",
+        "no":"No"
+      },
+      "selectDeliveryUnits":"Delivery Units *",
+      "selectCurrency":"Currency *",
+      "selectDeliveryValue":"Delivery Value *"
+    }
+  },
+  "cashManegement":{
+    "title":"Cash Management",
+    "subTitle":"Manage cash receipts and transactions",
+    "table":{
+      "tableTitle":"Cash Receipts",
+      "column1":"Receipt Number",
+      "column2":"Invoice Number",
+      "column3":"Customer",
+      "column4":"Amount",
+      "column5":"Currency",
+      "column6":"Picked By",
+      "column7":"Pickup Date",
+      "column8":"Status",
+      "column9":"Actions"    
+  },
+  "modal":{
+    "title":"Create Cash Receipt",
+    "subTitle":"Create a new cash receipt",
+    "inputReceiptNumber":"Receipt Number",
+    "selectInvoiceNumber":"Invoice Number",
+    "selectCustomer":"Customer",
+    "numberAmount":"Amount",
+    "inputCurrency":"Currency",
+    "inputPickedBy":"Picked By",
+    "selectPickupTime":"Pickup Time",
+    "inputReceiptNumberError":"Receipt number is required",
+    "selectInvoiceNumberError":"Invoice number is required",
+    "selectCustomerError":"Customer is required",
+    "numberAmountError":"Amount is required",
+    "inputPickedByError":"Picked by is required",
+    "selectPickupTimeError":"Pickup time is required",
+    "selectPickupDate":"Pickup Date",
+    "singleSelect":{
+      "partialDeleviry":"Partial Delivery"
+  },
+
+
+  "cancel": "Cancel",
+  "total":"Total",
+  "page":"Page",
+  "create":"Create",
+  "totalReceipts":"Total Receipts",
+  "customer":"customers",
+  "user":"user"
   }
+
+
+
+},
+"addCustomer":{
+  "title":"Customers",
+  "subtitle":"Manage your customer database",
+  "table":{
+    "title":"Customer List",
+    "column1":"Company Name",
+    "column2":"Contact Person",
+    "column3":"Email",
+  "column4":"City",
+"column5":"Country",
+"column6":"BRN",
+"column7":"Created",
+"column8":"Updated",
+"column9":"Actions"
+  },
+  "modal":{
+    "title":"Create New Customer",
+    "inputCompanyName":"Company Name *",
+    "inputContactPersonName":"Contact Person Name *",
+    "inputEmail":"Email *",
+    "inputContactNumber":"Contact Number *",
+    "inputBrn":"Business Registration Number (BRN) *",
+    "inputCity":"City *",
+    "inputCountry":"Country *",
+    "inputAddress":"Address *",
+    "inputCompanyNameError":"Company name is required",
+    "inputContactPersonNameError":"Contact person name is required",
+    "inputEmailError":"Email is required",
+    "inputContactNumberError":"Contact number is required",
+    "inputBrnError":"Business Registration Number is required",
+    "inputCityError":"City is required",
+    "inputCountryError":"Country is required",
+    "inputAddressEror":"Address is required"
+  }
+},
+"settings":{
+  "updateCurrency":"Update Currency",
+  "misReport":"MIS Report",
+  "changePassword":"Change Password",
+  "language":"Language",
+"createUser":"Create User"
+},
+"updateCurrency":{
+  "title":"Currency Exchange Rates",
+  "hkdToMopError":"HKD to MOP rate is required",
+  "hkdToCnyError":"HKD to CNY rate is required",
+  "updateRates":"Update Rates",
+  "currentExchangeRates":"Current Exchange Rates"
+},
+"misReport":{
+  "title":"MIS Report Generation",
+  "selectStartDate":"Start Date *",
+  "selectEndDate":"End Date *",
+  "selectCustomerName":"Customer Name *",
+  "selectReportType":"Report Type *",
+  "downloadButton":"Download Excel"
+},
+"changePassword":{
+  "title":"Change Password",
+  "inputCurrentPassword":"Current Password",
+  "inputCurrentPasswordError":"Current password is required",
+  "inputNewPassword":"New Password",
+  "inputNewPasswordError":"New password is required",
+  "inputConfirmNewPassword":"Confirm New Password",
+  "inputConfirmNewPasswordError":"Please confirm your password",
+  "changePasswordButton":"Change Password"
+},
+"language":{
+  "title":"Language Settings",
+  "selectLanguage":"Select Language",
+  "inputNote":"Note: Language changes will be applied to the entire application interface."
+},
+"createUser":{
+  "title":"Create New User",
+  "subtitle":"Add a new user to the system",
+  "userInformation":"User Information",
+  "inputNmae":"Name *",
+  "selectRole":"Role *",
+  "inputPhoneNumber":"Phone Number *",
+  "inputEmail":"Email *",
+  "inputPassword":"Password *",
+  "passwordRequirement":"Password must contain at least 8 characters with uppercase, lowercase, number, and special character.",
+  "inputNmaeError":"Name is required",
+  "selectRoleError":"Role is required",
+  "inputPhoneNumberError":"Phone number is required",
+  "inputEmailError":"Email is required",
+  "inputPasswordError":"Password is required"
 }
+
+}
+
+
+
+
+
