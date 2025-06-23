@@ -68,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("token", response.token)
         localStorage.setItem("userEmail", email)
         localStorage.setItem("userName", response.user?.name || "User")
+        localStorage.setItem("userPhone", response.user?.phoneNo || "--")
 
         setUser({
           id: response.user?.userId || "1",

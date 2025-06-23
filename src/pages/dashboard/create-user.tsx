@@ -17,10 +17,10 @@ import { useNavigate } from "react-router-dom"
 const createUserSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   role: Yup.string().required("Role is required"),
-  phoneNumber: Yup.string()
+  phoneNo: Yup.string()
     .matches(/^[+]?[\d\s\-()]{10,}$/, "Please enter a valid phone number")
     .required("Phone number is required"),
-  email: Yup.string().email("Invalid email format").required("Email is required"),
+  emailId: Yup.string().email("Invalid email format").required("Email is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .matches(
@@ -55,7 +55,11 @@ export default function CreateUserPage() {
   })
 
   const handleCreateUser = (values: any, { resetForm }: any) => {
-    createUserMutation.mutate(values, {
+    const payload = {
+      ...values,
+      username: values.phoneNo, // Add the username field based on phoneNo
+    };
+    createUserMutation.mutate(payload, {
       onSuccess: () => resetForm(),
     })
   }
@@ -91,8 +95,8 @@ export default function CreateUserPage() {
             initialValues={{
               name: "",
               role: "",
-              phoneNumber: "",
-              email: "",
+              phoneNo: "",
+              emailId: "",
               password: "",
             }}
             validationSchema={createUserSchema}
@@ -144,38 +148,38 @@ export default function CreateUserPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="phoneNumber" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="phoneNo" className="text-gray-700 dark:text-gray-300">
                       Phone Number *
                     </Label>
                     <Field
                       as={Input}
-                      id="phoneNumber"
-                      name="phoneNumber"
+                      id="phoneNo"
+                      name="phoneNo"
                       placeholder="Enter phone number"
                       className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
-                        errors.phoneNumber && touched.phoneNumber ? "border-red-500" : ""
+                        errors.phoneNo && touched.phoneNo ? "border-red-500" : ""
                       }`}
                     />
-                    {errors.phoneNumber && touched.phoneNumber && (
-                      <p className="text-sm text-red-500">{errors.phoneNumber}</p>
+                    {errors.phoneNo && touched.phoneNo && (
+                      <p className="text-sm text-red-500">{errors.phoneNo}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="emailId" className="text-gray-700 dark:text-gray-300">
                       Email *
                     </Label>
                     <Field
                       as={Input}
-                      id="email"
-                      name="email"
+                      id="emailId"
+                      name="emailId"
                       type="email"
                       placeholder="Enter email address"
                       className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
-                        errors.email && touched.email ? "border-red-500" : ""
+                        errors.emailId && touched.emailId ? "border-red-500" : ""
                       }`}
                     />
-                    {errors.email && touched.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                    {errors.emailId && touched.emailId && <p className="text-sm text-red-500">{errors.emailId}</p>}
                   </div>
                 </div>
 

@@ -19,7 +19,6 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
     email: localStorage.getItem("userEmail") || user?.email || "N/A",
     role: localStorage.getItem("userRole") || user?.role || "N/A",
     phone: localStorage.getItem("userPhone") || "N/A",
-    createdAt: localStorage.getItem("userCreatedAt") || "N/A",
   }
 
   return (
@@ -64,16 +63,6 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                 <div>
                   <p className="text-sm font-medium text-gray-900">Phone Number</p>
                   <p className="text-sm text-gray-600">{userData.phone}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Calendar className="h-5 w-5 text-gray-500" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Member Since</p>
-                  <p className="text-sm text-gray-600">
-                    {userData.createdAt !== "N/A" ? new Date(userData.createdAt).toLocaleDateString() : "N/A"}
-                  </p>
                 </div>
               </div>
             </div>

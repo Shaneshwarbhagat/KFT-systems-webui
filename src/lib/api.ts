@@ -138,8 +138,8 @@ export const currencyApi = {
     const response = await api.get("/v1/currency/list")
     return response.data
   },
-  updateCurrency: async (data: { hkdToMop: number; hkdToCny: number }) => {
-    const response = await api.put("/v1/currency/edit/00000000-0000-0000-0000-000000000001", data)
+  updateCurrency: async (id:string, data: { hkdToMop: number; hkdToCny: number }) => {
+    const response = await api.put(`/v1/currency/edit/${id}`, data)
     return response.data
   },
 }

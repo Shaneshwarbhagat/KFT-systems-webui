@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
@@ -17,7 +17,8 @@ const currencySchema = Yup.object().shape({
 })
 
 export function UpdateCurrencySection() {
-  const { toast } = useToast()
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch current currency rates
   const { data: currencyData } = useQuery({
@@ -25,11 +26,14 @@ export function UpdateCurrencySection() {
     queryFn: currencyApi.getCurrencies,
   })
 
+  const currencyId = currencyData?.currency?.[0]?.id || null;
+
   // Update currency mutation
   const updateCurrencyMutation = useMutation({
     mutationFn: ({ hkdToMop, hkdToCny }: { hkdToMop: number; hkdToCny: number }) =>
-      currencyApi.updateCurrency({ hkdToMop, hkdToCny }),
+      currencyApi.updateCurrency(currencyId, { hkdToMop, hkdToCny }),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currencies"] }) // triggers refetch
       toast({
         title: "Success",
         description: "Currency rates updated successfully",
@@ -111,24 +115,22 @@ export function UpdateCurrencySection() {
         </Formik>
 
         {/* Currency List Display */}
-        {currencyData && (
+        {currencyData?.currency?.length ? (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium text-gray-900 mb-3">Current Exchange Rates</h4>
             <div className="space-y-2">
-              {currencyData.currencies?.map((currency: any, index: number) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">
-                    {currency.fromCurrency} to {currency.toCurrency}:
-                  </span>
-                  <span className="font-medium">{currency.rate}</span>
+              {currencyData?.currency?.map((currency: any, index: number) => (
+                <div key={index} className="space-y-1 text-sm text-gray-600">
+                  <p>1 HKD = {currency?.hkdToMop} MOP</p>
+                  <p>1 HKD = {currency?.hkdToCny} CNY</p>
                 </div>
-              )) || (
-                <div className="space-y-1 text-sm text-gray-600">
-                  <p>1 HKD = 1.03 MOP</p>
-                  <p>1 HKD = 0.91 CNY</p>
-                </div>
-              )}
+              ))}
             </div>
+          </div>
+        ) : (
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h4 className="font-medium text-gray-900 mb-3">Current Exchange Rates</h4>
+            <div className="space-y-2">No currency rate defined</div>
           </div>
         )}
       </CardContent>
