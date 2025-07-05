@@ -10,6 +10,8 @@ export default defineConfig({
     },
   },
   server: {
+    // port: 3000,
+    host: '8.218.174.70',
     port: 3000,
     open: true,
   },
