@@ -6,7 +6,7 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useToast } from "../../hooks/use-toast"
-import { invoiceApi } from "../../lib/api"
+import { invoiceApi, customerApi } from "../../lib/api"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 
@@ -26,6 +26,11 @@ interface InvoiceFormValues {
   totalUnits: number | string;
 }
 
+interface InvoiceEditFormValues {
+  amount: number | string;
+  currency: string;
+}
+
 interface InvoiceModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -40,8 +45,7 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
   // Fetch customers for dropdown
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
-    queryFn: () => invoiceApi.getInvoices({ page: 1, limit: 100 }),
-    enabled: open,
+    queryFn: () => customerApi.getCustomers({ page: 1, limit: 100 }),
   })
 
   // Create/Update mutation
@@ -71,14 +75,16 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
 
 
   const handleSubmit = (values: any) => {
+    const currentDate = new Date().toISOString().split('.')[0] + "Z";
+    const payload = { ...values, invoiceDate: currentDate };
     if (isEditing) {
-      mutation.mutate({ id: invoice.id, ...values })
+      mutation.mutate({ id: invoice.id, ...payload });
     } else {
-      mutation.mutate(values)
+      mutation.mutate(payload);
     }
   }
 
-  const customers = customersData?.data || []
+  const customers = customersData?.customers || []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,6 +95,85 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
           </DialogTitle>
         </DialogHeader>
 
+        {isEditing ? 
+        <>
+          <div className="mt-2">
+            Invoice Number: <span className="text-gray-700 dark:text-gray-300"><b>{invoice?.invoiceNumber || ""}</b></span>
+          </div>
+          <Formik<InvoiceEditFormValues> 
+            initialValues={{
+              amount: invoice?.amount || "",
+              currency: invoice?.currency || "HKD",
+            }}
+            validationSchema={invoiceSchema}
+            onSubmit={handleSubmit}
+            enableReinitialize
+          >
+            {({ errors, touched, setFieldValue, values }) => (
+              <Form className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="amount" className="text-gray-700 dark:text-gray-300">
+                      Amount *
+                    </Label>
+                    <Field
+                      as={Input}
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                        errors.amount && touched.amount ? "border-red-500" : ""
+                      }`}
+                    />
+                    {errors.amount && touched.amount && <p className="text-sm text-red-500">{errors.amount}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="currency" className="text-gray-700 dark:text-gray-300">
+                      Currency *
+                    </Label>
+                    <Select value={values.currency} onValueChange={(value) => setFieldValue("currency", value)}>
+                      <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                        <SelectItem value="HKD" className="text-gray-900 dark:text-gray-100">
+                          HKD
+                        </SelectItem>
+                        <SelectItem value="MOP" className="text-gray-900 dark:text-gray-100">
+                          MOP
+                        </SelectItem>
+                        <SelectItem value="CNY" className="text-gray-900 dark:text-gray-100">
+                          CNY
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                    className="flex-1 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={mutation.isPending}
+                    className="flex-1 bg-brand-primary hover:bg-brand-dark text-white"
+                  >
+                    {mutation.isPending ? "Saving..." : isEditing ? "Update Invoice" : "Create Invoice"}
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </> : 
         <Formik<InvoiceFormValues> 
           initialValues={{
             invoiceNumber: invoice?.invoiceNumber || "",
@@ -228,7 +313,7 @@ export function InvoiceModal({ open, onOpenChange, invoice, onSuccess }: Invoice
               </div>
             </Form>
           )}
-        </Formik>
+        </Formik>}
       </DialogContent>
     </Dialog>
   )

@@ -29,6 +29,7 @@ interface CustomerModalProps {
 }
 
 const customerSchema = Yup.object().shape({
+  customerName: Yup.string().notRequired(),
   companyName: Yup.string().required("Company name is required"),
   address: Yup.string().required("Address is required"),
   city: Yup.string().required("City is required"),
@@ -44,6 +45,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
   const queryClient = useQueryClient()
 
   const initialValues = {
+    customerName: customer?.contactPersonName || "",
     companyName: customer?.companyName || "",
     address: customer?.address || "",
     city: customer?.city || "",
@@ -96,7 +98,8 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
   const handleSubmit = (values: any) => {
     if (mode === "create") {
-      createMutation.mutate(values)
+      let res = {...values, customerName: values.contactPersonName} 
+      createMutation.mutate(res)
     } else if (customer) {
       updateMutation.mutate({ id: customer.id, data: values })
     }

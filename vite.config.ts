@@ -10,10 +10,13 @@ export default defineConfig({
     },
   },
   server: {
-    // port: 3000,
-    host: '0.0.0.0',
+    host: '0.0.0.0', // This allows external access
     port: 3000,
-    open: true,
+    open: false, // Don't auto-open browser on server
+  },
+  preview: {
+    host: '0.0.0.0', // For production preview
+    port: 3000,
   },
   build: {
     outDir: "dist",

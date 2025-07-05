@@ -31,17 +31,18 @@ interface CreateOrderModalProps {
 
 export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModalProps) {
   const [formData, setFormData] = useState({
-    invoiceId: "",
+    invoiceNumber: "",
     partialDelivery: false,
-    deliveryUnits: "",
     currency: "",
-    deliveryValue: "",
+    deliveryUnits: "",
+    amountOfDelivery: "",
+    orderNumber: "",
   })
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  const selectedInvoice = invoices.find((inv) => inv.id === formData.invoiceId)
+  const selectedInvoice = invoices.find((inv) => inv.invoiceNumber === formData.invoiceNumber);
 
   const createMutation = useMutation({
     mutationFn: orderApi.createOrder,
@@ -66,18 +67,19 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
 
   const resetForm = () => {
     setFormData({
-      invoiceId: "",
+      invoiceNumber: "",
       partialDelivery: false,
-      deliveryUnits: "",
       currency: "",
-      deliveryValue: "",
+      deliveryUnits: "",
+      amountOfDelivery: "",
+      orderNumber: "",
     })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.invoiceId || !formData.deliveryUnits || !formData.currency || !formData.deliveryValue) {
+    if (!formData.invoiceNumber || !formData.currency || !formData.deliveryUnits || !formData.amountOfDelivery|| !formData.orderNumber) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -87,11 +89,13 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
     }
 
     const orderData = {
-      invoiceId: formData.invoiceId,
+      invoiceNumber: formData.invoiceNumber,
       partialDelivery: formData.partialDelivery,
-      deliveredUnits: Number.parseInt(formData.deliveryUnits),
+      deliveredUnits: Number(formData.deliveryUnits),
       currency: formData.currency,
-      amountOfDelivery: formData.deliveryValue,
+      amountOfDelivery: Number(formData.amountOfDelivery),
+      orderNumber: formData.orderNumber,
+      customerId: selectedInvoice?.customerId || ""
     }
 
     createMutation.mutate(orderData)
@@ -114,15 +118,15 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
           <div className="space-y-2">
             <Label htmlFor="invoice">Invoice Number *</Label>
             <Select
-              value={formData.invoiceId}
-              onValueChange={(value: any) => setFormData((prev) => ({ ...prev, invoiceId: value }))}
+              value={formData.invoiceNumber}
+              onValueChange={(value: any) => setFormData((prev) => ({ ...prev, invoiceNumber: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select an invoice" />
               </SelectTrigger>
               <SelectContent>
                 {invoices.map((invoice) => (
-                  <SelectItem key={invoice.id} value={invoice.id}>
+                  <SelectItem key={invoice.invoiceNumber} value={invoice.invoiceNumber}>
                     {invoice.invoiceNumber}
                   </SelectItem>
                 ))}
@@ -134,7 +138,7 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
           {selectedInvoice && (
             <div className="space-y-2">
               <Label htmlFor="customer">Customer Name</Label>
-              <Input id="customer" value={selectedInvoice.customer.companyName} disabled className="bg-gray-50" />
+              <Input id="customer" value={selectedInvoice.customer.companyName || selectedInvoice.customer.contactPersonName} disabled className="bg-gray-50" />
             </div>
           )}
 
@@ -165,16 +169,28 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
             </div>
           </div>
 
-          {/* Delivery Units */}
+          {/* Amount of Delivery */}
           <div className="space-y-2">
-            <Label htmlFor="deliveryUnits">Delivery Units *</Label>
+            <Label htmlFor="amountOfDelivery">Amount of Delivery *</Label>
             <Input
-              id="deliveryUnits"
+              id="amountOfDelivery"
               type="number"
-              placeholder="Enter delivery units"
-              value={formData.deliveryUnits}
-              onChange={(e:any) => setFormData((prev) => ({ ...prev, deliveryUnits: e.target.value }))}
+              placeholder="Enter amount of delivery"
+              value={formData.amountOfDelivery}
+              onChange={(e: any) => setFormData((prev) => ({ ...prev, amountOfDelivery: e.target.value }))}
               min="0"
+            />
+          </div>
+
+          {/* Order Number */}
+          <div className="space-y-2">
+            <Label htmlFor="orderNumber">Order Number *</Label>
+            <Input
+              id="orderNumber"
+              type="text"
+              placeholder="Enter order number"
+              value={formData.orderNumber}
+              onChange={(e: any) => setFormData((prev) => ({ ...prev, orderNumber: e.target.value }))}
             />
           </div>
 
@@ -198,14 +214,14 @@ export function CreateOrderModal({ isOpen, onClose, invoices }: CreateOrderModal
 
           {/* Delivery Value */}
           <div className="space-y-2">
-            <Label htmlFor="deliveryValue">Delivery Value *</Label>
+            <Label htmlFor="deliveryUnits">Delivery Value *</Label>
             <Input
-              id="deliveryValue"
+              id="deliveryUnits"
               type="number"
               step="0.01"
               placeholder="Enter delivery value"
-              value={formData.deliveryValue}
-              onChange={(e: any) => setFormData((prev) => ({ ...prev, deliveryValue: e.target.value }))}
+              value={formData.deliveryUnits}
+              onChange={(e: any) => setFormData((prev) => ({ ...prev, deliveryUnits: e.target.value }))}
               min="0"
             />
           </div>

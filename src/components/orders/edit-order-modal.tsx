@@ -4,14 +4,14 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { orderApi } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/hooks/use-toast"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { orderApi } from "../../lib/api"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { Checkbox } from "../../components/ui/checkbox"
+import { useToast } from "../../hooks/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog"
 
 interface Order {
   id: string
@@ -20,7 +20,7 @@ interface Order {
   partialDelivery: boolean
   amountOfDelivery: string
   currency: string
-  deliveredUnits: number
+  customerId: string
   customer: {
     companyName: string
     contactPersonName: string
@@ -36,10 +36,11 @@ interface EditOrderModalProps {
 export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) {
   const [formData, setFormData] = useState({
     deliveryStatus: false,
-    deliveryUnits: "",
     deliveredValue: "",
     currency: "",
   })
+
+  console.log("ORDER:", order)
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -48,7 +49,6 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
     if (order) {
       setFormData({
         deliveryStatus: order.partialDelivery,
-        deliveryUnits: order.deliveredUnits.toString(),
         deliveredValue: order.amountOfDelivery,
         currency: order.currency,
       })
@@ -78,10 +78,10 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!order || !formData.deliveryUnits || !formData.deliveredValue || !formData.currency) {
+    if (!order || !formData.deliveredValue || !formData.currency) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all * required fields",
         variant: "destructive",
       })
       return
@@ -89,9 +89,10 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
 
     const updateData = {
       partialDelivery: formData.deliveryStatus,
-      deliveredUnits: Number.parseInt(formData.deliveryUnits),
-      amountOfDelivery: formData.deliveredValue,
+      amountOfDelivery: Number(formData.deliveredValue),
       currency: formData.currency,
+      customerId: order?.customerId || "",
+      invoiceNumber: order?.invoiceNumber || ""
     }
 
     updateMutation.mutate({ id: order.id, data: updateData })
@@ -144,19 +145,6 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
                 </Label>
               </div>
             </div>
-          </div>
-
-          {/* Delivery Units */}
-          <div className="space-y-2">
-            <Label htmlFor="deliveryUnits">Delivery Units *</Label>
-            <Input
-              id="deliveryUnits"
-              type="number"
-              placeholder="Enter delivery units"
-              value={formData.deliveryUnits}
-              onChange={(e) => setFormData((prev) => ({ ...prev, deliveryUnits: e.target.value }))}
-              min="0"
-            />
           </div>
 
           {/* Delivered Value */}
