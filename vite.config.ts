@@ -11,12 +11,12 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // This allows external access
-    port: 3000,
+    port: 3001,
     open: false, // Don't auto-open browser on server
   },
   preview: {
     host: '0.0.0.0', // For production preview
-    port: 3000,
+    port: 3001,
   },
   build: {
     outDir: "dist",
