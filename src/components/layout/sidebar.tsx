@@ -47,7 +47,7 @@ const navigation = [
     name: "Customer Management",
     href: "/dashboard/customers",
     icon: Users,
-    roles: ["Admin", "Executive"]
+    roles: ["Admin"]
   },
   { name: "User Management", 
     href: "/dashboard/user-management", 
