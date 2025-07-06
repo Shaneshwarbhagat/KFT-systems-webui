@@ -12,11 +12,11 @@ import { Checkbox } from "../ui/checkbox"
 import { useToast } from "../../hooks/use-toast"
 import { cashApi, customerApi, invoiceApi } from "../../lib/api"
 import { LoadingSpinner } from "../ui/loading-spinner"
+import { useEffect, useState } from "react"
 
 const cashSchema = Yup.object().shape({
-  receiptNumber: Yup.string().required("Receipt number is required"),
   invoiceNumber: Yup.string().required("Invoice number is required"),
-  customerId: Yup.string().required("Customer is required"),
+  customerId: Yup.string().notRequired(),
   amount: Yup.number().positive("Amount must be positive").required("Amount is required"),
   currency: Yup.string().required("Currency is required"),
   pickedBy: Yup.string().required("Picked by is required"),
@@ -25,7 +25,6 @@ const cashSchema = Yup.object().shape({
 })
 
 interface CashFormValues {
-  receiptNumber: string;
   invoiceNumber: string;
   customerId: string;
   amount: number | string;
@@ -45,6 +44,7 @@ interface CashModalProps {
 export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const [customerNameId, setCustomerNameId] = useState({customerName: "", customerId: ""})
 
   const { data: customers } = useQuery({
     queryKey: ["customers"],
@@ -100,7 +100,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     if (cash) {
       updateMutation.mutate({ id: cash.id, data: values })
     } else {
-      createMutation.mutate(values)
+      createMutation.mutate({...values, customerId: customerNameId.customerId})
     }
   }
 
@@ -116,7 +116,6 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
 
         <Formik<CashFormValues>
           initialValues={{
-            receiptNumber: cash?.receiptNumber || "",
             invoiceNumber: cash?.invoiceNumber || "",
             customerId: cash?.customerId || "",
             amount: cash?.amount || "",
@@ -129,23 +128,15 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
           validationSchema={cashSchema}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, setFieldValue, values }) => (
-            <Form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="receiptNumber">Receipt Number</Label>
-                  <Field
-                    as={Input}
-                    id="receiptNumber"
-                    name="receiptNumber"
-                    placeholder="REC-001"
-                    className={errors.receiptNumber && touched.receiptNumber ? "border-red-500" : ""}
-                  />
-                  {errors.receiptNumber && touched.receiptNumber && (
-                    <p className="text-sm text-red-500">{errors.receiptNumber}</p>
-                  )}
-                </div>
+          {({ errors, touched, setFieldValue, values }) => {
 
+            useEffect(() => {
+              const invoice = invoices?.invoices?.find((inv:any) => inv.invoiceNumber === values.invoiceNumber)
+              if (invoice) setCustomerNameId({customerName: invoice?.customer?.companyName || invoice?.customer?.contactPersonName || "No customer found", customerId: invoice.customerId})
+            }, [values.invoiceNumber, invoices])
+
+            return <Form className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
                   <Select value={values.invoiceNumber} onValueChange={(value) => setFieldValue("invoiceNumber", value)}>
@@ -167,6 +158,11 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="customerId">Customer Name</Label>
+                <Input value={customerNameId.customerName} readOnly disabled className="bg-gray-100" />
+              </div>
+
+              {/* <div className="space-y-2">
                 <Label htmlFor="customerId">Customer</Label>
                 <Select value={values.customerId} onValueChange={(value) => setFieldValue("customerId", value)}>
                   <SelectTrigger>
@@ -181,7 +177,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   </SelectContent>
                 </Select>
                 {errors.customerId && touched.customerId && <p className="text-sm text-red-500">{errors.customerId}</p>}
-              </div>
+              </div> */}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -260,8 +256,9 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   checked={values.partialDelivery}
                   onCheckedChange={(checked) => setFieldValue("partialDelivery", checked)}
                 />
-                <Label htmlFor="partialDelivery">Partial Delivery</Label>
+                <Label htmlFor="partialDelivery">Partial Payment</Label>
               </div>
+              <div className="text-xs italic">By default it is not partial payment, checkmark if have partial payment  </div>
 
               <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -281,7 +278,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                 </Button>
               </div>
             </Form>
-          )}
+          }}
         </Formik>
       </DialogContent>
     </Dialog>

@@ -66,7 +66,7 @@ export default function LoginPage() {
 
         <CardContent className="space-y-6">
           <Formik
-            initialValues={{ email: "sam@brightdiva.com", password: "Sam123789" }}
+            initialValues={{ email: "", password: "" }}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}
           >

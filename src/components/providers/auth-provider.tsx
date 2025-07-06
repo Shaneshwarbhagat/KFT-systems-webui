@@ -34,12 +34,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             const userEmail = localStorage.getItem("userEmail")
             const userName = localStorage.getItem("userName")
+            const userRole = localStorage.getItem("userRole")
 
             if (userEmail) {
               setUser({
                 id: "1",
                 email: userEmail,
                 name: userName || "User",
+                role: userRole || "--"
               })
             }
           } catch (error) {
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem("token")
             localStorage.removeItem("userEmail")
             localStorage.removeItem("userName")
+            localStorage.removeItem("userRole")
           }
         }
       } catch (error) {
@@ -69,12 +72,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("userEmail", email)
         localStorage.setItem("userName", response.user?.name || "User")
         localStorage.setItem("userPhone", response.user?.phoneNo || "--")
+        localStorage.setItem("userRole", response.user?.role || "--")
 
         setUser({
           id: response.user?.userId || "1",
           email: email,
           name: response.user?.name || "User",
-          role: response.user?.role || "admin",
+          role: response.user?.role || "",
         })
       } else {
         throw new Error(response.message || "Login failed")
@@ -94,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("token")
       localStorage.removeItem("userEmail")
       localStorage.removeItem("userName")
+      localStorage.removeItem("userPhone")
+      localStorage.removeItem("userRole")
       setUser(null)
     }
   }

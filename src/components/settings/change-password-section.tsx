@@ -8,6 +8,7 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { useToast } from "../../hooks/use-toast"
 import { authApi } from "../../lib/api"
+import { useAuth } from "../../hooks/use-auth"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 import { Lock, Eye, EyeOff } from "lucide-react"
@@ -16,7 +17,7 @@ const changePasswordSchema = Yup.object().shape({
   oldPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain uppercase, lowercase, and number")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, "Password must contain uppercase, lowercase, and number")
     .required("New password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword")], "Passwords must match")
@@ -28,6 +29,7 @@ export function ChangePasswordSection() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { toast } = useToast()
+  const { user } = useAuth()
 
   // Change password mutation
   const changePasswordMutation = useMutation({
@@ -36,7 +38,6 @@ export function ChangePasswordSection() {
       toast({
         title: "Success",
         description: "Password changed successfully",
-        className: "bg-success text-white",
       })
     },
     onError: (error: any) => {
@@ -49,7 +50,12 @@ export function ChangePasswordSection() {
   })
 
   const handlePasswordChange = (values: any, { resetForm }: any) => {
-    changePasswordMutation.mutate(values, {
+    // Only send oldPassword and newPassword to API
+    const payload = {
+      oldPassword: values.oldPassword,
+      newPassword: values.newPassword,
+    }
+    changePasswordMutation.mutate(payload, {
       onSuccess: () => resetForm(),
     })
   }
@@ -75,7 +81,9 @@ export function ChangePasswordSection() {
           {({ errors, touched }) => (
             <Form className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="oldPassword">Current Password</Label>
+                <Label htmlFor="oldPassword">
+                  Current Password *
+                </Label>
                 <div className="relative">
                   <Field
                     as={Input}
@@ -83,7 +91,7 @@ export function ChangePasswordSection() {
                     name="oldPassword"
                     type={showOldPassword ? "text" : "password"}
                     placeholder="Enter current password"
-                    className={errors.oldPassword && touched.oldPassword ? "border-red-500 pr-10" : "pr-10"}
+                    className={`pr-10 ${errors.oldPassword && touched.oldPassword ? "border-red-500" : ""}`}
                   />
                   <Button
                     type="button"
@@ -101,7 +109,9 @@ export function ChangePasswordSection() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
+                <Label htmlFor="newPassword">
+                  New Password *
+                </Label>
                 <div className="relative">
                   <Field
                     as={Input}
@@ -109,7 +119,7 @@ export function ChangePasswordSection() {
                     name="newPassword"
                     type={showNewPassword ? "text" : "password"}
                     placeholder="Enter new password"
-                    className={errors.newPassword && touched.newPassword ? "border-red-500 pr-10" : "pr-10"}
+                    className={`pr-10 ${errors.newPassword && touched.newPassword ? "border-red-500" : ""}`}
                   />
                   <Button
                     type="button"
@@ -127,7 +137,9 @@ export function ChangePasswordSection() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword">
+                  Confirm New Password *
+                </Label>
                 <div className="relative">
                   <Field
                     as={Input}
@@ -135,7 +147,9 @@ export function ChangePasswordSection() {
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm new password"
-                    className={errors.confirmPassword && touched.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                    className={`pr-10 ${
+                      errors.confirmPassword && touched.confirmPassword ? "border-red-500" : ""
+                    }`}
                   />
                   <Button
                     type="button"
@@ -152,11 +166,7 @@ export function ChangePasswordSection() {
                 )}
               </div>
 
-              <Button
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-                className="w-full bg-brand-primary hover:bg-brand-dark text-white"
-              >
+              <Button type="submit" disabled={changePasswordMutation.isPending} className="w-full bg-brand-primary hover:bg-brand-dark text-white">
                 {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
               </Button>
             </Form>

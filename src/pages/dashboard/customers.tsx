@@ -168,10 +168,10 @@ export default function CustomersPage() {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="rounded-md border border-border overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-gray-50 dark:bg-gray-700/50">
                     <TableHead>Company Name</TableHead>
                     <TableHead>Contact Person</TableHead>
                     <TableHead>Email</TableHead>

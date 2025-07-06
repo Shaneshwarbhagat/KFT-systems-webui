@@ -93,10 +93,10 @@ export default function CashPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="rounded-md border border-border overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-gray-50 dark:bg-gray-700/50">
                   <TableHead>Receipt Number</TableHead>
                   <TableHead>Invoice Number</TableHead>
                   <TableHead>Customer</TableHead>

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "../../lib/utils"
+import { useAuth } from "../../hooks/use-auth"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import {
@@ -14,6 +15,7 @@ import {
   Receipt,
   Truck,
   Calendar,
+  UserCog,
 } from "lucide-react"
 
 const navigation = [
@@ -21,36 +23,51 @@ const navigation = [
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    roles: ["Admin", "Executive"]
   },
   {
     name: "Invoices",
     href: "/dashboard/invoices",
     icon: FileText,
+    roles: ["Admin", "Executive"]
   },
   {
     name: "Delivery Order",
     href: "/dashboard/orders",
     icon: Truck,
+    roles: ["Admin", "Executive"]
   },
   {
     name: "Cash Receipt",
     href: "/dashboard/cash",
     icon: Receipt,
+    roles: ["Admin", "Executive"]
   },
   {
-    name: "Add Customer",
+    name: "Customer Management",
     href: "/dashboard/customers",
     icon: Users,
+    roles: ["Admin", "Executive"]
+  },
+  { name: "User Management", 
+    href: "/dashboard/user-management", 
+    icon: UserCog, 
+    roles: ["Admin"],
   },
   {
     name: "Expected Payment Date",
     href: "/dashboard/expected-payments",
     icon: Calendar,
+    roles: ["Admin", "Executive"]
   },
 ]
 
 export function Sidebar() {
   const location = useLocation()
+  const { user } = useAuth()
+  // Show all navigation items if user is not loaded yet (prevents sidebar from disappearing on reload)
+  const userRole = user?.role || "Admin" // Default to Admin to show all items during loading
+  const filteredNavigation = navigation.filter((item) => item.roles.includes(userRole))
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -79,7 +96,7 @@ export function Sidebar() {
 
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-2">
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const isActive = location.pathname === item.href
             return (
               <Link

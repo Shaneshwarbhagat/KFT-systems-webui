@@ -55,11 +55,7 @@ export function Header({ onSearch }: HeaderProps) {
   }
 
   const handleSettingClick = (component: string) => {
-    if (component === "createUser") {
-      navigate("/dashboard/create-user")
-    } else {
-      setActiveSettingComponent(component)
-    }
+    setActiveSettingComponent(component)
   }
 
   // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,13 +145,6 @@ export function Header({ onSearch }: HeaderProps) {
                 >
                   <Globe className="mr-2 h-4 w-4" />
                   Language
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleSettingClick("createUser")}
-                  className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Create User
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
