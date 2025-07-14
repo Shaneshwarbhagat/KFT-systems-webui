@@ -32,7 +32,7 @@ export default function LoginPage() {
       toast({
         title: "Welcome !",
         description: "You have successfully logged in to KFT Management System",
-        className: "bg-success/10 border-success text-success-foreground",
+        className: "bg-success text-white",
       })
       navigate("/dashboard")
     } catch (error: any) {
@@ -132,14 +132,14 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <Link
                     to="/forgot-password"
                     className="text-sm text-brand-primary hover:text-brand-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 rounded"
                   >
                     Forgot your password?
                   </Link>
-                </div>
+                </div> */}
 
                 <Button
                   type="submit"

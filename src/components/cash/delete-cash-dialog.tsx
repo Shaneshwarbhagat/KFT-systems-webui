@@ -32,6 +32,7 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
       toast({
         title: "Success",
         description: "Cash receipt deleted successfully",
+        className: "bg-success text-white"
       })
       onOpenChange(false)
     },

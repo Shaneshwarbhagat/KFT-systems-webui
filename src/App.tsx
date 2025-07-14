@@ -4,7 +4,6 @@ import { AuthProvider } from "./components/providers/auth-provider"
 import { ThemeProvider } from "./components/providers/theme-provider"
 import { Toaster } from "./components/ui/toaster"
 import { ErrorBoundary } from "./components/error-boundary"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 // Pages
 import LoginPage from "./pages/auth/login"
@@ -20,15 +19,6 @@ import AdminPage from "./pages/dashboard/admin"
 import ExpectedPaymentsPage from "./pages/dashboard/expected-payments"
 import ProtectedRoute from "./components/auth/protected-route"
 import UserManagementPage from "./pages/dashboard/user-management"
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-})
 
 function App() {
   return (

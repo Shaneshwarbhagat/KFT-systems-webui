@@ -43,8 +43,8 @@ const createUserSchema = Yup.object().shape({
       schema
         .min(8, "Password must be at least 8 characters")
         .matches(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-          "Password must contain uppercase, lowercase, number, and special character",
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])/,
+          "Password must contain uppercase, lowercase, number and special character(@#$!%*?&)",
         )
         .required("Password is required"),
     otherwise: (schema) =>
@@ -78,6 +78,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
       toast({
         title: "Success",
         description: "User created successfully",
+        className: "bg-success text-white"
       })
       onClose()
     },
@@ -97,6 +98,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
       toast({
         title: "Success",
         description: "User updated successfully",
+        className: "bg-success text-white"
       })
       onClose()
     },

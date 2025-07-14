@@ -8,7 +8,6 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { useToast } from "../../hooks/use-toast"
 import { authApi } from "../../lib/api"
-import { useAuth } from "../../hooks/use-auth"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 import { Lock, Eye, EyeOff } from "lucide-react"
@@ -17,7 +16,7 @@ const changePasswordSchema = Yup.object().shape({
   oldPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, "Password must contain uppercase, lowercase, and number")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])/, "Password must contain uppercase, lowercase, number and special character(@$!%*?&)")
     .required("New password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword")], "Passwords must match")
@@ -29,7 +28,6 @@ export function ChangePasswordSection() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { toast } = useToast()
-  const { user } = useAuth()
 
   // Change password mutation
   const changePasswordMutation = useMutation({
@@ -37,26 +35,60 @@ export function ChangePasswordSection() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Password changed successfully",
+        description: "Password changed successfully. Please login again with your new password.",
+        duration: 3000,
+        className: "bg-success text-white",
       })
     },
     onError: (error: any) => {
+      console.error("Password change error:", error)
       toast({
         title: "Error",
         description: error.response?.data?.message || "Failed to change password",
         variant: "destructive",
+        duration: 5000,
       })
     },
   })
 
-  const handlePasswordChange = (values: any, { resetForm }: any) => {
+  const handlePasswordChange = (values: any, { resetForm, setFieldError }: any) => {
+    // Check if new password is different from old password
+    if (values.oldPassword === values.newPassword) {
+      setFieldError("newPassword", "New password must be different from current password")
+      toast({
+        title: "Error",
+        description: "New password must be different from current password",
+        variant: "destructive",
+      })
+      return
+    }
+
     // Only send oldPassword and newPassword to API
     const payload = {
       oldPassword: values.oldPassword,
       newPassword: values.newPassword,
     }
     changePasswordMutation.mutate(payload, {
-      onSuccess: () => resetForm(),
+      onSuccess: () => {
+        resetForm()
+        toast({
+          title: "Success",
+          description: "Password changed successfully. Please login again with your new password.",
+          className: "bg-success text-white",
+        })
+      },
+      onError: (error: any) => {
+        // Handle server-side validation errors
+        if (error.response?.data?.message?.includes("current password")) {
+          setFieldError("oldPassword", "Current password is incorrect")
+        }
+        // Show error toast but don't redirect
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || "Failed to change password",
+          variant: "destructive",
+        })
+      },
     })
   }
 
@@ -78,7 +110,7 @@ export function ChangePasswordSection() {
           validationSchema={changePasswordSchema}
           onSubmit={handlePasswordChange}
         >
-          {({ errors, touched }) => (
+          {({ errors, touched}) => (
             <Form className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="oldPassword">
@@ -134,6 +166,9 @@ export function ChangePasswordSection() {
                 {errors.newPassword && touched.newPassword && (
                   <p className="text-sm text-red-500">{errors.newPassword}</p>
                 )}
+                <p className="text-xs text-gray-500">
+                  Password must contain at least 8 characters with uppercase, lowercase, number and special character
+                </p>
               </div>
 
               <div className="space-y-2">

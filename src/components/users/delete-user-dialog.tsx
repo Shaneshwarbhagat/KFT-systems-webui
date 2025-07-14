@@ -28,7 +28,7 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, userName, isLoadi
         <AlertDialogHeader>
           <AlertDialogTitle className="text-foreground">Delete User</AlertDialogTitle>
           <AlertDialogDescription className="text-muted-foreground">
-            Are you sure you want to delete user "{userName}"? This action cannot be undone and will permanently remove
+            Are you sure you want to delete user "<span className="font-semibold text-gray-900">{userName}</span>"? This action cannot be undone and will permanently remove
             the user from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>

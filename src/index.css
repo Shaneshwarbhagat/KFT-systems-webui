@@ -24,6 +24,10 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 195 100% 39%;
     --radius: 0.75rem;
+    --mui-background: hsl(var(--background));
+    --mui-border: hsl(var(--border));
+    --mui-ring: hsl(var(--ring));
+    --mui-foreground: hsl(var(--foreground));
 
     /* Custom brand colors */
     --brand-primary: 195 100% 39%;
@@ -66,7 +70,8 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Helvetica Neue", Arial, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -157,6 +162,29 @@
   background-image: linear-gradient(rgba(36, 54, 54, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(36, 54, 54, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+.MuiOutlinedInput-root {
+  background-color: var(--mui-background) !important;
+}
+.MuiOutlinedInput-root fieldset {
+  border-color: var(--mui-border) !important;
+}
+.MuiOutlinedInput-root:hover fieldset {
+  border-color: var(--mui-border) !important;
+}
+.MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: var(--mui-ring) !important;
+}
+.MuiInputLabel-root {
+  color: var(--mui-foreground) !important;
+}
+.MuiInputBase-input {
+  color: var(--mui-foreground) !important;
+}
+.MuiPopper-root {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
 }
 
 /* High contrast mode support */

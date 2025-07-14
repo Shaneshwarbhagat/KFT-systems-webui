@@ -200,16 +200,16 @@ export default function CustomersPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEdit(customer)}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                             title="Edit Customer"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 " />
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleDelete(customer)}
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                             title="Delete Customer"
                           >
                             <Trash2 className="h-4 w-4" />

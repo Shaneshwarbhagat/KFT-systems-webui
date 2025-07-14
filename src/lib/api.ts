@@ -181,23 +181,18 @@ export const cashApi = {
   },
 }
 
-// Expected Payment API
-export const expectedPaymentApi = {
-  saveExpectedPayment: async (data: any) => {
-    console.log("Saving expected payment data:", data)
-    const response = await api.post(`/v1/invoice/`, data)
-    return response.data
-  },
-  // getExpectedPayments: async (params: { page: number; limit: number }) => {
-  //   const response = await api.get("/v1/expected-payment/list", { params })
-  //   return response.data
-  // },
-}
-
 // MIS API
 export const misApi = {
   generateReport: async (params: { type: string; fromDate: string; toDate: string; customerId?: string }) => {
     const response = await api.get("/v1/mis/generate-mis-report", { params })
+    return response.data
+  },
+}
+
+// Expected Payment API
+export const expectedPaymentApi = {
+  saveExpectedPayment: async (id: string, data: any) => {
+    const response = await api.put(`/v1/invoice/edit/${id}`, data)
     return response.data
   },
 }

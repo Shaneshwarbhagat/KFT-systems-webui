@@ -70,6 +70,7 @@ export default function UserManagementPage() {
       toast({
         title: "Success",
         description: "User deleted successfully",
+        className: "bg-success text-white"
       })
       setIsDeleteDialogOpen(false)
       setSelectedUser(null)
@@ -255,7 +256,7 @@ export default function UserManagementPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(user)}
-                            className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                             title="Edit User"
                           >
                             <Edit className="h-4 w-4" />

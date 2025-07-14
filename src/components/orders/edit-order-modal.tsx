@@ -1,110 +1,126 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { orderApi } from "../../lib/api"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { Checkbox } from "../../components/ui/checkbox"
-import { useToast } from "../../hooks/use-toast"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog"
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { orderApi } from "../../lib/api";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Checkbox } from "../../components/ui/checkbox";
+import { useToast } from "../../hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 
 interface Order {
-  id: string
-  orderNumber: string
-  invoiceNumber: string
-  partialDelivery: boolean
-  amountOfDelivery: string
-  currency: string
-  customerId: string
+  id: string;
+  orderNumber: string;
+  invoiceNumber: string;
+  partialDelivery: boolean;
+  amountOfDelivery: string;
+  currency: string;
+  customerId: string;
   customer: {
-    companyName: string
-    contactPersonName: string
-  }
+    companyName: string;
+    contactPersonName: string;
+  };
 }
 
 interface EditOrderModalProps {
-  isOpen: boolean
-  onClose: () => void
-  order: Order | null
+  isOpen: boolean;
+  onClose: () => void;
+  order: Order | null;
 }
 
-export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) {
+export function EditOrderModal({
+  isOpen,
+  onClose,
+  order,
+}: EditOrderModalProps) {
   const [formData, setFormData] = useState({
     deliveryStatus: false,
     deliveredValue: "",
     currency: "",
-  })
+  });
 
-  console.log("ORDER:", order)
-
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (order) {
       setFormData({
         deliveryStatus: order.partialDelivery,
-        deliveredValue: order.amountOfDelivery,
+        deliveredValue: parseFloat(order.amountOfDelivery).toFixed(2),
         currency: order.currency,
-      })
+      });
     }
-  }, [order])
+  }, [order]);
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => orderApi.updateOrder(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      orderApi.updateOrder(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast({
         title: "Success",
         description: "Order updated successfully",
         className: "bg-success text-white",
-      })
-      onClose()
+      });
+      onClose();
     },
     onError: (error: any) => {
       toast({
         title: "Error",
         description: error.response?.data?.message || "Failed to update order",
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!order || !formData.deliveredValue || !formData.currency) {
       toast({
         title: "Error",
         description: "Please fill in all * required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     const updateData = {
       partialDelivery: formData.deliveryStatus,
-      amountOfDelivery: Number(formData.deliveredValue),
+      amountOfDelivery: Number(parseFloat(formData.deliveredValue).toFixed(2)),
       currency: formData.currency,
       customerId: order?.customerId || "",
-      invoiceNumber: order?.invoiceNumber || ""
-    }
+      invoiceNumber: order?.invoiceNumber || "",
+    };
 
-    updateMutation.mutate({ id: order.id, data: updateData })
-  }
+    updateMutation.mutate({ id: order.id, data: updateData });
+  };
 
-  if (!order) return null
+  if (!order) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900">Edit Order</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900">
+            Edit Order
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -116,19 +132,23 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
             </div>
             <div className="flex justify-between">
               <span className="font-medium text-gray-700">Company Name:</span>
-              <span className="text-gray-900">{order.customer.companyName}</span>
+              <span className="text-gray-900">
+                {order.customer.companyName}
+              </span>
             </div>
           </div>
 
           {/* Delivery Status */}
           <div className="space-y-3">
-            <Label>Delivery Status</Label>
+            <Label>Partial Delivery</Label>
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="status-yes"
                   checked={formData.deliveryStatus === true}
-                  onCheckedChange={() => setFormData((prev) => ({ ...prev, deliveryStatus: true }))}
+                  onCheckedChange={() =>
+                    setFormData((prev) => ({ ...prev, deliveryStatus: true }))
+                  }
                 />
                 <Label htmlFor="status-yes" className="text-sm font-normal">
                   Yes
@@ -138,7 +158,9 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
                 <Checkbox
                   id="status-no"
                   checked={formData.deliveryStatus === false}
-                  onCheckedChange={() => setFormData((prev) => ({ ...prev, deliveryStatus: false }))}
+                  onCheckedChange={() =>
+                    setFormData((prev) => ({ ...prev, deliveryStatus: false }))
+                  }
                 />
                 <Label htmlFor="status-no" className="text-sm font-normal">
                   No
@@ -155,8 +177,17 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
               type="number"
               step="0.01"
               placeholder="Enter delivered value"
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                const rounded = parseFloat(e.target.value).toFixed(2);
+                setFormData((prev)=>({...prev, deliveredValue: rounded}));
+              }}
               value={formData.deliveredValue}
-              onChange={(e) => setFormData((prev) => ({ ...prev, deliveredValue: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  deliveredValue: e.target.value,
+                }))
+              }
               min="0"
             />
           </div>
@@ -166,7 +197,9 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
             <Label htmlFor="currency">Currency *</Label>
             <Select
               value={formData.currency}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, currency: value }))}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, currency: value }))
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select currency" />
@@ -181,7 +214,12 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={updateMutation.isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={updateMutation.isPending}
+            >
               Cancel
             </Button>
             <Button
@@ -195,5 +233,5 @@ export function EditOrderModal({ isOpen, onClose, order }: EditOrderModalProps) 
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

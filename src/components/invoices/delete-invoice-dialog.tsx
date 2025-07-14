@@ -26,7 +26,7 @@ export function DeleteInvoiceDialog({ open, onOpenChange, invoice, onConfirm, is
         <AlertDialogHeader>
           <AlertDialogTitle className="text-gray-900 dark:text-white">Delete Invoice</AlertDialogTitle>
           <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete invoice "{invoice?.invoiceNumber}"? This action cannot be undone.
+            Are you sure you want to delete invoice <span className="font-semibold text-gray-900">"{invoice?.invoiceNumber}"</span>? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
