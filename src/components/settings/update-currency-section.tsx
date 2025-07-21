@@ -37,7 +37,7 @@ export function UpdateCurrencySection() {
       toast({
         title: "Success",
         description: "Currency rates updated successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       })
     },
     onError: (error: any) => {

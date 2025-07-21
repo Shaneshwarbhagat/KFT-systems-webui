@@ -32,7 +32,7 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     const restrictedPaths = ["/dashboard/customers", "/dashboard/user-management"]
     const currentPath = location.pathname
 
-    if (restrictedPaths.includes(currentPath)) {
+    if (restrictedPaths.some((path) => currentPath.startsWith(path))) {
       return <Navigate to="/dashboard" replace />
     }
   }

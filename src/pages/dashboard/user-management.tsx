@@ -70,7 +70,7 @@ export default function UserManagementPage() {
       toast({
         title: "Success",
         description: "User deleted successfully",
-        className: "bg-success text-white"
+        className: "bg-success text-white [&_button]:text-white"
       })
       setIsDeleteDialogOpen(false)
       setSelectedUser(null)
@@ -148,7 +148,7 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

@@ -20,7 +20,7 @@ export function LanguageSection() {
     toast({
       title: "Language Updated",
       description: `Language changed to ${language === "en" ? "English" : "Chinese"}`,
-      className: "bg-success text-white",
+      className: "bg-success text-white [&_button]:text-white",
     })
   }
 

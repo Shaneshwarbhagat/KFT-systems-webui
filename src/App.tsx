@@ -7,8 +7,7 @@ import { ErrorBoundary } from "./components/error-boundary"
 
 // Pages
 import LoginPage from "./pages/auth/login"
-import ForgotPasswordPage from "./pages/auth/forgot-password"
-import ResetPasswordPage from "./pages/auth/reset-password"
+// import ForgotPasswordPage from "./pages/auth/forgot-password"
 import DashboardLayout from "./components/layout/dashboard-layout"
 import DashboardPage from "./pages/dashboard/dashboard"
 import InvoicesPage from "./pages/dashboard/invoices"
@@ -30,8 +29,7 @@ function App() {
               <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
 
                 {/* Protected Routes */}
                 <Route

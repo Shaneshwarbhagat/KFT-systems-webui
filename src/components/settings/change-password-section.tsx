@@ -11,6 +11,8 @@ import { authApi } from "../../lib/api"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 import { Lock, Eye, EyeOff } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../hooks/use-auth"
 
 const changePasswordSchema = Yup.object().shape({
   oldPassword: Yup.string().required("Current password is required"),
@@ -27,7 +29,9 @@ export function ChangePasswordSection() {
   const [showOldPassword, setShowOldPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const { logout } = useAuth()
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   // Change password mutation
   const changePasswordMutation = useMutation({
@@ -37,11 +41,16 @@ export function ChangePasswordSection() {
         title: "Success",
         description: "Password changed successfully. Please login again with your new password.",
         duration: 3000,
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       })
+      localStorage.clear()
+      // Redirect to login after success
+      setTimeout(() => {
+        logout()
+        navigate("/login")
+      }, 1000)
     },
     onError: (error: any) => {
-      console.error("Password change error:", error)
       toast({
         title: "Error",
         description: error.response?.data?.message || "Failed to change password",
@@ -74,7 +83,7 @@ export function ChangePasswordSection() {
         toast({
           title: "Success",
           description: "Password changed successfully. Please login again with your new password.",
-          className: "bg-success text-white",
+          className: "bg-success text-white [&_button]:text-white",
         })
       },
       onError: (error: any) => {

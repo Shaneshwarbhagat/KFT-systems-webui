@@ -118,13 +118,13 @@ export function Header({ onSearch }: HeaderProps) {
                 align="end"
                 className="w-56 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
               >
-                <DropdownMenuItem
+                {user?.role?.toLowerCase() === "admin" && <DropdownMenuItem
                   onClick={() => handleSettingClick("currency")}
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <DollarSign className="mr-2 h-4 w-4" />
                   Update Currency
-                </DropdownMenuItem>
+                </DropdownMenuItem>}
                 <DropdownMenuItem
                   onClick={() => handleSettingClick("mis")}
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"

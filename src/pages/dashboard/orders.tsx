@@ -25,12 +25,14 @@ import {
   DollarSign,
   Calendar,
   Building,
+  CoinsIcon,
 } from "lucide-react";
 import { CreateOrderModal } from "../../components/orders/create-order-modal";
 import { EditOrderModal } from "../../components/orders/edit-order-modal";
 import { DeleteOrderDialog } from "../../components/orders/delete-order-dialog";
 import { useAuth } from "../../hooks/use-auth";
 import { formatDate } from "../../lib/utils";
+import Tooltip from "@mui/material/Tooltip";
 
 interface Order {
   id: string;
@@ -100,7 +102,7 @@ export default function OrdersPage() {
       toast({
         title: "Success",
         description: "Order deleted successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       setIsDeleteDialogOpen(false);
       setSelectedOrder(null);
@@ -310,7 +312,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -387,35 +389,55 @@ export default function OrdersPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {orders.map((order: Order) => (
-            <Card
+          {orders.map((order: Order) => {
+             const deliveredValue = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).remainingAmount;
+             const totalPaidAmount = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).totalPaidAmount;
+
+            return <Card
               key={order.id}
               className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-brand-secondary"
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="p-4 pb-3">
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="w-[62%] pr-1">
                     <CardTitle className="text-lg font-semibold text-gray-900">
                       {order.orderNumber}
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 mt-1 break-words">
                       Invoice: {order.invoiceNumber}
                     </p>
                   </div>
-                  <Badge
-                    variant={order.partialDelivery ? "default" : "secondary"}
-                    className={
-                      order.partialDelivery
-                        ? "bg-brand-secondary text-white"
-                        : ""
-                    }
-                  >
-                    {order.partialDelivery ? "Partial" : "Full"}
-                  </Badge>
+                  <div className="w-[40%] text-right">
+                    <Tooltip title="Order Delivery status" placement="top">
+                      <Badge
+                        variant={order.partialDelivery ? "default" : "secondary"}
+                        className={
+                          order.partialDelivery
+                            ? "bg-brand-secondary text-white"
+                            : ""
+                        }
+                      >
+                      {order.partialDelivery ? "Partial" : "Full"}
+                    </Badge>
+                    </Tooltip>
+                    <Tooltip title="Payment Status" placement="bottom">
+                      <Badge
+                        variant={deliveredValue == 0 ? "secondary" : totalPaidAmount == 0 ? "default" : "outline"}
+                        className={
+                          `${deliveredValue == 0 ? "bg-green-600 text-white hover:bg-green-500" 
+                            : totalPaidAmount == 0 ? "text-white bg-red-500 hover:bg-red-500" 
+                            : ""} mt-2`
+                        }
+                      >
+                        {deliveredValue === 0 ? "Complete" : totalPaidAmount == 0 ? "Incomplete" : "Partial"}
+                      </Badge>
+                    </Tooltip>
+                  </div>
+                  
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-4 pt-0">
                 {/* Customer Info */}
                 <div className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-gray-400" />
@@ -424,14 +446,14 @@ export default function OrdersPage() {
                       {order.customer.companyName}
                     </p>
                     <p className="text-xs text-gray-600">
-                      {order.customer.contactPersonName}
+                      Contact Person: {order.customer.contactPersonName}
                     </p>
                   </div>
                 </div>
 
                 {/* Amount Info */}
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-gray-400" />
+                  <CoinsIcon className="h-4 w-4 text-gray-400" />
                   <div>
                     <p className="font-medium text-sm text-gray-900">
                       {Number.parseFloat(order.amountOfDelivery).toFixed(2)} {order.currency}
@@ -446,7 +468,14 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    {formatDate(order.createdAt)}
+                    Created at: {formatDate(order.createdAt)}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-gray-400" />
+                  <p className="text-sm text-gray-600">
+                    Amount in HKD:{Number.parseFloat(order.amountInHkd).toFixed(2)}
                   </p>
                 </div>
 
@@ -486,7 +515,7 @@ export default function OrdersPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          })}
         </div>
       )}
 

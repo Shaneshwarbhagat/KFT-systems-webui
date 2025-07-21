@@ -58,7 +58,7 @@ export default function ExpectedPaymentsPage() {
       toast({
         title: "Success",
         description: "Expected payment date saved successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["expected-payments"] });
     },

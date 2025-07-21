@@ -32,7 +32,7 @@ export default function LoginPage() {
       toast({
         title: "Welcome !",
         description: "You have successfully logged in to KFT Management System",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       })
       navigate("/dashboard")
     } catch (error: any) {

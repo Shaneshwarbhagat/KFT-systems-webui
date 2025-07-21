@@ -22,7 +22,7 @@ import {
 } from "../ui/select";
 import { Checkbox } from "../ui/checkbox";
 import { useToast } from "../../hooks/use-toast";
-import { cashApi, invoiceApi } from "../../lib/api";
+import { cashApi, currencyApi, invoiceApi } from "../../lib/api";
 import { LoadingSpinner } from "../ui/loading-spinner";
 import { useEffect, useState } from "react";
 
@@ -44,7 +44,7 @@ interface CashFormValues {
   amount: number | string;
   currency: string;
   pickedBy: string;
-  cashPickupDate: string; // ISO date string
+  cashPickupDate: string;
   pickupTime: string;
   partialDelivery: boolean;
 }
@@ -61,30 +61,86 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
   const [selectedInvoiceDetails, setSelectedInvoiceDetails] = useState({
     customerName: "",
     paymentStatus: "",
+    remainingAmount: 0,
+  });
+  const [currencyRates, setCurrencyRates] = useState({
+    hkdToMop: 1.03,
+    hkdToCny: 0.93,
   });
 
+  // Fetch currency rates
+  const { data: currencies } = useQuery({
+    queryKey: ["currencies"],
+    queryFn: currencyApi.getCurrencies,
+    enabled: open,
+  });
+
+  // Fetch invoices
   const { data: invoices } = useQuery({
     queryKey: ["invoices"],
     queryFn: () => invoiceApi.getInvoices({ page: 0, limit: 100 }),
     enabled: open,
   });
 
+  useEffect(() => {
+    if (currencies?.currency?.[0]) {
+      const currencyData = currencies.currency[0];
+      setCurrencyRates({
+        hkdToMop: currencyData.hkdToMop || 1.03,
+        hkdToCny: currencyData.hkdToCny || 0.93,
+      });
+    }
+  }, [currencies]);
+
+  // Convert amount from HKD to selected currency
+  const convertFromHKD = (hkdAmount: number, currency: string) => {
+    if (currency === "HKD") return hkdAmount;
+    if (currency === "MOP") return hkdAmount * currencyRates.hkdToMop;
+    if (currency === "CNY") return hkdAmount * currencyRates.hkdToCny;
+    return hkdAmount;
+  };
+
+  // Convert amount from selected currency to HKD
+  const convertToHKD = (amount: number, currency: string) => {
+    if (currency === "HKD") return amount;
+    if (currency === "MOP") return amount / currencyRates.hkdToMop;
+    if (currency === "CNY") return amount / currencyRates.hkdToCny;
+    return amount;
+  };
+
+  // Get maximum allowed amount in selected currency
+  const getMaxAllowedAmount = (currency: string, remainingAmountHKD: number) => {
+    return convertFromHKD(remainingAmountHKD, currency);
+  };
+
+  // Check if amount equals remaining amount (full payment)
+  const isFullPayment = (amount: number, currency: string, remainingAmountHKD: number) => {
+    const amountInHKD = convertToHKD(amount, currency);
+    return Math.abs(amountInHKD - remainingAmountHKD) < 0.01;
+  };
+
+  // Validate amount against remaining amount
+  const validateAmount = (amount: number, currency: string, remainingAmountHKD: number) => {
+    const amountInHKD = convertToHKD(amount, currency);
+    return amountInHKD <= remainingAmountHKD;
+  };
+
   const createMutation = useMutation({
     mutationFn: cashApi.createCash,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({
         title: "Success",
         description: "Cash receipt created successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       onOpenChange(false);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description:
-          error.response?.data?.message || "Failed to create cash receipt",
+        description: error.response?.data?.message || "Failed to create cash receipt",
         variant: "destructive",
       });
     },
@@ -95,18 +151,18 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
       cashApi.updateCash(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({
         title: "Success",
         description: "Cash receipt updated successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       onOpenChange(false);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description:
-          error.response?.data?.message || "Failed to update cash receipt",
+        description: error.response?.data?.message || "Failed to update cash receipt",
         variant: "destructive",
       });
     },
@@ -115,7 +171,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
   const handleSubmit = (values: any) => {
     const submitData = {
       ...values,
-      amount: Number(values.amount), // Ensure amount is a number
+      amount: Number(values.amount),
     };
 
     if (cash) {
@@ -127,6 +183,97 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
 
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
+  const handlePartialPaymentChange = (
+    checked: any,
+    setFieldValue: any,
+    values: any,
+    selectedInvoiceDetails: any
+  ) => {
+    setFieldValue("partialDelivery", checked);
+    const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+
+    if (!checked) {
+      // If unchecking partial payment, set to full remaining amount
+      const amountInCurrency = getMaxAllowedAmount(values.currency, remainingAmountHKD);
+      setFieldValue("amount", amountInCurrency.toFixed(2));
+    }
+  };
+
+  const handleAmountChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFieldValue: any,
+    values: any,
+    selectedInvoiceDetails: any
+  ) => {
+    const inputValue = e.target.value;
+    // Allow empty value or valid numbers
+    if (inputValue === "" || /^[0-9]*\.?[0-9]*$/.test(inputValue)) {
+      setFieldValue("amount", inputValue);
+    }
+  };
+
+  const handleAmountBlur = (
+    e: React.FocusEvent<HTMLInputElement>,
+    setFieldValue: any,
+    values: any,
+    selectedInvoiceDetails: any
+  ) => {
+    const amount = parseFloat(e.target.value);
+    if (isNaN(amount)) {
+      setFieldValue("amount", "");
+      return;
+    }
+
+    // Round to 2 decimal places
+    const roundedAmount = Math.round(amount * 100) / 100;
+    const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+
+    // Validate amount doesn't exceed remaining amount
+    if (!validateAmount(roundedAmount, values.currency, remainingAmountHKD)) {
+      const maxAllowed = getMaxAllowedAmount(values.currency, remainingAmountHKD);
+      setFieldValue("amount", maxAllowed.toFixed(2));
+      setFieldValue("partialDelivery", false);
+      toast({
+        title: "Warning",
+        description: `Amount exceeds remaining balance. Maximum allowed is ${maxAllowed.toFixed(2)} ${values.currency} (${remainingAmountHKD.toFixed(2)} HKD)`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFieldValue("amount", roundedAmount.toFixed(2));
+    // Auto-handle partial delivery checkbox
+    const isFullPaymentAmount = isFullPayment(roundedAmount, values.currency, remainingAmountHKD);
+    setFieldValue("partialDelivery", !isFullPaymentAmount);
+  };
+
+  const handleCurrencyChange = (
+    newCurrency: string,
+    setFieldValue: any,
+    values: any,
+    selectedInvoiceDetails: any
+  ) => {
+    const currentAmount = values.amount ? parseFloat(values.amount) : 0;
+    const currentAmountHKD = convertToHKD(currentAmount, values.currency);
+    const newAmount = convertFromHKD(currentAmountHKD, newCurrency);
+    
+    setFieldValue("currency", newCurrency);
+    setFieldValue("amount", newAmount.toFixed(2));
+    
+    // Check if the new amount is full payment
+    const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+    const isFullPaymentAmount = isFullPayment(newAmount, newCurrency, remainingAmountHKD);
+    setFieldValue("partialDelivery", !isFullPaymentAmount);
+  };
+
+  useEffect(() => {
+    setSelectedInvoiceDetails({
+      customerName: "",
+      paymentStatus: "",
+      remainingAmount: 0,
+    });
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] sm:max-h-[90vh] overflow-y-auto">
@@ -134,16 +281,13 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
           <DialogTitle>
             {cash ? "Edit Cash Receipt" : "Create Cash Receipt"}
           </DialogTitle>
-          <DialogDescription>
-            {cash ? "Update cash receipt details" : "Create a new cash receipt"}
-          </DialogDescription>
         </DialogHeader>
 
         <Formik<CashFormValues>
           initialValues={{
             invoiceNumber: cash?.invoiceNumber || "",
             customerId: cash?.customerId || "",
-            amount : Number.parseFloat(cash?.amount).toFixed(2) || "0",
+            amount: cash?.amount ? Number.parseFloat(cash.amount).toFixed(2) : "",
             currency: cash?.currency || "HKD",
             pickedBy: cash?.pickedBy || "",
             cashPickupDate:
@@ -156,40 +300,46 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
           onSubmit={handleSubmit}
         >
           {({ errors, touched, setFieldValue, values }) => {
-            // Handle partial payment checkbox change
-            const handlePartialPaymentChange = (checked: boolean) => {
-              setFieldValue("partialDelivery", checked);
-            };
-
             useEffect(() => {
-              setSelectedInvoiceDetails({
-                customerName: "",
-                paymentStatus: "",
-              });
-
               if (values.invoiceNumber) {
                 const invoice = invoices?.invoices?.find(
-                  (inv: any) =>
-                    inv.invoiceNumber === values.invoiceNumber
+                  (inv: any) => inv.invoiceNumber === values.invoiceNumber
                 );
                 if (invoice) {
+                  const remainingAmountHKD = Number.parseFloat(invoice?.remainingAmount) || 0;
                   const details = {
                     customerName:
                       invoice?.customer?.companyName ||
                       invoice?.customer?.contactPersonName ||
                       "No customer found",
-                      paymentStatus: invoice?.remainingAmount === 0 ? "Complete" : "Partial"
+                    paymentStatus: remainingAmountHKD === 0 ? "complete" : "partial",
+                    remainingAmount: remainingAmountHKD,
                   };
                   setSelectedInvoiceDetails(details);
-                  setFieldValue("customerId", invoice.customerId)
+                  setFieldValue("customerId", invoice.customerId);
                   
-                  if (!cash) {
-                    // Create mode
-                    setFieldValue("amount", invoice?.remainingAmount)
-                  } 
+                  if (!cash && remainingAmountHKD > 0) {
+                    // Create mode - set to full amount by default
+                    const amountInCurrency = getMaxAllowedAmount(values.currency, remainingAmountHKD);
+                    setFieldValue("amount", amountInCurrency.toFixed(2));
+                    setFieldValue("partialDelivery", false);
+                  } else if (cash) {
+                    // Edit mode - keep existing amount but validate
+                    const currentAmount = values.amount ? parseFloat(String(values.amount)) : 0;
+                    if (!validateAmount(currentAmount, values.currency, remainingAmountHKD)) {
+                      const maxAllowed = getMaxAllowedAmount(values.currency, remainingAmountHKD);
+                      setFieldValue("amount", maxAllowed.toFixed(2));
+                      setFieldValue("partialDelivery", false);
+                      toast({
+                        title: "Warning",
+                        description: `Amount adjusted to maximum allowed value of ${maxAllowed.toFixed(2)} ${values.currency}`,
+                        variant: "destructive",
+                      });
+                    }
+                  }
                 }
               }
-            }, [open, cash, invoices, values.invoiceNumber]);
+            }, [open, cash, invoices, values.invoiceNumber, values.currency, currencyRates]);
 
             return (
               <Form className="space-y-4">
@@ -198,11 +348,13 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                     <Label htmlFor="invoiceNumber">Invoice Number</Label>
                     <Select
                       value={values.invoiceNumber}
-                      onValueChange={(value) =>
-                        setFieldValue("invoiceNumber", value)
-                      }
+                      onValueChange={(value) => {
+                        setFieldValue("invoiceNumber", value);
+                        setFieldValue("amount", "");
+                      }}
+                      disabled={!!cash}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={`${cash ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
                         <SelectValue placeholder="Select invoice" />
                       </SelectTrigger>
                       <SelectContent>
@@ -210,8 +362,9 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                           <SelectItem
                             key={invoice.id}
                             value={invoice.invoiceNumber}
+                            disabled={invoice.remainingAmount <= 0 && !cash?.invoiceNumber}
                           >
-                            {invoice.invoiceNumber}
+                            {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && "(Fulfilled)"}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -222,6 +375,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       </p>
                     )}
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="pickedBy">Picked By</Label>
                     <Field
@@ -229,11 +383,11 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       id="pickedBy"
                       name="pickedBy"
                       placeholder="Person name"
+                      disabled={selectedInvoiceDetails.paymentStatus === "complete" || !selectedInvoiceDetails.customerName}
                       className={
-                        errors.pickedBy && touched.pickedBy
-                          ? "border-red-500"
-                          : ""
-                      }
+                        `${errors.pickedBy && touched.pickedBy ? "border-red-500" : ""} 
+                        ${(selectedInvoiceDetails.paymentStatus === "complete") || (!selectedInvoiceDetails.customerName) ? "bg-gray-100 dark:bg-gray-800" : ""
+                        }`}
                     />
                     {errors.pickedBy && touched.pickedBy && (
                       <p className="text-sm text-red-500">{errors.pickedBy}</p>
@@ -254,7 +408,9 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">{cash ? "Delivered Value" : values.partialDelivery ? "Amount" : "Total Amount To Pay"}</Label>
+                    <Label htmlFor="amount">
+                      {cash ? values.partialDelivery ? "Delivered Amount" : "Need to Delivered Amount" : values.partialDelivery ? "Amount" : "Total Amount to Pay"} in {values.currency}
+                    </Label>
                     <Field
                       as={Input}
                       id="amount"
@@ -262,22 +418,32 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       type="number"
                       step="0.01"
                       onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                        const rounded = parseFloat(e.target.value).toFixed(2);
-                        setFieldValue("amount", rounded);
+                        handleAmountBlur(e, setFieldValue, values, selectedInvoiceDetails);
                       }}
-                      onValueChange={(value: number) =>
-                        setFieldValue("amount", value)
-                      }
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        handleAmountChange(e, setFieldValue, values, selectedInvoiceDetails);
+                      }}
                       placeholder="0.00"
-                      disabled={selectedInvoiceDetails.paymentStatus === "complete" ? true : cash? false : !values.partialDelivery}
-                      className={`${
-                        errors.amount && touched.amount ? "border-red-500" : ""
-                      } ${
-                        !values.partialDelivery && !cash
-                          ? "bg-gray-100 dark:bg-gray-800"
-                          : ""
-                      }`}
+                      disabled={
+                        (selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
+                        (!selectedInvoiceDetails.customerName && !cash) || 
+                        selectedInvoiceDetails.remainingAmount <= 0
+                      }
+                      className={`
+                        ${errors.amount && touched.amount ? "border-red-500" : ""} 
+                        ${(selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
+                          (!selectedInvoiceDetails.customerName && !cash) || 
+                          selectedInvoiceDetails.remainingAmount <= 0 ? "bg-gray-100 dark:bg-gray-800" : ""
+                        }`}
                     />
+                    {selectedInvoiceDetails.remainingAmount > 0 && (
+                      <div className="text-xs text-gray-500">
+                        Remaining Amount: {getMaxAllowedAmount(values.currency, selectedInvoiceDetails.remainingAmount).toFixed(2)} {values.currency}
+                        {values.currency !== "HKD" && (
+                          <span> ({selectedInvoiceDetails.remainingAmount.toFixed(2)} HKD)</span>
+                        )}
+                      </div>
+                    )}
                     {errors.amount && touched.amount && (
                       <p className="text-sm text-red-500">{errors.amount}</p>
                     )}
@@ -287,12 +453,20 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                     <Label htmlFor="currency">Currency</Label>
                     <Select
                       value={values.currency}
-                      onValueChange={(value) =>
-                        setFieldValue("currency", value)
+                      onValueChange={(newCurrency) => {
+                        handleCurrencyChange(newCurrency, setFieldValue, values, selectedInvoiceDetails);
+                      }}
+                      disabled={
+                        (selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
+                        (!selectedInvoiceDetails.customerName && !cash) || 
+                        selectedInvoiceDetails.remainingAmount <= 0
                       }
-                      disabled={selectedInvoiceDetails.paymentStatus === "complete" ? true : false}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={`${
+                        (selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
+                        (!selectedInvoiceDetails.customerName && !cash) || 
+                        selectedInvoiceDetails.remainingAmount <= 0 ? "bg-gray-100 dark:bg-gray-800" : ""
+                      }`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -303,6 +477,35 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                     </Select>
                   </div>
                 </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="partialDelivery"
+                    checked={values.partialDelivery}
+                    onCheckedChange={(checked) => {
+                      handlePartialPaymentChange(checked, setFieldValue, values, selectedInvoiceDetails);
+                    }}
+                    disabled={
+                      (selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
+                      (!selectedInvoiceDetails.customerName && !cash) || 
+                      selectedInvoiceDetails.remainingAmount <= 0 
+                      // isFullPayment(
+                      //   values.amount ? parseFloat(values.amount) : 0,
+                      //   values.currency,
+                      //   selectedInvoiceDetails.remainingAmount
+                      // )
+                    }
+                  />
+                  <Label htmlFor="partialDelivery">Partial Payment</Label>
+                </div>
+                <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4">
+                  Checkmark if partial payment and add amount.
+                </div>
+                {selectedInvoiceDetails.paymentStatus === "complete" && (
+                  <div className="text-xs text-green-600">
+                    Full payment done - Invoice is already fulfilled
+                  </div>
+                )}
 
                 {/* <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -345,20 +548,6 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   </div>
                 </div> */}
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="partialDelivery"
-                    checked={values.partialDelivery}
-                    onCheckedChange={handlePartialPaymentChange}
-                  />
-                  <Label htmlFor="partialDelivery">Partial Payment</Label>
-                </div>
-                <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4">
-                  By default total remaining amount is shown (i.e full payment
-                  that needs to be done). Checkmark for partial payment and add
-                  amount.
-                </div>
-
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button
                     type="button"
@@ -369,7 +558,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || selectedInvoiceDetails.remainingAmount <= 0}
                     className="bg-brand-primary hover:bg-brand-dark text-white"
                   >
                     {isLoading ? (

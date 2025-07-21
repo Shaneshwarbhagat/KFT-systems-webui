@@ -63,7 +63,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
       toast({
         title: "Success",
         description: "Customer created successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       })
       onClose()
     },
@@ -83,7 +83,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
       toast({
         title: "Success",
         description: "Customer updated successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       })
       onClose()
     },

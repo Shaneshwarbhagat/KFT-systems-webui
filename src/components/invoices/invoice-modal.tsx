@@ -82,7 +82,7 @@ export function InvoiceModal({
         description: `Invoice ${
           isEditing ? "updated" : "created"
         } successfully`,
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       onSuccess();
     },

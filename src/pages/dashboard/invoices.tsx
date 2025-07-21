@@ -34,6 +34,8 @@ import {
 import { InvoiceModal } from "../../components/invoices/invoice-modal";
 import { DeleteInvoiceDialog } from "../../components/invoices/delete-invoice-dialog";
 import { LoadingSpinner } from "../../components/ui/loading-spinner";
+import { getIn } from "formik";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function InvoicesPage() {
   // const [searchQuery, setSearchQuery] = useState("")
@@ -49,9 +51,10 @@ export default function InvoicesPage() {
   const queryClient = useQueryClient();
 
   // Check if user is admin
-    const isAdmin = user?.role?.toLowerCase() === "admin"
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   // Fetch invoices
+  // Fetch invoices and payment status in parallel
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["invoices", currentPage],
     queryFn: () =>
@@ -61,6 +64,9 @@ export default function InvoicesPage() {
       }),
   });
 
+  const invoices = invoicesData?.invoices || [];
+  const totalPages = Math.ceil((invoicesData?.total || 0) / 10);
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: invoiceApi.deleteInvoice,
@@ -68,7 +74,7 @@ export default function InvoicesPage() {
       toast({
         title: "Success",
         description: "Invoice deleted successfully",
-        className: "bg-success text-white",
+        className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       setDeletingInvoice(null);
@@ -82,6 +88,32 @@ export default function InvoicesPage() {
       });
     },
   });
+
+  const getStatus = (remainingAmt: number, totalAmt: number) => {
+    if (remainingAmt === 0) {
+      return (
+        <Badge variant="secondary" className="bg-green-600 text-white hover:bg-green-500">
+          Complete
+        </Badge>
+      );
+    }
+    if (totalAmt !== 0) {
+      return (
+        <Badge
+          variant="default"
+          className="bg-brand-secondary text-white hover:bg-brand-secondary">
+          Partial
+        </Badge>
+      );
+    }
+    if (totalAmt === 0) {
+      return (
+        <Badge className="text-white bg-red-500 hover:bg-red-500">
+          Incomplete
+        </Badge>
+      );
+    }
+  };
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -179,7 +211,9 @@ export default function InvoicesPage() {
               Address: 9970981030.175006112547@gmail.com<br>
               Phone: 9970981031<br>
               Date: ${new Date().toLocaleDateString()}<br>
-              Business Registration#: ${invoice.customer.businessRegistrationNumber || "--"}<br>
+              Business Registration#: ${
+                invoice.customer.businessRegistrationNumber || "--"
+              }<br>
               Invoice#: ${invoice.invoiceNumber}
             </div>
           </div>
@@ -188,7 +222,11 @@ export default function InvoicesPage() {
             <div class="client-info">
               <div class="section-header">CLIENT</div>
               <div class="section-content">
-                ${invoice.customer?.companyName || invoice.customer?.contactPersonName || "N/A"}
+                ${
+                  invoice.customer?.companyName ||
+                  invoice.customer?.contactPersonName ||
+                  "N/A"
+                }
               </div>
             </div>
             <div class="note-info">
@@ -215,7 +253,7 @@ export default function InvoicesPage() {
                 <td>${invoice.description || "Service Charge"}</td>
                 <td>${invoice.units || 1}</td>
                 <td>${Number.parseFloat(invoice.amount || 0).toFixed(2)}</td>
-                <td>${Number.parseFloat(invoice.amount || 0).toFixed(2)}</td>
+                <td>${Number.parseFloat(invoice.amountInHkd || 0).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -224,9 +262,15 @@ export default function InvoicesPage() {
             <p>Unless otherwise agreed, all invoices are payable within 10 days by wire transfer to our bank account</p>
             
             <div class="totals">
-              <div><strong>SUB TOTAL: ${Number.parseFloat(invoice.amount || 0).toFixed(2)}</strong></div>
+              <div><strong>SUB TOTAL: ${Number.parseFloat(
+                invoice.amount || 0
+              ).toFixed(2)}</strong></div>
               <div><strong>DISCOUNT: -</strong></div>
-              <div><strong>Amount due ${invoice.currency || "HKD"}: ${Number.parseFloat(invoice.amount || 0).toFixed(2)}</strong></div>
+              <div><strong>Amount due ${
+                invoice.currency || "HKD"
+              }: ${Number.parseFloat(invoice.amountInHkd || 0).toFixed(
+      2
+    )}</strong></div>
             </div>
           </div>
 
@@ -235,19 +279,16 @@ export default function InvoicesPage() {
           </div>
         </body>
       </html>
-    `
+    `;
 
-    const printWindow = window.open("", "_blank")
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
-      printWindow.document.write(printContent)
-      printWindow.document.close()
-      printWindow.print()
-      printWindow.close()
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+      printWindow.close();
     }
   };
-
-  const invoices = invoicesData?.invoices || [];
-  const totalPages = Math.ceil((invoicesData?.total || 0) / 10);
 
   if (isLoading) {
     return (
@@ -357,16 +398,37 @@ export default function InvoicesPage() {
                     </TableHead>
                     <TableHead className="text-gray-700 dark:text-gray-300">
                       Units
-                    </TableHead>  
+                    </TableHead>
+                    <TableHead
+                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("amount")}
+                    >
+                      <div className="flex items-center">
+                        Total Amount in HKD
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableHead>
                     <TableHead className="text-gray-700 dark:text-gray-300">
-                      Total Amt in HKD
-                    </TableHead>                   
+                      Total Paid Amt (HKD)
+                    </TableHead>
+                    <TableHead className="text-gray-700 dark:text-gray-300">
+                      Total Remiaining Amt (HKD)
+                    </TableHead>
                     <TableHead
                       className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
                       onClick={() => handleSort("expectedAt")}
                     >
                       <div className="flex items-center">
                         Expected Payment Date
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("paymentStatus")}
+                    >
+                      <div className="flex items-center">
+                        Payment Status
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                       </div>
                     </TableHead>
@@ -422,9 +484,23 @@ export default function InvoicesPage() {
                           {Number.parseFloat(invoice.amountInHkd).toFixed(2)}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {invoice.expectedPaymentDate ? new Date(invoice.expectedPaymentDate).toLocaleDateString(
-                            "en-GB"
-                          ) : "--"}
+                          {Number.parseFloat(invoice.totalPaidAmount).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-gray-300">
+                          {Number.parseFloat(invoice.remainingAmount).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-gray-300">
+                          {invoice.expectedPaymentDate
+                            ? new Date(
+                                invoice.expectedPaymentDate
+                              ).toLocaleDateString("en-GB")
+                            : "--"}
+                        </TableCell>
+                        <TableCell className="text-gray-700 dark:text-gray-300">
+                          {getStatus(
+                            invoice.remainingAmount,
+                            invoice.totalPaidAmount
+                          )}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
                           {new Date(invoice.createdAt).toLocaleDateString(
@@ -438,10 +514,13 @@ export default function InvoicesPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
+                                  disabled={invoice.remainingAmount === 0 ? true : false}
                                   onClick={() => setEditingInvoice(invoice)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                  className={`text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 [&[disabled]]:cursor-not-allowed [&[disabled]]:opacity-50 [&[disabled]]:pointer-events-auto`}
                                 >
-                                  <Edit className="h-4 w-4" />
+                                  <Tooltip title={invoice.remainingAmount === 0 ? "Not allowed to edit as payment is completed" : ""}>
+                                    <Edit className="h-4 w-4" />
+                                  </Tooltip>
                                 </Button>
                                 <Button
                                   variant="ghost"

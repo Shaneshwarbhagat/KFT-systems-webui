@@ -107,7 +107,7 @@ export const orderApi = {
 
 // Customer API
 export const customerApi = {
-  getCustomers: async (params: { page: number; limit?: number; search?: string }) => {
+  getCustomers: async (params: { page: number; limit?: number}) => {
     const response = await api.get("/v1/customer/list", { params })
     return response.data
   },

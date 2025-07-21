@@ -233,19 +233,19 @@ export default function CashPage() {
               <div class="receipt-left">
                 <div class="info-row">
                   <span class="info-label">Receipt No:</span>
-                  <span class="info-value">${cash.receiptNumber || "N/A"}</span>
+                  <span class="info-value">${cash.receiptNumber || "--"}</span>
                 </div>
                 <div class="info-row">
                   <span class="info-label">Invoice No:</span>
-                  <span class="info-value">${cash.invoiceNumber|| "N/A"}</span>
+                  <span class="info-value">${cash.invoiceNumber|| "--"}</span>
                 </div>
                 <div class="info-row">
                   <span class="info-label">Client Name (Customer):</span>
-                  <span class="info-value">${cash.customer.companyName || "N/A"}</span>
+                  <span class="info-value">${cash.customer.companyName || "--"}</span>
                 </div>
                 <div class="info-row">
-                  <span class="info-label">Invoice No:</span>
-                  <span class="info-value">${cash.invoiceNumber || "N/A"}</span>
+                  <span class="info-label">Picked By:</span>
+                  <span class="info-value">${cash.pickedBy || "--"}</span>
                 </div>
               </div>
               
@@ -258,21 +258,17 @@ export default function CashPage() {
                 </div>
                 <div class="info-row">
                   <span class="info-label">Time:</span>
-                  <span class="info-value">${cash.pickupTime || "N/A"}</span>
+                  <span class="info-value">${cash.pickupTime || "--"}</span>
                 </div>
                 <div class="info-row">
                   <span class="info-label">Currency:</span>
-                  <span class="info-value">${cash.currency}</span>
+                  <span class="info-value">${cash.currency || 'HKD'}</span>
                 </div>
                 <div class="info-row">
                   <span class="info-label">Payment Type:</span>
                   <span class="info-value">${
                     cash.partialDelivery ? "Partial Payment" : "Full Payment"
                   }</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-label">Picked By:</span>
-                  <span class="info-value">${cash.pickedBy || "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -287,6 +283,10 @@ export default function CashPage() {
               <div class="info-row">
                 <span class="info-label">Payment Method:</span>
                 <span class="info-value">Cash</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Amount in HKD:</span>
+                <span class="info-value">${Number.parseFloat(cash.amountInHkd).toFixed(2) || '--'}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Status:</span>
@@ -399,8 +399,8 @@ export default function CashPage() {
                       {/* {getSortIcon("invoiceNumber")} */}
                     </TableHead>
                     <TableHead>Customer</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Currency</TableHead>
+                    <TableHead>Amount Received</TableHead>
+                    <TableHead>Amount in HKD</TableHead>
                     <TableHead>Picked By</TableHead>
                     <TableHead>Pickup Date</TableHead>
                     <TableHead>Status</TableHead>
@@ -418,10 +418,14 @@ export default function CashPage() {
                         {cash.customer?.companyName || "--"}
                       </TableCell>
                       <TableCell>
-                        {formatCurrency(cash.amount, cash.currency)}
+                        {Number.parseFloat(cash.amount).toFixed(2)} <Badge
+                          variant="outline"
+                        >
+                          {cash.currency}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{cash.currency}</Badge>
+                        {Number.parseFloat(cash?.amountInHkd).toFixed(2) || "--"}
                       </TableCell>
                       <TableCell>{cash.pickedBy}</TableCell>
                       <TableCell>{formatDate(cash.cashPickupDate)}</TableCell>

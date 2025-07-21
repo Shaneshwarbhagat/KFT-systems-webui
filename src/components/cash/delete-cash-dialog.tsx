@@ -28,11 +28,12 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
   const deleteMutation = useMutation({
     mutationFn: (id: string) => cashApi.deleteCash(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cash"] })
+      queryClient.invalidateQueries({ queryKey: ["cash"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({
         title: "Success",
         description: "Cash receipt deleted successfully",
-        className: "bg-success text-white"
+        className: "bg-success text-white [&_button]:text-white"
       })
       onOpenChange(false)
     },
