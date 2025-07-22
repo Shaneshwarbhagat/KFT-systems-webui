@@ -43,12 +43,12 @@ export function ChangePasswordSection() {
         duration: 3000,
         className: "bg-success text-white [&_button]:text-white",
       })
-      localStorage.clear()
       // Redirect to login after success
       setTimeout(() => {
+        localStorage.clear()
         logout()
         navigate("/login")
-      }, 1000)
+      }, 2000)
     },
     onError: (error: any) => {
       toast({
@@ -80,23 +80,12 @@ export function ChangePasswordSection() {
     changePasswordMutation.mutate(payload, {
       onSuccess: () => {
         resetForm()
-        toast({
-          title: "Success",
-          description: "Password changed successfully. Please login again with your new password.",
-          className: "bg-success text-white [&_button]:text-white",
-        })
       },
       onError: (error: any) => {
         // Handle server-side validation errors
         if (error.response?.data?.message?.includes("current password")) {
           setFieldError("oldPassword", "Current password is incorrect")
         }
-        // Show error toast but don't redirect
-        toast({
-          title: "Error",
-          description: error.response?.data?.message || "Failed to change password",
-          variant: "destructive",
-        })
       },
     })
   }

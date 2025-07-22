@@ -59,7 +59,11 @@ export default function UserManagementPage() {
   } = useQuery({
     queryKey: ["users", currentPage, searchTerm, sortField, sortOrder],
     queryFn: () =>
-      adminApi.getUsers(),
+      adminApi.getUsers({
+        page: currentPage,
+        limit,
+      }),
+
   })
 
   // Delete mutation

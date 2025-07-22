@@ -159,6 +159,15 @@ export function EditOrderModal({
       return;
     }
 
+    if (formData.deliveredValue === "0.00" || formData.deliveredValue === "0") {
+      toast({
+        title: "Error",
+        description: "Delivery amount cannot be 0.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (remainingAmountHKD <= 0) {
       toast({
         title: "Error",

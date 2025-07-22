@@ -56,6 +56,11 @@ export function CreateOrderModal({
     orderNumber: "",
   });
 
+  //selected Order values
+  const selectedInvoice = invoices.find(
+    (inv) => inv.invoiceNumber === formData.invoiceNumber
+  );
+
   const [currencyRates, setCurrencyRates] = useState({
     hkdToMop: 1.03, // Default values in case API fails
     hkdToCny: 0.93,
@@ -78,10 +83,14 @@ export function CreateOrderModal({
     }
   }, [isOpen]);
 
-  //selected Order values
-  const selectedInvoice = invoices.find(
-    (inv) => inv.invoiceNumber === formData.invoiceNumber
-  );
+  useEffect(() => {
+    if (selectedInvoice) {
+      setFormData(prev => ({
+        ...prev,
+        amountOfDelivery: Number(selectedInvoice?.amountInHkd).toFixed(2),
+      }))
+    }
+  }, [selectedInvoice]);
 
   // Convert amount from HKD to selected currency
   const convertFromHKD = (hkdAmount: number, currency: string) => {
@@ -144,6 +153,15 @@ export function CreateOrderModal({
       toast({
         title: "Error",
         description: "Please fill in all * required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.amountOfDelivery == "0" || formData.amountOfDelivery == "0.00") {
+      toast({
+        title: "Error",
+        description: "Delivery amount cannot be 0.",
         variant: "destructive",
       });
       return;
@@ -339,15 +357,20 @@ export function CreateOrderModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="partialDelivery"
-                      checked={formData.partialDelivery}
-                      onCheckedChange={(checked) =>
-                        setFormData(prev => ({...prev, partialDelivery: !!checked}))
-                      }
-                    />
-                    <Label htmlFor="partialDelivery">Partial Delivery</Label>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="partialDelivery"
+                        checked={formData.partialDelivery}
+                        onCheckedChange={(checked) =>
+                          setFormData(prev => ({...prev, partialDelivery: !!checked}))
+                        }
+                      />
+                      <Label htmlFor="partialDelivery">Partial Delivery</Label>
+                    </div>
+                    <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4 mt-2">
+                      Checkmark if partial delivery and add amount.
+                    </div>
                   </div>
                 </>
               )}

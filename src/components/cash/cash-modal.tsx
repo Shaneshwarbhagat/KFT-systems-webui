@@ -25,6 +25,7 @@ import { useToast } from "../../hooks/use-toast";
 import { cashApi, currencyApi, invoiceApi } from "../../lib/api";
 import { LoadingSpinner } from "../ui/loading-spinner";
 import { useEffect, useState } from "react";
+import { convertFromHKD, convertToHKD } from "../../lib/utils";
 
 const cashSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
@@ -92,36 +93,20 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     }
   }, [currencies]);
 
-  // Convert amount from HKD to selected currency
-  const convertFromHKD = (hkdAmount: number, currency: string) => {
-    if (currency === "HKD") return hkdAmount;
-    if (currency === "MOP") return hkdAmount * currencyRates.hkdToMop;
-    if (currency === "CNY") return hkdAmount * currencyRates.hkdToCny;
-    return hkdAmount;
-  };
-
-  // Convert amount from selected currency to HKD
-  const convertToHKD = (amount: number, currency: string) => {
-    if (currency === "HKD") return amount;
-    if (currency === "MOP") return amount / currencyRates.hkdToMop;
-    if (currency === "CNY") return amount / currencyRates.hkdToCny;
-    return amount;
-  };
-
   // Get maximum allowed amount in selected currency
   const getMaxAllowedAmount = (currency: string, remainingAmountHKD: number) => {
-    return convertFromHKD(remainingAmountHKD, currency);
+    return convertFromHKD(remainingAmountHKD, currency, currencyRates);
   };
 
   // Check if amount equals remaining amount (full payment)
   const isFullPayment = (amount: number, currency: string, remainingAmountHKD: number) => {
-    const amountInHKD = convertToHKD(amount, currency);
+    const amountInHKD = convertToHKD(amount, currency, currencyRates);
     return Math.abs(amountInHKD - remainingAmountHKD) < 0.01;
   };
 
   // Validate amount against remaining amount
   const validateAmount = (amount: number, currency: string, remainingAmountHKD: number) => {
-    const amountInHKD = convertToHKD(amount, currency);
+    const amountInHKD = convertToHKD(amount, currency, currencyRates);
     return amountInHKD <= remainingAmountHKD;
   };
 
@@ -190,13 +175,12 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     selectedInvoiceDetails: any
   ) => {
     setFieldValue("partialDelivery", checked);
-    const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
-
-    if (!checked) {
-      // If unchecking partial payment, set to full remaining amount
-      const amountInCurrency = getMaxAllowedAmount(values.currency, remainingAmountHKD);
-      setFieldValue("amount", amountInCurrency.toFixed(2));
-    }
+    // const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+    // if (!checked) {
+    //   // If unchecking partial payment, set to full remaining amount
+    //   const amountInCurrency = getMaxAllowedAmount(values.currency, remainingAmountHKD);
+    //   setFieldValue("amount", amountInCurrency.toFixed(2));
+    // }
   };
 
   const handleAmountChange = (
@@ -253,17 +237,29 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     values: any,
     selectedInvoiceDetails: any
   ) => {
-    const currentAmount = values.amount ? parseFloat(values.amount) : 0;
-    const currentAmountHKD = convertToHKD(currentAmount, values.currency);
-    const newAmount = convertFromHKD(currentAmountHKD, newCurrency);
-    
+    // If we're in create mode and no amount has been manually entered yet
+    if (!cash && (!values.amount || values.amount === "")) {
+      // Set to full remaining amount in new currency
+      const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+      const amountInCurrency = getMaxAllowedAmount(newCurrency, remainingAmountHKD);
+      setFieldValue("amount", amountInCurrency.toFixed(2));
+      setFieldValue("partialDelivery", false);
+    } 
+    // If amount has been manually entered (create or edit mode)
+    else if (values.amount && values.amount !== "") {
+      // Convert the existing amount to the new currency
+      const currentAmount = parseFloat(values.amount);
+      const currentAmountHKD = convertToHKD(currentAmount, values.currency, currencyRates);
+      const newAmount = convertFromHKD(currentAmountHKD, newCurrency, currencyRates);
+      setFieldValue("amount", newAmount.toFixed(2));
+
+      // Check if this is full payment
+      const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
+      const isFullPaymentAmount = isFullPayment(newAmount, newCurrency, remainingAmountHKD);
+      setFieldValue("partialDelivery", !isFullPaymentAmount);
+    }
+
     setFieldValue("currency", newCurrency);
-    setFieldValue("amount", newAmount.toFixed(2));
-    
-    // Check if the new amount is full payment
-    const remainingAmountHKD = selectedInvoiceDetails.remainingAmount;
-    const isFullPaymentAmount = isFullPayment(newAmount, newCurrency, remainingAmountHKD);
-    setFieldValue("partialDelivery", !isFullPaymentAmount);
   };
 
   useEffect(() => {
@@ -318,23 +314,26 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   setSelectedInvoiceDetails(details);
                   setFieldValue("customerId", invoice.customerId);
                   
-                  if (!cash && remainingAmountHKD > 0) {
-                    // Create mode - set to full amount by default
+                  // Only auto-set amount in create mode when first loading or invoice changes
+                  if (!cash && remainingAmountHKD > 0 && !values.amount) {
                     const amountInCurrency = getMaxAllowedAmount(values.currency, remainingAmountHKD);
                     setFieldValue("amount", amountInCurrency.toFixed(2));
                     setFieldValue("partialDelivery", false);
-                  } else if (cash) {
-                    // Edit mode - keep existing amount but validate
-                    const currentAmount = values.amount ? parseFloat(String(values.amount)) : 0;
+                  }
+                  if (values.amount) {
+                    const currentAmount = parseFloat(String(values.amount));
                     if (!validateAmount(currentAmount, values.currency, remainingAmountHKD)) {
                       const maxAllowed = getMaxAllowedAmount(values.currency, remainingAmountHKD);
                       setFieldValue("amount", maxAllowed.toFixed(2));
                       setFieldValue("partialDelivery", false);
-                      toast({
-                        title: "Warning",
-                        description: `Amount adjusted to maximum allowed value of ${maxAllowed.toFixed(2)} ${values.currency}`,
-                        variant: "destructive",
-                      });
+                      // Only show toast in edit mode to avoid spamming during create
+                      if (cash) {
+                        toast({
+                          title: "Warning",
+                          description: `Amount adjusted to maximum allowed value of ${maxAllowed.toFixed(2)} ${values.currency}`,
+                          variant: "destructive",
+                        });
+                      }
                     }
                   }
                 }

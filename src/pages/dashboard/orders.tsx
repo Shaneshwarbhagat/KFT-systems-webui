@@ -70,7 +70,7 @@ export default function OrdersPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const limit = 10;
+  const limit = 9;
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
   // Fetch orders
@@ -254,7 +254,7 @@ export default function OrdersPage() {
               <tr>
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>Order Processing</td>
-                <td>${order.deliveredUnits || 1}</td>
+                <td>${order.deliveredUnits || 0}</td>
                 <td>${Number.parseFloat(order.amountOfDelivery || "0").toFixed(2)} ${order.currency}</td>
                 <td>${Number.parseFloat(order.amountInHkd || "0").toFixed(2)}</td>
                 <td>${order?.partialDelivery ? "Partial Delivery" : "Full Delivery"}</td>
@@ -420,6 +420,7 @@ export default function OrdersPage() {
                       {order.partialDelivery ? "Partial" : "Full"}
                     </Badge>
                     </Tooltip>
+                    <br/>
                     <Tooltip title="Payment Status" placement="bottom">
                       <Badge
                         variant={deliveredValue == 0 ? "secondary" : totalPaidAmount == 0 ? "default" : "outline"}
@@ -455,12 +456,13 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <CoinsIcon className="h-4 w-4 text-gray-400" />
                   <div>
-                    <p className="font-medium text-sm text-gray-900">
+                    <span className="text-sm text-gray-600">Amount of delivery: </span>
+                    <span className="font-medium text-sm text-gray-900">
                       {Number.parseFloat(order.amountOfDelivery).toFixed(2)} {order.currency}
-                    </p>
-                    <p className="text-xs text-gray-600">
+                    </span>
+                    {/* <p className="text-xs text-gray-600">
                       Delivered: {order.deliveredUnits} units
-                    </p>
+                    </p> */}
                   </div>
                 </div>
 

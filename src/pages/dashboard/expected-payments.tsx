@@ -61,6 +61,7 @@ export default function ExpectedPaymentsPage() {
         className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["expected-payments"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
     onError: (error: any) => {
       toast({
@@ -180,8 +181,9 @@ export default function ExpectedPaymentsPage() {
                               <SelectItem
                                 key={invoice.id}
                                 value={invoice.invoiceNumber}
+                                disabled={invoice.remainingAmount <= 0}
                               >
-                                {invoice.invoiceNumber}
+                                {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && "(Fulfilled)"}
                               </SelectItem>
                             ))}
                           </SelectContent>

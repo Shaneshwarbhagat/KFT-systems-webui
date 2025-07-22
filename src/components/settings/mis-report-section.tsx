@@ -66,6 +66,7 @@ export function MisReportSection() {
         toast({
           title: "Success",
           description: "MIS report generated and downloaded successfully",
+          className: "bg-success text-white [&_button]:text-white",
         })
       }
     },

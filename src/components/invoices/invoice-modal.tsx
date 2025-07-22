@@ -12,9 +12,11 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useToast } from "../../hooks/use-toast";
-import { invoiceApi, customerApi } from "../../lib/api";
+import { invoiceApi, customerApi, currencyApi } from "../../lib/api";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import { useEffect, useState } from "react";
+import { convertFromHKD } from "../../lib/utils";
 
 interface InvoiceFormValues {
   invoiceNumber: string;
@@ -42,6 +44,7 @@ export function InvoiceModal({
   invoice,
   onSuccess,
 }: InvoiceModalProps) {
+  const [currencyRates, setCurrencyRates] = useState({ hkdToMop: 1.03, hkdToCny: 0.93 });
   const { toast } = useToast();
   const isEditing = !!invoice;
 
@@ -64,8 +67,23 @@ export function InvoiceModal({
   // Fetch customers for dropdown
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
-    queryFn: () => customerApi.getCustomers({ page: 1, limit: 100 }),
+    queryFn: () => customerApi.getCustomers({ page: 1, limit: 1000 }),
+    enabled: open
   });
+
+  const { data: currencyData } = useQuery({
+  queryKey: ["currencies"],
+  queryFn: () => currencyApi.getCurrencies(), // Update to your actual API
+});
+
+useEffect(() => {
+  if (currencyData?.currency?.[0]) {
+    setCurrencyRates({
+      hkdToMop: currencyData.currency[0].hkdToMop || 1.03,
+      hkdToCny: currencyData.currency[0].hkdToCny || 0.93,
+    });
+  }
+}, [currencyData]);
 
   // Create/Update mutation
   const mutation = useMutation({
@@ -135,7 +153,7 @@ export function InvoiceModal({
             <Form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {isEditing ? (
-                  <div className="mt-2 bg-gray-50 p-4 rounded-lg">
+                  <div className="mt-2 p-4 rounded-lg">
                     Invoice Number:{" "}
                     <span className="text-gray-700 dark:text-gray-300">
                       <b>{invoice?.invoiceNumber || ""}</b>
@@ -154,7 +172,7 @@ export function InvoiceModal({
                       id="invoiceNumber"
                       name="invoiceNumber"
                       placeholder="Enter invoice number"
-                      className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                      className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                         errors.invoiceNumber && touched.invoiceNumber
                           ? "border-red-500"
                           : ""
@@ -169,7 +187,7 @@ export function InvoiceModal({
                 )}
 
                 {isEditing ? (
-                  <div className="mt-2 bg-gray-50 p-4 rounded-lg">
+                  <div className="mt-2 p-4 rounded-lg">
                     Customer Name:{" "}
                     <span className="text-gray-700 dark:text-gray-300">
                       <b>{invoice?.customer?.companyName || ""}</b>
@@ -190,7 +208,7 @@ export function InvoiceModal({
                       }
                     >
                       <SelectTrigger
-                        className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                        className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                           errors.customerId && touched.customerId
                             ? "border-red-500"
                             : ""
@@ -238,12 +256,17 @@ export function InvoiceModal({
                       const rounded = parseFloat(e.target.value).toFixed(2);
                       setFieldValue("amount", rounded);
                     }}
-                    className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                    className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                       errors.amount && touched.amount ? "border-red-500" : ""
                     }`}
                   />
                   {errors.amount && touched.amount && (
                     <p className="text-sm text-red-500">{errors.amount}</p>
+                  )}
+                  {values.currency !== 'HKD' && values.amount && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      ≈ {convertFromHKD(Number(values.amount), values.currency, currencyRates).toFixed(2)} HKD
+                    </p>
                   )}
                 </div>
 
@@ -258,7 +281,7 @@ export function InvoiceModal({
                     value={values.currency}
                     onValueChange={(value) => setFieldValue("currency", value)}
                   >
-                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">
+                    <SelectTrigger className="dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -297,7 +320,7 @@ export function InvoiceModal({
                     name="totalUnits"
                     type="number"
                     placeholder="0"
-                    className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                    className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                       errors.totalUnits && touched.totalUnits
                         ? "border-red-500"
                         : ""

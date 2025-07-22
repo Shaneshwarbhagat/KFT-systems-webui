@@ -29,6 +29,7 @@ import {
   Package,
   Printer,
   ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { CashModal } from "../../components/cash/cash-modal";
 import { DeleteCashDialog } from "../../components/cash/delete-cash-dialog";
@@ -36,7 +37,7 @@ import { LoadingSpinner } from "../../components/ui/loading-spinner";
 import { useAuth } from "../../hooks/use-auth";
 
 export default function CashPage() {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   // const [search, setSearch] = useState("")
   const [selectedCash, setSelectedCash] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -44,6 +45,7 @@ export default function CashPage() {
   const [cashToDelete, setCashToDelete] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const limit = 10
   const { user } = useAuth();
 
   const isAdmin = user?.role?.toLowerCase() === "admin";
@@ -51,8 +53,11 @@ export default function CashPage() {
   // Fetch cash list
   const { data: cashData, isLoading } = useQuery({
     queryKey: ["cash", page],
-    queryFn: () => cashApi.getCashList({ page, limit: 10 }),
+    queryFn: () => cashApi.getCashList({ page: page, limit }),
   });
+
+  const total = cashData?.total || 0
+  const totalPages = Math.ceil(total / limit)
 
   // const handleSort = (field: string) => {
   //   if (sortField === field) {
@@ -483,34 +488,36 @@ export default function CashPage() {
             </div>
 
             {/* Pagination */}
-            {cashData?.total > 10 && (
-              <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Showing {page * 10 + 1} to{" "}
-                  {Math.min((page + 1) * 10, cashData.total)} of{" "}
-                  {cashData.total} results
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(Math.max(0, page - 1))}
-                    disabled={page === 0}
-                  >
-                    <ChevronLeft className="h-4 w-4 mr-1" />
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(page + 1)}
-                    disabled={(page + 1) * 10 >= cashData.total}
-                  >
-                    Next
-                  </Button>
-                </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} users
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={page === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               </div>
-            )}
+            </div>
+          )}
           </CardContent>
         </Card>
       ) : (

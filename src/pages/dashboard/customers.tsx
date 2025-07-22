@@ -132,6 +132,7 @@ export default function CustomersPage() {
     mutationFn: customerApi.deleteCustomer,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({
         title: "Success",
         description: "Customer deleted successfully",

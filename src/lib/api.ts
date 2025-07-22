@@ -29,10 +29,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/change-password')) {
       localStorage.removeItem("token")
       localStorage.removeItem("userEmail")
       localStorage.removeItem("userName")
+      localStorage.clear()
       window.location.href = "/login"
     }
     return Promise.reject(error)
@@ -131,8 +132,8 @@ export const customerApi = {
 
 // Admin/Users API
 export const adminApi = {
-  getUsers: async () => {
-    const response = await api.get(`/v1/users/list`)
+  getUsers: async (params: { page: number; limit?: number }) => {
+    const response = await api.get(`/v1/users/list`, {params})
     return response.data
   },
   createUser: async (userData: any) => {

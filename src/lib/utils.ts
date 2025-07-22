@@ -29,3 +29,22 @@ export function formatDateTime(date: string | Date) {
     minute: "2-digit",
   }).format(new Date(date))
 }
+
+interface icurrencies { 
+  hkdToMop: number, 
+  hkdToCny: number 
+}
+
+export const convertFromHKD = (hkdAmount: number, currency: string, currencyRates: icurrencies): number => {
+  if (currency === "HKD") return hkdAmount;
+  if (currency === "MOP") return hkdAmount * currencyRates.hkdToMop;
+  if (currency === "CNY") return hkdAmount * currencyRates.hkdToCny;
+  return hkdAmount;
+};
+
+export const convertToHKD = (amount: number, currency: string, currencyRates: icurrencies): number => {
+  if (currency === "HKD") return amount;
+  if (currency === "MOP") return amount / currencyRates.hkdToMop;
+  if (currency === "CNY") return amount / currencyRates.hkdToCny;
+  return amount;
+};
