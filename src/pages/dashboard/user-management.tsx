@@ -176,7 +176,7 @@ export default function UserManagementPage() {
             className="pl-10 form-input"
           /> */}
         </div>
-        <div className="font-semibold text-gray-900 dark:text-white">Total: {total} users</div>
+        <div className="text-gray-900 dark:text-white">Total: <span className="font-semibold">{total}</span> users</div>
       </div>
 
       {/* Users Table */}
@@ -210,32 +210,32 @@ export default function UserManagementPage() {
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("name")}>
                       <div className="flex items-center">
                         Name
-                        {getSortIcon("name")}
+                        {/* {getSortIcon("name")} */}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("username")}>
                       <div className="flex items-center">
                         Username
-                        {getSortIcon("username")}
+                        {/* {getSortIcon("username")} */}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("emailId")}>
                       <div className="flex items-center">
                         Email
-                        {getSortIcon("emailId")}
+                        {/* {getSortIcon("emailId")} */}
                       </div>
                     </TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("role")}>
                       <div className="flex items-center">
                         Role
-                        {getSortIcon("role")}
+                        {/* {getSortIcon("role")} */}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("createdAt")}>
                       <div className="flex items-center">
                         Created
-                        {getSortIcon("createdAt")}
+                        {/* {getSortIcon("createdAt")} */}
                       </div>
                     </TableHead>
                     <TableHead className="text-right">Actions</TableHead>

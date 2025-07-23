@@ -5,8 +5,10 @@ import { ErrorBoundary } from "../../components/error-boundary"
 import { dashboardApi } from "../../lib/api"
 import { DollarSign, FileText, Package, TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react"
 import { formatCurrency } from "../../lib/utils"
+import { useTranslation } from "react-i18next"
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const {
     data: dashboardData,
     isLoading,
@@ -30,37 +32,37 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      title: "Total Orders",
+      title: t("dashboard.cardTotalOrders"),
       value: dashboardData?.totalOrderValue || 0,
       icon: Package,
       color: "from-blue-500 to-blue-600",
     },
     {
-      title: "Delivered Orders",
+      title: t("dashboard.cardDeliveredOrders"),
       value: dashboardData?.totalDeliveredValue || 0,
       icon: FileText,
       color: "from-green-500 to-green-600",
     },
     {
-      title: "Non-Delivered Orders",
+      title: t("dashboard.cardNonDeliveredOrders"),
       value: dashboardData?.nonDeliveredValue || 0,
       icon: Package,
       color: "from-red-500 to-red-600",
     },
     {
-      title: "Total Order Value",
+      title: t("dashboard.cardTotalOrderValue"),
       value: formatCurrency(dashboardData?.totalCashPickup || 0),
       icon: DollarSign,
       color: "from-brand-primary to-brand-secondary",
     },
     {
-      title: "Cash Picked Up",
+      title: t("dashboard.cardCashPickedUp"),
       value: formatCurrency(dashboardData?.deliveredCashPickup || 0),
       icon: DollarSign,
       color: "from-purple-500 to-purple-600",
     },
     {
-      title: "Cash Not Picked Up",
+      title: t("dashboard.cardCashNotPickedUp"),
       value: formatCurrency(dashboardData?.totalNetDue || 0),
       icon: DollarSign,
       color: "from-orange-500 to-orange-600",
@@ -73,8 +75,8 @@ export default function DashboardPage() {
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-brand-dark">Dashboard</h1>
-            <p className="text-brand-dark/70 text-lg mt-2">Welcome ! Here's what's happening with your business.</p>
+            <h1 className="text-4xl font-bold tracking-tight text-brand-dark">{t("dashboard.title")}</h1>
+            <p className="text-brand-dark/70 text-lg mt-2">{t("dashboard.subtitle")}</p>
           </div>
         </div>
 

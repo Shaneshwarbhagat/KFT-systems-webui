@@ -26,6 +26,7 @@ import { cashApi, currencyApi, invoiceApi } from "../../lib/api";
 import { LoadingSpinner } from "../ui/loading-spinner";
 import { useEffect, useState } from "react";
 import { convertFromHKD, convertToHKD } from "../../lib/utils";
+import { Receipt } from "lucide-react";
 
 const cashSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
@@ -156,6 +157,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
   const handleSubmit = (values: any) => {
     const submitData = {
       ...values,
+      receiptNumber: `REC-${values?.invoiceNumber}`,
       amount: Number(values.amount),
     };
 
@@ -408,7 +410,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="amount">
-                      {cash ? values.partialDelivery ? "Delivered Amount" : "Need to Delivered Amount" : values.partialDelivery ? "Amount" : "Total Amount to Pay"} in {values.currency}
+                      {cash ? values.partialDelivery ? "Delivered Amount" : "Need to Deliver Amount" : values.partialDelivery ? "Amount" : "Total Amount to Pay"} in {values.currency}
                     </Label>
                     <Field
                       as={Input}

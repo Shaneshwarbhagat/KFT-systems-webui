@@ -13,56 +13,59 @@ import {
   ChevronLeft,
   ChevronRight,
   Receipt,
-  Truck,
   Calendar,
   UserCog,
+  Truck,
 } from "lucide-react"
-
-const navigation = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    roles: ["Admin", "Executive"]
-  },
-  {
-    name: "Invoices",
-    href: "/dashboard/invoices",
-    icon: FileText,
-    roles: ["Admin", "Executive"]
-  },
-  {
-    name: "Delivery Order",
-    href: "/dashboard/orders",
-    icon: Truck,
-    roles: ["Admin", "Executive"]
-  },
-  {
-    name: "Cash Receipt",
-    href: "/dashboard/cash",
-    icon: Receipt,
-    roles: ["Admin", "Executive"]
-  },
-  {
-    name: "Customer Management",
-    href: "/dashboard/customers",
-    icon: Users,
-    roles: ["Admin"]
-  },
-  { name: "User Management", 
-    href: "/dashboard/user-management", 
-    icon: UserCog, 
-    roles: ["Admin"],
-  },
-  {
-    name: "Expected Payment Date",
-    href: "/dashboard/expected-payments",
-    icon: Calendar,
-    roles: ["Admin", "Executive"]
-  },
-]
+import { useTranslation } from "react-i18next"
 
 export function Sidebar() {
+  const { t } = useTranslation();
+
+  const navigation = [
+    {
+      name: t("menu.dashboard"),
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      roles: ["Admin", "Executive"]
+    },
+    {
+      name: t("menu.invoices"),
+      href: "/dashboard/invoices",
+      icon: FileText,
+      roles: ["Admin", "Executive"]
+    },
+    {
+      name: t("menu.deliveryOrder"),
+      href: "/dashboard/orders",
+      icon: Truck,
+      roles: ["Admin", "Executive"]
+    },
+    {
+      name: t("menu.cashReceipt"),
+      href: "/dashboard/cash",
+      icon: Receipt,
+      roles: ["Admin", "Executive"]
+    },
+    {
+      name: t("menu.customerManagement"),
+      href: "/dashboard/customers",
+      icon: Users,
+      roles: ["Admin"]
+    },
+    { name: t("menu.userManagement"), 
+      href: "/dashboard/user-management", 
+      icon: UserCog, 
+      roles: ["Admin"],
+    },
+    {
+      name: t("menu.expectedPaymentDate"),
+      href: "/dashboard/expected-payments",
+      icon: Calendar,
+      roles: ["Admin", "Executive"]
+    },
+  ]
+
   const location = useLocation()
   const { user } = useAuth()
   // Show all navigation items if user is not loaded yet (prevents sidebar from disappearing on reload)

@@ -28,17 +28,17 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-const expectedPaymentSchema = Yup.object().shape({
-  invoiceNumber: Yup.string().required("Invoice number is required"),
-  customerName: Yup.string().notRequired(),
-  expectedPaymentDate: Yup.date().required("Expected date is required"),
-});
-
 export default function ExpectedPaymentsPage() {
   const { t } = useTranslation();
   const [expectedDate, setExpectedDate] = useState<Date | null>(new Date());
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const expectedPaymentSchema = Yup.object().shape({
+    invoiceNumber: Yup.string().required(t("expectedPayment.invoiceNumberRequired")),
+    customerName: Yup.string().notRequired(),
+    expectedPaymentDate: Yup.date().required(t("expectedPayment.expectedDateRequired")),
+  });
 
   // Fetch invoices for dropdown
   const { data: invoicesData } = useQuery({
@@ -57,7 +57,7 @@ export default function ExpectedPaymentsPage() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Expected payment date saved successfully",
+        description: t("expectedPayment.expectedPaymentDateSavedSuccessfully"),
         className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["expected-payments"] });
@@ -68,7 +68,7 @@ export default function ExpectedPaymentsPage() {
         title: "Error",
         description:
           error.response?.data?.message ||
-          "Failed to save expected payment date",
+          t("expectedPayment.failedToSaveExpectedPaymentDate"),
         variant: "destructive",
       });
     },
@@ -183,7 +183,7 @@ export default function ExpectedPaymentsPage() {
                                 value={invoice.invoiceNumber}
                                 disabled={invoice.remainingAmount <= 0}
                               >
-                                {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && "(Fulfilled)"}
+                                {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && t("fulfilled")}
                               </SelectItem>
                             ))}
                           </SelectContent>

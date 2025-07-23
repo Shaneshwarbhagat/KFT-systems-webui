@@ -218,8 +218,8 @@ export default function CustomersPage() {
             className="pl-10"
           /> */}
         </div>
-        <div className="font-semibold text-gray-900 dark:text-white">
-          Total: {total} customers
+        <div className="text-gray-900 dark:text-white">
+          Total: <span className="font-semibold">{total}</span> customers
         </div>
       </div>
 
