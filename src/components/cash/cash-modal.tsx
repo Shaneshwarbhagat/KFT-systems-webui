@@ -80,7 +80,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
   // Fetch invoices
   const { data: invoices } = useQuery({
     queryKey: ["invoices"],
-    queryFn: () => invoiceApi.getInvoices({ page: 0, limit: 100 }),
+    queryFn: () => invoiceApi.getInvoices(),
     enabled: open,
   });
 
@@ -116,6 +116,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash"] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] }); // delete this once receive picked by from order get api.
       toast({
         title: "Success",
         description: "Cash receipt created successfully",
@@ -138,6 +139,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash"] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] }); // delete this once receive picked by from order get api.
       toast({
         title: "Success",
         description: "Cash receipt updated successfully",

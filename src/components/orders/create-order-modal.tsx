@@ -87,7 +87,7 @@ export function CreateOrderModal({
     if (selectedInvoice) {
       setFormData(prev => ({
         ...prev,
-        amountOfDelivery: Number(selectedInvoice?.amountInHkd).toFixed(2),
+        amountOfDelivery: selectedInvoice.remainingAmount === 0 ? Number(selectedInvoice?.amountInHkd).toFixed(2): Number(selectedInvoice.remainingAmount).toFixed(2),
       }))
     }
   }, [selectedInvoice]);
@@ -282,14 +282,14 @@ export function CreateOrderModal({
               <SelectTrigger>
                 <SelectValue placeholder="Select an invoice" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60 overflow-y-auto">
                 {invoices.map((invoice) => (
                   <SelectItem
                     key={invoice.invoiceNumber}
                     value={invoice.invoiceNumber}
                     disabled={invoice.remainingAmount <= 0}
                   >
-                    {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && "(Fulfilled)"}
+                    {invoice.invoiceNumber} {invoice.remainingAmount <= 0 || invoice.remainingAmount <= 0.00 && "(Fulfilled)"}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -43,7 +43,7 @@ export default function ExpectedPaymentsPage() {
   // Fetch invoices for dropdown
   const { data: invoicesData } = useQuery({
     queryKey: ["invoices"],
-    queryFn: () => invoiceApi.getInvoices({ page: 0, limit: 100 }),
+    queryFn: () => invoiceApi.getInvoices(),
   });
 
   const invoices = invoicesData?.invoices || [];
@@ -176,7 +176,7 @@ export default function ExpectedPaymentsPage() {
                         </SelectTrigger>
                         {invoicesData?.invoices &&
                         invoicesData?.invoices?.length ? (
-                          <SelectContent>
+                          <SelectContent className="max-h-60 overflow-y-auto">
                             {invoicesData?.invoices?.map((invoice: any) => (
                               <SelectItem
                                 key={invoice.id}
@@ -245,6 +245,7 @@ export default function ExpectedPaymentsPage() {
                           },
                         }}
                         format="dd/MM/yyyy"
+                        disablePast
                       />
                     </div>
 

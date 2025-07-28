@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderApi, invoiceApi } from "../../lib/api";
+import { orderApi, invoiceApi, cashApi } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -88,10 +88,16 @@ export default function OrdersPage() {
       }),
   });
 
-  // Fetch invoices for create modal
+  // Fetch all cash list, remove this if reciving pickedBy from get orderlist api.
+  const { data: cashListData } = useQuery({
+    queryKey: ["cash"],
+    queryFn: () => cashApi.getCashList(),
+  });
+
+  // Fetch invoices for create modal (fetch all, no limit)
   const { data: invoicesData } = useQuery({
     queryKey: ["invoices"],
-    queryFn: () => invoiceApi.getInvoices({ page: 1, limit: 100 }),
+    queryFn: () => invoiceApi.getInvoices(), // Remove limit to get all
   });
 
   // Delete mutation
@@ -116,9 +122,19 @@ export default function OrdersPage() {
     },
   });
 
+  
   const orders = ordersData?.orders || [];
   const total = ordersData?.total || 0;
   const totalPages = Math.ceil(total / limit);
+
+  // Merge pickedBy from cashListData into orders
+  const ordersWithPickedBy = orders.map((order:any) => {
+    const cashItem = cashListData?.data?.find((cash: any) => cash.invoiceNumber === order.invoiceNumber);
+    return {
+      ...order,
+      pickedBy: cashItem?.pickedBy || "--",
+    };
+  });
 
   const handleEdit = (order: Order) => {
     setSelectedOrder(order);
@@ -389,7 +405,7 @@ export default function OrdersPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {orders.map((order: Order) => {
+          {ordersWithPickedBy.map((order: Order & { pickedBy?: string }) => {
              const deliveredValue = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).remainingAmount;
              const totalPaidAmount = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).totalPaidAmount;
 
@@ -452,6 +468,17 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
+                {/* Delivered By */}
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <span className="text-sm text-gray-600">Delivered by: </span>
+                    <span className="font-medium text-sm text-gray-900">
+                      {order.pickedBy}
+                    </span>
+                  </div>
+                </div>
+
                 {/* Amount Info */}
                 <div className="flex items-center gap-2">
                   <CoinsIcon className="h-4 w-4 text-gray-400" />
@@ -477,7 +504,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    Amount in HKD:{Number.parseFloat(order.amountInHkd).toFixed(2)}
+                    Amount in HKD: {Number.parseFloat(order.amountInHkd).toFixed(2)}
                   </p>
                 </div>
 
@@ -576,6 +603,8 @@ export default function OrdersPage() {
         orderNumber={selectedOrder?.orderNumber || ""}
         isLoading={deleteMutation.isPending}
       />
+
+      {/* NOTE: For very large datasets, consider implementing backend pagination and infinite scroll for best performance. */}
     </div>
   );
 }

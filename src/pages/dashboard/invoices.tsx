@@ -77,6 +77,8 @@ export default function InvoicesPage() {
         className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["cash"] });
       setDeletingInvoice(null);
     },
     onError: (error: any) => {
@@ -354,7 +356,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Invoice Number
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -363,7 +365,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Customer Email ID
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -372,7 +374,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Customer Mobile No.
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -381,7 +383,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Customer
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -390,22 +392,22 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Amount
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead className="text-gray-700 dark:text-gray-300">
                       Currency
                     </TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">
+                    {/* <TableHead className="text-gray-700 dark:text-gray-300">
                       Units
-                    </TableHead>
+                    </TableHead> */}
                     <TableHead
                       className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
                       onClick={() => handleSort("amount")}
                     >
                       <div className="flex items-center">
                         Total Amount in HKD
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead className="text-gray-700 dark:text-gray-300">
@@ -420,7 +422,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Expected Payment Date
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -429,7 +431,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Payment Status
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead
@@ -438,7 +440,7 @@ export default function InvoicesPage() {
                     >
                       <div className="flex items-center">
                         Date
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                       </div>
                     </TableHead>
                     <TableHead className="text-gray-700 dark:text-gray-300">
@@ -477,9 +479,9 @@ export default function InvoicesPage() {
                             {invoice.currency}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-gray-700 dark:text-gray-300">
+                        {/* <TableCell className="text-gray-700 dark:text-gray-300">
                           {invoice.totalUnits}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell className="text-gray-700 dark:text-gray-300">
                           {Number.parseFloat(invoice.amountInHkd).toFixed(2)}
                         </TableCell>
@@ -503,7 +505,7 @@ export default function InvoicesPage() {
                           )}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {new Date(invoice.createdAt).toLocaleDateString(
+                          {new Date(invoice.invoiceDate).toLocaleDateString(
                             "en-GB"
                           )}
                         </TableCell>

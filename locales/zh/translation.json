@@ -86,7 +86,9 @@
       "invoiceinputCurrency": "货币 *",
       "invoiceCurrencyError": "货币是必需的",
       "invoiceEditInvoiceNumber": "发票号码",
-      "invoiceEditCustomerName": "客户名称"
+      "invoiceEditCustomerName": "客户名称",
+      "invoiceDate": "发票日期 *",
+      "invoiceDateError": "发票日期为必填项"
     },
     "table": {
       "invoiceTableTitle": "发票列表",
@@ -238,12 +240,12 @@
       "inputContactPersonName": "联系人姓名 *",
       "inputEmail": "电子邮件 *",
       "inputContactNumber": "联系电话 *",
-      "inputBrn": "商业注册号 (BRN) *",
+      "inputBrn": "商业注册号 (BRN)",
       "inputCity": "城市 *",
-      "inputCountry": "国家 *",
-      "inputAddress": "地址 *",
+      "inputCountry": "国家",
+      "inputAddress": "地址",
       "inputCompanyNameError": "公司名称是必需的",
-      "inputAddressEror": "地址是必需的",
+      "inputAddressError": "地址是必需的",
       "inputCityError": "城市是必需的",
       "inputCountryError": "国家是必需的",
       "inputBrnError": "商业注册号是必需的",
@@ -373,7 +375,7 @@
     "dashboard": "仪表板",
     "invoices": "发票",
     "deliveryOrder": "交付订单",
-    "cashReceipt": "现金收据 *",
+    "cashReceipt": "现金收据",
     "customerManagement": "客户管理",
     "userManagement": "用户管理",
     "expectedPaymentDate": "预计付款日期"

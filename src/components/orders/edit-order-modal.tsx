@@ -78,10 +78,7 @@ export function EditOrderModal({
         }
 
         // Fetch invoice to get remaining amount
-        return invoiceApi.getInvoices({ 
-          page: 1, 
-          limit: 100,
-        });
+        return invoiceApi.getInvoices();
       }).then((invoiceData) => {
         const invoice = invoiceData.invoices.find(
           (inv: any) => inv.invoiceNumber === order.invoiceNumber
@@ -314,41 +311,43 @@ export function EditOrderModal({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="deliveredValue">Ordered Amount *</Label>
-                  <Input
-                    id="deliveredValue"
-                    type="number"
-                    step="0.01"
-                    placeholder="Enter amount"
-                    value={formData.deliveredValue}
-                    onChange={handleAmountChange}
-                    onBlur={handleAmountBlur}
-                  />
-                  <div className="text-xs text-gray-500">
-                    Remaining Amount: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
-                    {formData.currency !== "HKD" && (
-                      <span> ({remainingAmountHKD.toFixed(2)} HKD)</span>
-                    )}
+                <div className="grid grid-cols-2 gap-4">  
+                  <div className="space-y-2">
+                    <Label htmlFor="deliveredValue">Ordered Amount *</Label>
+                    <Input
+                      id="deliveredValue"
+                      type="number"
+                      step="0.01"
+                      placeholder="Enter amount"
+                      value={formData.deliveredValue}
+                      onChange={handleAmountChange}
+                      onBlur={handleAmountBlur}
+                    />
+                    <div className="text-xs text-gray-500">
+                      Remaining Amount: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
+                      {formData.currency !== "HKD" && (
+                        <span> ({remainingAmountHKD.toFixed(2)} HKD)</span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="currency">Currency *</Label>
-                  <Select
-                    value={formData.currency}
-                    onValueChange={handleCurrencyChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="HKD">HKD</SelectItem>
-                      <SelectItem value="MOP">MOP</SelectItem>
-                      <SelectItem value="CNY">CNY</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="currency">Currency *</Label>
+                    <Select
+                      value={formData.currency}
+                      onValueChange={handleCurrencyChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="HKD">HKD</SelectItem>
+                        <SelectItem value="MOP">MOP</SelectItem>
+                        <SelectItem value="CNY">CNY</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>  
               </>
             )}
 

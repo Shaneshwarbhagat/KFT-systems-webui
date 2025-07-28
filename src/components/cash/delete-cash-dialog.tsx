@@ -30,6 +30,7 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cash"] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast({
         title: "Success",
         description: "Cash receipt deleted successfully",

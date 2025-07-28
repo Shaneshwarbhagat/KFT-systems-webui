@@ -86,7 +86,9 @@
       "invoiceinputCurrency": "Currency *",
       "invoiceCurrencyError": "Currency is required",
       "invoiceEditInvoiceNumber": "Invoice Number",
-      "invoiceEditCustomerName": "Customer Name"
+      "invoiceEditCustomerName": "Customer Name",
+      "invoiceDate": "Invoice Date *",
+      "invoiceDateError": "Invoice date is required"
     },
     "table": {
       "invoiceTableTitle": "Invoice List",
@@ -238,12 +240,12 @@
       "inputContactPersonName": "Contact Person Name *",
       "inputEmail": "Email *",
       "inputContactNumber": "Contact Number *",
-      "inputBrn": "Business Registration Number (BRN) *",
+      "inputBrn": "Business Registration Number (BRN)",
       "inputCity": "City *",
-      "inputCountry": "Country *",
-      "inputAddress": "Address *",
+      "inputCountry": "Country",
+      "inputAddress": "Address",
       "inputCompanyNameError": "Company name is required",
-      "inputAddressEror": "Address is required",
+      "inputAddressError": "Address is required",
       "inputCityError": "City is required",
       "inputCountryError": "Country is required",
       "inputBrnError": "Business Registration Number is required",
@@ -373,7 +375,7 @@
     "dashboard": "Dashboard",
     "invoices": "Invoices",
     "deliveryOrder": "Delivery Order",
-    "cashReceipt": "Cash Receipt *",
+    "cashReceipt": "Cash Receipt",
     "customerManagement": "Customer Management",
     "userManagement": "User Management",
     "expectedPaymentDate": "Expected Payment Date"

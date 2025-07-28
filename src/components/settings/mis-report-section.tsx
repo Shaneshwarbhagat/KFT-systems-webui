@@ -47,7 +47,7 @@ export function MisReportSection() {
   // Fetch customers for dropdown
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
-    queryFn: () => customerApi.getCustomers({ page: 0, limit: 100 }),
+    queryFn: () => customerApi.getCustomers(),
   })
 
   // Generate MIS report mutation

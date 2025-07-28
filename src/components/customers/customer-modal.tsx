@@ -31,13 +31,13 @@ interface CustomerModalProps {
 const customerSchema = Yup.object().shape({
   customerName: Yup.string().notRequired(),
   companyName: Yup.string().required("Company name is required"),
-  address: Yup.string().required("Address is required"),
+  address: Yup.string().notRequired(),
   city: Yup.string().required("City is required"),
-  country: Yup.string().required("Country is required"),
-  businessRegistrationNumber: Yup.string().required("Business Registration Number is required"),
+  country: Yup.string().notRequired(),
+  businessRegistrationNumber: Yup.string().notRequired(),
   emailId: Yup.string().email("Invalid email").required("Email is required"),
   contactPersonName: Yup.string().required("Contact person name is required"),
-  mobileNumber: Yup.string().required("Contact number is required"),
+  mobileNumber: Yup.string().matches(/^[+]?[\d\s\-()]{10,}$/, "Please enter a valid phone number").required("Contact number is required"),
 })
 
 export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModalProps) {
@@ -181,7 +181,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Business Registration Number */}
                 <div className="space-y-2">
-                  <Label htmlFor="businessRegistrationNumber">Business Registration Number (BRN) *</Label>
+                  <Label htmlFor="businessRegistrationNumber">Business Registration Number (BRN)</Label>
                   <Field
                     as={Input}
                     id="businessRegistrationNumber"
@@ -211,7 +211,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Country */}
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country *</Label>
+                  <Label htmlFor="country">Country</Label>
                   <Field
                     as={Input}
                     id="country"
@@ -225,7 +225,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
               {/* Address - Full Width */}
               <div className="space-y-2">
-                <Label htmlFor="address">Address *</Label>
+                <Label htmlFor="address">Address</Label>
                 <Field
                   as={Input}
                   id="address"
