@@ -20,6 +20,8 @@ import { convertFromHKD } from "../../lib/utils";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { Search } from "lucide-react"
+import { useDebounce } from "../../hooks/use-debounce"
 
 interface InvoiceFormValues {
   invoiceNumber: string;
@@ -49,6 +51,8 @@ export function InvoiceModal({
   onSuccess,
 }: InvoiceModalProps) {
   const [currencyRates, setCurrencyRates] = useState({ hkdToMop: 1.03, hkdToCny: 0.93 });
+  const [customerSearch, setCustomerSearch] = useState("")
+  const debouncedCustomerSearch = useDebounce(customerSearch, 300)
   const { toast } = useToast();
   const isEditing = !!invoice;
 
@@ -137,6 +141,21 @@ useEffect(() => {
 
   const customers = customersData?.customers || [];
 
+  // Filter customers based on search
+  const filteredCustomers = customers.filter((customer: any) => {
+    const searchTerm = debouncedCustomerSearch.toLowerCase()
+    const companyName = (customer.companyName || "").toLowerCase()
+    const contactName = (customer.contactPersonName || "").toLowerCase()
+    return companyName.includes(searchTerm) || contactName.includes(searchTerm)
+  })
+
+  // Reset search when modal closes
+  useEffect(() => {
+    if (!open) {
+      setCustomerSearch("")
+    }
+  }, [open])
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-y-auto">
@@ -201,48 +220,53 @@ useEffect(() => {
                     <div className="bg-gray-50 mt-2 p-4 rounded-lg">
                       Customer Name:{" "}
                       <span className="text-gray-700 dark:text-gray-300">
-                        <b>{invoice?.customer?.companyName || ""}</b>
+                        <b>{invoice?.customer?.companyName || invoice?.customer?.contactPersonName || ""}</b>
                       </span>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Label
-                        htmlFor="customerId"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
+                      <Label htmlFor="customerId" className="text-gray-700 dark:text-gray-300">
                         Customer *
                       </Label>
-                      <Select
-                        value={values.customerId}
-                        onValueChange={(value) =>
-                          setFieldValue("customerId", value)
-                        }
-                      >
+                      <Select value={values.customerId} onValueChange={(value) => setFieldValue("customerId", value)}>
                         <SelectTrigger
                           className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
-                            errors.customerId && touched.customerId
-                              ? "border-red-500"
-                              : ""
+                            errors.customerId && touched.customerId ? "border-red-500" : ""
                           }`}
                         >
                           <SelectValue placeholder="Select customer" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                          {customers.map((customer: any) => (
-                            <SelectItem
-                              key={customer.id}
-                              value={customer.id}
-                              className="text-gray-900 dark:text-gray-100"
-                            >
-                              {customer.companyName || customer.contactPersonName}
-                            </SelectItem>
-                          ))}
+                          <div className="flex items-center px-3 pb-2">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <Input
+                              placeholder="Search customers..."
+                              value={customerSearch}
+                              onChange={(e) => setCustomerSearch(e.target.value)}
+                              className="h-8 w-full bg-transparent border-0 focus:ring-0 focus:outline-none"
+                            />
+                          </div>
+                          <div className="max-h-60 overflow-y-auto">
+                            {filteredCustomers.length > 0 ? (
+                              filteredCustomers.map((customer: any) => (
+                                <SelectItem
+                                  key={customer.id}
+                                  value={customer.id}
+                                  className="text-gray-900 dark:text-gray-100"
+                                >
+                                  {customer.companyName || customer.contactPersonName}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                                No customers found
+                              </div>
+                            )}
+                          </div>
                         </SelectContent>
                       </Select>
                       {errors.customerId && touched.customerId && (
-                        <p className="text-sm text-red-500">
-                          {errors.customerId}
-                        </p>
+                        <p className="text-sm text-red-500">{errors.customerId}</p>
                       )}
                     </div>
                   )}
