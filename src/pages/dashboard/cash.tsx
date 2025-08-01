@@ -35,6 +35,7 @@ import { CashModal } from "../../components/cash/cash-modal";
 import { DeleteCashDialog } from "../../components/cash/delete-cash-dialog";
 import { LoadingSpinner } from "../../components/ui/loading-spinner";
 import { useAuth } from "../../hooks/use-auth";
+import { formatCurrency } from "../../lib/utils";
 
 export default function CashPage() {
   const [page, setPage] = useState(1);
@@ -280,7 +281,7 @@ export default function CashPage() {
             
             <div class="amount-section">
               <div class="amount-label">AMOUNT RECEIVED</div>
-              <div class="amount-value">${cash.currency} ${Number.parseFloat(cash.amount).toFixed(2)}</div>
+              <div class="amount-value">${cash.currency} ${formatCurrency(cash.amount)}</div>
             </div>
             
             <div class="payment-details">
@@ -291,7 +292,7 @@ export default function CashPage() {
               </div>
               <div class="info-row">
                 <span class="info-label">Amount in HKD:</span>
-                <span class="info-value">${Number.parseFloat(cash.amountInHkd).toFixed(2) || '--'}</span>
+                <span class="info-value">${formatCurrency(cash.amountInHkd) || '--'}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Status:</span>
@@ -332,10 +333,6 @@ export default function CashPage() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-GB");
-  };
-
-  const formatCurrency = (amount: string, currency: string) => {
-    return `${Number.parseFloat(amount).toFixed(2)} ${currency}`;
   };
 
   if (isLoading) {
@@ -423,16 +420,12 @@ export default function CashPage() {
                         {cash.customer?.companyName || "--"}
                       </TableCell>
                       <TableCell>
-                        {Number.parseFloat(cash.amount).toFixed(2)} <Badge
-                          variant="outline"
-                        >
-                          {cash.currency}
-                        </Badge>
+                        <b>{formatCurrency(cash.amount)}</b> <Badge variant="outline"> {cash.currency}</Badge>
                       </TableCell>
                       <TableCell>
-                        {Number.parseFloat(cash?.amountInHkd).toFixed(2) || "--"}
+                        {formatCurrency(cash?.amountInHkd) || "--"}
                       </TableCell>
-                      <TableCell>{cash.pickedBy}</TableCell>
+                      <TableCell><b>{cash.pickedBy}</b></TableCell>
                       <TableCell>{formatDate(cash.cashPickupDate)}</TableCell>
                       <TableCell>
                         <Badge

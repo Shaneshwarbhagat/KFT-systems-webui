@@ -51,19 +51,34 @@ export default function DashboardPage() {
     },
     {
       title: t("dashboard.cardTotalOrderValue"),
-      value: formatCurrency(dashboardData?.totalCashPickup || 0),
+      value: (
+        <>
+          <span className="text-gray-500">{formatCurrency(dashboardData?.totalCashPickup || 0, "HKD").split(" ")[0]}</span>{" "}
+          {formatCurrency(dashboardData?.totalCashPickup || 0, "HKD").split(" ")[1]}
+        </>
+      ),
       icon: DollarSign,
       color: "from-brand-primary to-brand-secondary",
     },
     {
       title: t("dashboard.cardCashPickedUp"),
-      value: formatCurrency(dashboardData?.deliveredCashPickup || 0),
+      value: (
+        <>
+          <span className="text-gray-500">{formatCurrency(dashboardData?.deliveredCashPickup || 0, "HKD").split(" ")[0]}</span>{" "}
+          {formatCurrency(dashboardData?.deliveredCashPickup || 0, "HKD").split(" ")[1]}
+        </>
+      ),
       icon: DollarSign,
       color: "from-purple-500 to-purple-600",
     },
     {
       title: t("dashboard.cardCashNotPickedUp"),
-      value: formatCurrency(dashboardData?.totalNetDue || 0),
+      value: (
+        <>
+          <span className="text-gray-500">{formatCurrency(dashboardData?.totalNetDue || 0, "HKD").split(" ")[0]}</span>{" "}
+          {formatCurrency(dashboardData?.totalNetDue || 0, "HKD").split(" ")[1]}
+        </>
+      ),
       icon: DollarSign,
       color: "from-orange-500 to-orange-600",
     },

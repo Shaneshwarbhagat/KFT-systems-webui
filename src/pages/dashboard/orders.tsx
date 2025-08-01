@@ -31,7 +31,7 @@ import { CreateOrderModal } from "../../components/orders/create-order-modal";
 import { EditOrderModal } from "../../components/orders/edit-order-modal";
 import { DeleteOrderDialog } from "../../components/orders/delete-order-dialog";
 import { useAuth } from "../../hooks/use-auth";
-import { formatDate } from "../../lib/utils";
+import { formatCurrency, formatDate } from "../../lib/utils";
 import Tooltip from "@mui/material/Tooltip";
 
 interface Order {
@@ -271,8 +271,8 @@ export default function OrdersPage() {
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>Order Processing</td>
                 <td>${order.deliveredUnits || 0}</td>
-                <td>${Number.parseFloat(order.amountOfDelivery || "0").toFixed(2)} ${order.currency}</td>
-                <td>${Number.parseFloat(order.amountInHkd || "0").toFixed(2)}</td>
+                <td>${formatCurrency(Number(order.amountOfDelivery || "0"))} ${order.currency}</td>
+                <td>${formatCurrency(Number(order.amountInHkd || "0"))}</td>
                 <td>${order?.partialDelivery ? "Partial Delivery" : "Full Delivery"}</td>
                 <td>${expectedPaymentDate || "--"} </td>
               </tr>
@@ -283,13 +283,13 @@ export default function OrdersPage() {
             <p>Unless otherwise agreed, all orders are processed within standard delivery timeframes.</p>
             
             <div class="totals">
-              <div><strong>SUB TOTAL: ${Number.parseFloat(
-                order.amountOfDelivery || "0"
-              ).toFixed(2)}</strong></div>
+              <div><strong>SUB TOTAL: ${formatCurrency(
+                Number(order.amountOfDelivery || "0")
+              )}</strong></div>
               <div><strong>DISCOUNT: -</strong></div>
               <div><strong>Amount due ${
                 order.currency || "HKD"
-              }: ${Number.parseFloat(order.amountOfDelivery || "0").toFixed(2)}</strong></div>
+              }: ${formatCurrency(Number(order.amountOfDelivery || "0"))}</strong></div>
             </div>
           </div>
 
@@ -485,7 +485,7 @@ export default function OrdersPage() {
                   <div>
                     <span className="text-sm text-gray-600">Amount of delivery: </span>
                     <span className="font-medium text-sm text-gray-900">
-                      {Number.parseFloat(order.amountOfDelivery).toFixed(2)} {order.currency}
+                      {formatCurrency(Number(order.amountOfDelivery))} {order.currency}
                     </span>
                     {/* <p className="text-xs text-gray-600">
                       Delivered: {order.deliveredUnits} units
@@ -504,7 +504,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    Amount in HKD: {Number.parseFloat(order.amountInHkd).toFixed(2)}
+                    Amount in HKD: {formatCurrency(Number(order.amountInHkd))}
                   </p>
                 </div>
 

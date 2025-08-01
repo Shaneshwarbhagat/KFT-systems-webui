@@ -22,6 +22,7 @@ import {
 import { useToast } from "../../hooks/use-toast";
 import { useAuth } from "../../hooks/use-auth";
 import { invoiceApi } from "../../lib/api";
+import { formatCurrency } from "../../lib/utils";
 import {
   Plus,
   Search,
@@ -254,8 +255,8 @@ export default function InvoicesPage() {
                 <td>${new Date(invoice.createdAt).toLocaleDateString()}</td>
                 <td>${invoice.description || "Service Charge"}</td>
                 <td>${invoice.units || 1}</td>
-                <td>${Number.parseFloat(invoice.amount || 0).toFixed(2)}</td>
-                <td>${Number.parseFloat(invoice.amountInHkd || 0).toFixed(2)}</td>
+                <td>${formatCurrency(invoice.amount || 0)}</td>
+                <td>${formatCurrency(invoice.amountInHkd || 0)}</td>
               </tr>
             </tbody>
           </table>
@@ -264,15 +265,11 @@ export default function InvoicesPage() {
             <p>Unless otherwise agreed, all invoices are payable within 10 days by wire transfer to our bank account</p>
             
             <div class="totals">
-              <div><strong>SUB TOTAL: ${Number.parseFloat(
-                invoice.amount || 0
-              ).toFixed(2)}</strong></div>
+              <div><strong>SUB TOTAL: ${formatCurrency(invoice.amount || 0)}</strong></div>
               <div><strong>DISCOUNT: -</strong></div>
               <div><strong>Amount due ${
                 invoice.currency || "HKD"
-              }: ${Number.parseFloat(invoice.amountInHkd || 0).toFixed(
-      2
-    )}</strong></div>
+              }: ${formatCurrency(invoice.amountInHkd || 0)}</strong></div>
             </div>
           </div>
 
@@ -469,7 +466,7 @@ export default function InvoicesPage() {
                             invoice.customer?.contactPersonName}
                         </TableCell>
                         <TableCell className="text-gray-900 dark:text-gray-100 font-semibold">
-                          {Number.parseFloat(invoice.amount).toFixed(2)}
+                          {formatCurrency(invoice.amount)}
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -483,13 +480,13 @@ export default function InvoicesPage() {
                           {invoice.totalUnits}
                         </TableCell> */}
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {Number.parseFloat(invoice.amountInHkd).toFixed(2)}
+                          {formatCurrency(invoice.amountInHkd)}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {Number.parseFloat(invoice.totalPaidAmount).toFixed(2)}
+                          {formatCurrency(invoice.totalPaidAmount)}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {Number.parseFloat(invoice.remainingAmount).toFixed(2)}
+                          {formatCurrency(invoice.remainingAmount)}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
                           {invoice.expectedPaymentDate
