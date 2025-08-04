@@ -20,7 +20,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles"
 const misSchema = Yup.object().shape({
   startDate: Yup.date().required("Start date is required"),
   endDate: Yup.date().required("End date is required").min(Yup.ref("startDate"), "End date must be after start date"),
-  customerName: Yup.string().required("Customer name is required"),
+  customerName: Yup.string().notRequired(),
   reportType: Yup.string().required("Report type is required"),
 })
 
@@ -53,7 +53,7 @@ export function MisReportSection() {
   // Generate MIS report mutation
   const generateReportMutation = useMutation({
     mutationFn: misApi.generateReport,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       if (data.url) {
         // Download the file
         const link = document.createElement("a")
@@ -65,7 +65,11 @@ export function MisReportSection() {
 
         toast({
           title: "Success",
-          description: "MIS report generated and downloaded successfully",
+          description: `MIS report generated and downloaded successfully for ${
+            variables?.customerId
+              ? customersData?.customers?.find((c: any) => c.id === variables.customerId)?.companyName || data.customerId
+              : "all customers"
+          }.`,
           className: "bg-success text-white [&_button]:text-white",
         })
       }
@@ -184,7 +188,7 @@ export function MisReportSection() {
 
                   <div className="space-y-2">
                     <Label htmlFor="customerName" className="form-label">
-                      Customer Name *
+                      Customer Name
                     </Label>
                     <Select value={values.customerName} onValueChange={(value) => setFieldValue("customerName", value)}>
                       <SelectTrigger
@@ -194,7 +198,7 @@ export function MisReportSection() {
                           placeholder={customersData?.customers?.length === 0 ? "No customer found" : "Select customer"}
                         />
                       </SelectTrigger>
-                      <SelectContent className="bg-card border-border z-50">
+                      <SelectContent className="bg-card border-border z-50 max-h-60 overflow-y-auto">
                         {customersData?.customers?.map((customer: any) => (
                           <SelectItem key={customer.id} value={customer.id}>
                             {customer.companyName}

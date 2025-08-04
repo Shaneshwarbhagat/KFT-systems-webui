@@ -15,13 +15,14 @@ import { useToast } from "../../hooks/use-toast";
 import { invoiceApi, customerApi, currencyApi } from "../../lib/api";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { convertFromHKD } from "../../lib/utils";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Search } from "lucide-react"
 import { useDebounce } from "../../hooks/use-debounce"
+import { useTranslation } from "react-i18next";
 
 interface InvoiceFormValues {
   invoiceNumber: string;
@@ -50,6 +51,7 @@ export function InvoiceModal({
   invoice,
   onSuccess,
 }: InvoiceModalProps) {
+  const { t } = useTranslation();
   const [currencyRates, setCurrencyRates] = useState({ hkdToMop: 1.03, hkdToCny: 0.93 });
   const [customerSearch, setCustomerSearch] = useState("")
   const debouncedCustomerSearch = useDebounce(customerSearch, 300)
@@ -81,9 +83,9 @@ export function InvoiceModal({
   });
 
   const { data: currencyData } = useQuery({
-  queryKey: ["currencies"],
-  queryFn: () => currencyApi.getCurrencies(), // Update to your actual API
-});
+    queryKey: ["currencies"],
+    queryFn: () => currencyApi.getCurrencies(), // Update to your actual API
+  });
 
 useEffect(() => {
   if (currencyData?.currency?.[0]) {
@@ -107,8 +109,8 @@ useEffect(() => {
       toast({
         title: "Success",
         description: `Invoice ${
-          isEditing ? "updated" : "created"
-        } successfully`,
+          isEditing ? t("updated") : t("created")
+        } ${t("successfully")}`,
         className: "bg-success text-white [&_button]:text-white",
       });
       onSuccess();
@@ -118,7 +120,7 @@ useEffect(() => {
         title: "Error",
         description:
           error.response?.data?.message ||
-          `Failed to ${isEditing ? "update" : "create"} invoice`,
+          `Failed to ${isEditing ? t("update") : t("create")} ${t("invoice")}`,
         variant: "destructive",
       });
     },
@@ -142,12 +144,15 @@ useEffect(() => {
   const customers = customersData?.customers || [];
 
   // Filter customers based on search
-  const filteredCustomers = customers.filter((customer: any) => {
-    const searchTerm = debouncedCustomerSearch.toLowerCase()
-    const companyName = (customer.companyName || "").toLowerCase()
-    const contactName = (customer.contactPersonName || "").toLowerCase()
-    return companyName.includes(searchTerm) || contactName.includes(searchTerm)
-  })
+  const filteredCustomers = useMemo(() => {
+    const result = customers.filter((customer: any) => {
+      const searchTerm = debouncedCustomerSearch.toLowerCase()
+      const companyName = (customer.companyName || "").toLowerCase()
+      const contactName = (customer.contactPersonName || "").toLowerCase()
+      return companyName.includes(searchTerm) || contactName.includes(searchTerm)
+    })
+    return result
+  }, [debouncedCustomerSearch]);
 
   // Reset search when modal closes
   useEffect(() => {
@@ -161,7 +166,7 @@ useEffect(() => {
       <DialogContent className="sm:max-w-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-gray-900 dark:text-white">
-            {isEditing ? "Edit Invoice" : "Create New Invoice"}
+            {isEditing ? t("invoices.editInvoiceButton") : t("invoices.modal.title")}
           </DialogTitle>
         </DialogHeader>
 
@@ -184,7 +189,7 @@ useEffect(() => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {isEditing ? (
                     <div className="bg-gray-50 p-4 rounded-lg mt-2">
-                      Invoice Number:{" "}
+                      {t("invoices.modal.invoiceEditInvoiceNumber")}:{" "}
                       <span className="text-gray-700 dark:text-gray-300">
                         <b>{invoice?.invoiceNumber || ""}</b>
                       </span>
@@ -195,7 +200,7 @@ useEffect(() => {
                         htmlFor="invoiceNumber"
                         className="text-gray-700 dark:text-gray-300"
                       >
-                        Invoice Number *
+                        {t("invoices.modal.inputInvoiceNumber")}
                       </Label>
                       <Field
                         as={Input}
@@ -218,7 +223,7 @@ useEffect(() => {
 
                   {isEditing ? (
                     <div className="bg-gray-50 mt-2 p-4 rounded-lg">
-                      Customer Name:{" "}
+                      {t("invoices.modal.invoiceEditCustomerName")}:{" "}
                       <span className="text-gray-700 dark:text-gray-300">
                         <b>{invoice?.customer?.companyName || invoice?.customer?.contactPersonName || ""}</b>
                       </span>
@@ -226,7 +231,7 @@ useEffect(() => {
                   ) : (
                     <div className="space-y-2">
                       <Label htmlFor="customerId" className="text-gray-700 dark:text-gray-300">
-                        Customer *
+                        {t("invoices.modal.inputCustomer")}
                       </Label>
                       <Select value={values.customerId} onValueChange={(value) => setFieldValue("customerId", value)}>
                         <SelectTrigger
@@ -243,7 +248,7 @@ useEffect(() => {
                               placeholder="Search customers..."
                               value={customerSearch}
                               onChange={(e) => setCustomerSearch(e.target.value)}
-                              className="h-8 w-full bg-transparent border-0 focus:ring-0 focus:outline-none"
+                              className="h-8 w-full bg-transparent focus:ring-0 focus:outline-none"
                             />
                           </div>
                           <div className="max-h-60 overflow-y-auto">
@@ -278,7 +283,7 @@ useEffect(() => {
                       htmlFor="amount"
                       className="text-gray-700 dark:text-gray-300"
                     >
-                      Amount *
+                      {t("invoices.modal.numberAmount")}
                     </Label>
                     <Field
                       as={Input}
@@ -310,7 +315,7 @@ useEffect(() => {
                       htmlFor="currency"
                       className="text-gray-700 dark:text-gray-300"
                     >
-                      Currency *
+                      {t("invoices.modal.invoiceinputCurrency")}
                     </Label>
                     <Select
                       value={values.currency}
@@ -345,7 +350,7 @@ useEffect(() => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="invoiceDate">Invoice Date *</Label>
+                    <Label htmlFor="invoiceDate">{t("invoices.modal.invoiceDate")}</Label>
                     <DatePicker
                         value={values.invoiceDate}
                         onChange={(date) => {
@@ -405,7 +410,7 @@ useEffect(() => {
                     onClick={() => onOpenChange(false)}
                     className="flex-1 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                   <Button
                     type="submit"
@@ -413,10 +418,10 @@ useEffect(() => {
                     className="flex-1 bg-brand-primary hover:bg-brand-dark text-white"
                   >
                     {mutation.isPending
-                      ? "Saving..."
+                      ? t("SavingText")
                       : isEditing
-                      ? "Update Invoice"
-                      : "Create Invoice"}
+                      ? t("invoices.updateInvoiceButton")
+                      : t("invoices.createInvoiceButton")}
                   </Button>
                 </div>
               </Form>

@@ -33,6 +33,7 @@ import {
 import { CustomerModal } from "../../components/customers/customer-modal";
 import { DeleteCustomerDialog } from "../../components/customers/delete-customer-dialog";
 import { formatDate } from "../../lib/utils";
+import { useDebounce } from "../../hooks/use-debounce";
 
 interface Customer {
   id: string;
@@ -54,6 +55,7 @@ type SortDirection = "asc" | "desc";
 export default function CustomersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedInvoiceSearch = useDebounce(searchTerm, 600)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
@@ -73,15 +75,15 @@ export default function CustomersPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["customers", currentPage],
+    queryKey: ["customers", currentPage, debouncedInvoiceSearch],
     queryFn: () =>
       customerApi.getCustomers({
         page: currentPage,
         limit,
+        search: debouncedInvoiceSearch,
       }),
   });
 
-  const customers = customersData?.customers || [];
   const total = customersData?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
@@ -90,18 +92,18 @@ export default function CustomersPage() {
     let result = customersData?.customers || [];
 
     // Frontend search
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (customer: any) =>
-          customer.companyName.toLowerCase().includes(term) ||
-          customer.contactPersonName.toLowerCase().includes(term) ||
-          customer.emailId.toLowerCase().includes(term) ||
-          customer.city.toLowerCase().includes(term) ||
-          customer.country.toLowerCase().includes(term) ||
-          customer.businessRegistrationNumber.toLowerCase().includes(term)
-      );
-    }
+    // if (searchTerm) {
+    //   const term = searchTerm.toLowerCase();
+    //   result = result.filter(
+    //     (customer: any) =>
+    //       customer.companyName.toLowerCase().includes(term) ||
+    //       customer.contactPersonName.toLowerCase().includes(term) ||
+    //       customer.emailId.toLowerCase().includes(term) ||
+    //       customer.city.toLowerCase().includes(term) ||
+    //       customer.country.toLowerCase().includes(term) ||
+    //       customer.businessRegistrationNumber.toLowerCase().includes(term)
+    //   );
+    // }
 
     // Frontend sorting
     if (sortField) {
@@ -116,7 +118,7 @@ export default function CustomersPage() {
     }
 
     return result;
-  }, [customersData?.customers, searchTerm, sortField, sortDirection]);
+  }, [customersData?.customers, debouncedInvoiceSearch, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -210,13 +212,13 @@ export default function CustomersPage() {
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         {/* TO DO: Search is working with current 10 list shown */}
         <div className="relative w-full sm:w-96">
-          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
-          /> */}
+          />
         </div>
         <div className="text-gray-900 dark:text-white">
           Total: <span className="font-semibold">{total}</span> customers

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -30,22 +30,27 @@ import {
   Printer,
   ChevronLeft,
   ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { CashModal } from "../../components/cash/cash-modal";
 import { DeleteCashDialog } from "../../components/cash/delete-cash-dialog";
 import { LoadingSpinner } from "../../components/ui/loading-spinner";
 import { useAuth } from "../../hooks/use-auth";
 import { formatCurrency } from "../../lib/utils";
+import { useDebounce } from "../../hooks/use-debounce";
 
 export default function CashPage() {
   const [page, setPage] = useState(1);
-  // const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("")
+  const debouncedCashSearch = useDebounce(search, 500);
+  const [sortField, setSortField] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedCash, setSelectedCash] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [cashToDelete, setCashToDelete] = useState<any>(null);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const limit = 10
   const { user } = useAuth();
 
@@ -53,26 +58,39 @@ export default function CashPage() {
 
   // Fetch cash list
   const { data: cashData, isLoading } = useQuery({
-    queryKey: ["cash", page],
-    queryFn: () => cashApi.getCashList({ page: page, limit }),
+    queryKey: ["cash", page, debouncedCashSearch],
+    queryFn: () => cashApi.getCashList({ page: page, limit, search: debouncedCashSearch }),
   });
 
   const total = cashData?.total || 0
   const totalPages = Math.ceil(total / limit)
 
-  // const handleSort = (field: string) => {
-  //   if (sortField === field) {
-  //     setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-  //   } else {
-  //     setSortField(field)
-  //     setSortOrder("asc")
-  //   }
-  // }
+  const processedCashData = useMemo(() => {
+    if (!cashData?.data) return [];
+    // Sort cash data based on sortField and sortOrder
+    const sortedCash = [...cashData.data].sort((a, b) => {
+      const aValue = a[sortField] || "";
+      const bValue = b[sortField] || "";
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+    return sortedCash;
+  }, [cashData, sortField, sortOrder]);
 
-  // const getSortIcon = (field: string) => {
-  //   if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-  //   return sortOrder === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-  // }
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("asc")
+    }
+  }
+
+  const getSortIcon = (field: string) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
+    return sortOrder === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+  }
 
   const handleEdit = (cash: any) => {
     setSelectedCash(cash);
@@ -354,30 +372,32 @@ export default function CashPage() {
             Manage cash receipts and transactions
           </p>
         </div>
-        <Button
-          onClick={handleCreate}
-          className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Cash Receipt
-        </Button>
-      </div>
-
-      {cashData?.data?.length !== 0 ? (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Cash Receipts</CardTitle>
-              <div className="flex items-center space-x-2">
-                {/* <div className="relative w-72">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 sm:gap-5">
+          <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search receipts..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-full sm:w-80"
               />
-            </div> */}
+            </div>
+          <Button
+            onClick={handleCreate}
+            className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Cash Receipt
+          </Button>
+        </div>
+      </div>
+
+      {processedCashData?.length !== 0 ? (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Cash Receipts</CardTitle>
+              <div className="flex items-center space-x-2">
                 Total Receipts: &nbsp;
                 <span className="font-semibold">{cashData?.total || 0}</span>
               </div>
@@ -388,29 +408,32 @@ export default function CashPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-gray-700/50">
-                    <TableHead
-                    // onClick={() => handleSort("receiptNumber")}
-                    >
-                      Receipt Number
-                      {/* {getSortIcon("receiptNumber")} */}
-                    </TableHead>
-                    <TableHead
-                    // onClick={() => handleSort("invoiceNumber")}
-                    >
-                      Invoice Number
-                      {/* {getSortIcon("invoiceNumber")} */}
+                    <TableHead>Receipt Number</TableHead>
+                    <TableHead>Invoice Number
                     </TableHead>
                     <TableHead>Customer</TableHead>
-                    <TableHead>Amount Received</TableHead>
+                    <TableHead onClick={() => handleSort("amount")} className="cursor-pointer flex items-center justify-between">
+                      Amount Received {getSortIcon("amount")}
+                    </TableHead>
                     <TableHead>Amount in HKD</TableHead>
-                    <TableHead>Picked By</TableHead>
-                    <TableHead>Pickup Date</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead onClick={() => handleSort("pickedBy")}>
+                      <div className="cursor-pointer flex items-center justify-between flex-diredction-row">
+                        Picked By <span className="ml-1">{getSortIcon("pickedBy")}</span>
+                      </div>
+                    </TableHead>
+                    <TableHead onClick={() => handleSort("cashPickupDate")} className="cursor-pointer flex items-center justify-between">
+                      Pickup Date {getSortIcon("cashPickupDate")}
+                    </TableHead>
+                    <TableHead onClick={() => handleSort("partialDelivery")}>
+                      <div className="cursor-pointer flex items-center justify-between flex-diredction-row">
+                        Status <span>{getSortIcon("partialDelivery")}</span>
+                      </div>
+                    </TableHead>
                     {isAdmin && <TableHead>Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cashData?.data?.map((cash: any) => (
+                  {processedCashData?.map((cash: any) => (
                     <TableRow key={cash.id}>
                       <TableCell className="font-medium">
                         {cash.receiptNumber}

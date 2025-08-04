@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { adminApi } from "../../lib/api"
 import { Button } from "../../components/ui/button"
@@ -24,6 +24,7 @@ import { LoadingSpinner } from "../../components/ui/loading-spinner"
 import { UserModal } from "../../components/users/user-modal"
 import { DeleteUserDialog } from "../../components/users/delete-user-dialog"
 import { Badge } from "../../components/ui/badge"
+import { useDebounce } from "../../hooks/use-debounce"
 
 interface User {
   id: string
@@ -40,6 +41,7 @@ interface User {
 export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
+  const debouncedUserSearch = useDebounce(searchTerm, 300)
   const [sortField, setSortField] = useState("")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -57,11 +59,12 @@ export default function UserManagementPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["users", currentPage, searchTerm, sortField, sortOrder],
+    queryKey: ["users", currentPage, debouncedUserSearch],
     queryFn: () =>
       adminApi.getUsers({
         page: currentPage,
         limit,
+        search: debouncedUserSearch
       }),
 
   })
@@ -91,6 +94,20 @@ export default function UserManagementPage() {
   const users = usersData?.users || []
   const total = usersData?.total || 0
   const totalPages = Math.ceil(total / limit)
+
+  const processedUserData = useMemo(() => {
+    if (users && users.length > 0) {
+      const sortedUser = [...users].sort((a, b) => {
+        const aValue = a[sortField] || "";
+        const bValue = b[sortField] || "";
+        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+      return sortedUser;
+    }
+    return [];
+  }, [users, sortField, sortOrder])
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -168,13 +185,13 @@ export default function UserManagementPage() {
       {/* Search and Stats */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-96">
-          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search users by name, email, or username..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 form-input"
-          /> */}
+          />
         </div>
         <div className="text-gray-900 dark:text-white">Total: <span className="font-semibold">{total}</span> users</div>
       </div>
@@ -192,7 +209,7 @@ export default function UserManagementPage() {
             <div className="flex justify-center py-8">
               <LoadingSpinner size="lg"/>
             </div>
-          ) : users.length === 0 ? (
+          ) : processedUserData.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No users found</h3>
@@ -210,39 +227,37 @@ export default function UserManagementPage() {
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("name")}>
                       <div className="flex items-center">
                         Name
-                        {/* {getSortIcon("name")} */}
+                        {getSortIcon("name")}
                       </div>
                     </TableHead>
-                    <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("username")}>
+                    <TableHead className="cursor-pointer hover:text-foreground">
                       <div className="flex items-center">
                         Username
-                        {/* {getSortIcon("username")} */}
                       </div>
                     </TableHead>
-                    <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("emailId")}>
+                    <TableHead className="cursor-pointer hover:text-foreground">
                       <div className="flex items-center">
                         Email
-                        {/* {getSortIcon("emailId")} */}
                       </div>
                     </TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("role")}>
                       <div className="flex items-center">
                         Role
-                        {/* {getSortIcon("role")} */}
+                        {getSortIcon("role")}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("createdAt")}>
                       <div className="flex items-center">
                         Created
-                        {/* {getSortIcon("createdAt")} */}
+                        {getSortIcon("createdAt")}
                       </div>
                     </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user: User) => (
+                  {processedUserData.map((user: User) => (
                     <TableRow key={user.id} className="table-row">
                       <TableCell className="font-medium text-foreground">{user.name}</TableCell>
                       <TableCell className="text-foreground">{user.username}</TableCell>

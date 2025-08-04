@@ -50,6 +50,7 @@ export function CreateOrderModal({
   const [formData, setFormData] = useState({
     invoiceNumber: "",
     partialDelivery: false,
+    deliveredBy: "",
     currency: "HKD",
     deliveryUnits: 0,
     amountOfDelivery: "",
@@ -139,6 +140,7 @@ export function CreateOrderModal({
     setFormData({
       invoiceNumber: "",
       partialDelivery: false,
+      deliveredBy: "",
       currency: "HKD",
       deliveryUnits: 0,
       amountOfDelivery: "",
@@ -149,7 +151,7 @@ export function CreateOrderModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.invoiceNumber || !formData.currency || !formData.amountOfDelivery) {
+    if (!formData.invoiceNumber || !formData.currency || !formData.amountOfDelivery || !formData.deliveredBy) {
       toast({
         title: "Error",
         description: "Please fill in all * required fields",
@@ -190,6 +192,7 @@ export function CreateOrderModal({
     const orderData = {
       invoiceNumber: formData.invoiceNumber,
       partialDelivery: formData.partialDelivery,
+      deliveredBy: formData.deliveredBy,
       deliveredUnits: Number(formData.deliveryUnits),
       currency: formData.currency,
       amountOfDelivery: Number(parseFloat(formData.amountOfDelivery).toFixed(2)),
@@ -309,8 +312,8 @@ export function CreateOrderModal({
                     <Input
                       id="customer"
                       value={
-                        selectedInvoice.customer.companyName ||
-                        selectedInvoice.customer.contactPersonName
+                        selectedInvoice?.customer?.companyName ||
+                        selectedInvoice?.customer?.contactPersonName
                       }
                       disabled
                       className="bg-gray-50"
@@ -357,19 +360,32 @@ export function CreateOrderModal({
                     </div>
                   </div>
 
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="partialDelivery"
-                        checked={formData.partialDelivery}
-                        onCheckedChange={(checked) =>
-                          setFormData(prev => ({...prev, partialDelivery: !!checked}))
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="partialDelivery"
+                          checked={formData.partialDelivery}
+                          onCheckedChange={(checked) =>
+                            setFormData(prev => ({...prev, partialDelivery: !!checked}))
+                          }
+                        />
+                        <Label htmlFor="partialDelivery">Partial Delivery</Label>
+                      </div>
+                      <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4 mt-2">
+                        Checkmark if partial delivery and add amount.
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="deliveredBy">Delivered By *</Label>
+                      <Input
+                        id="deliveredBy"
+                        placeholder="Enter name"
+                        value={formData.deliveredBy}
+                        onChange={(e) =>
+                          setFormData(prev => ({...prev, deliveredBy: e.target.value}))
                         }
                       />
-                      <Label htmlFor="partialDelivery">Partial Delivery</Label>
-                    </div>
-                    <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4 mt-2">
-                      Checkmark if partial delivery and add amount.
                     </div>
                   </div>
                 </>

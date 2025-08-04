@@ -27,6 +27,7 @@ interface Order {
   orderNumber: string;
   invoiceNumber: string;
   partialDelivery: boolean;
+  deliveredBy: string;
   amountOfDelivery: string;
   currency: string;
   customerId: string;
@@ -49,6 +50,7 @@ export function EditOrderModal({
 }: EditOrderModalProps) {
   const [formData, setFormData] = useState({
     deliveryStatus: false,
+    deliveredBy: "",
     deliveredValue: "",
     currency: "HKD",
   });
@@ -99,6 +101,7 @@ export function EditOrderModal({
 
       setFormData({
         deliveryStatus: order.partialDelivery,
+        deliveredBy: order.deliveredBy || "",
         deliveredValue: parseFloat(order.amountOfDelivery).toFixed(2),
         currency: order.currency,
       });
@@ -147,7 +150,7 @@ export function EditOrderModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!order || !formData.deliveredValue || !formData.currency) {
+    if (!order || !formData.deliveredValue || !formData.currency || !formData.deliveredBy ) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -187,6 +190,7 @@ export function EditOrderModal({
 
     const updateData = {
       partialDelivery: formData.deliveryStatus,
+      deliveredBy: formData.deliveredBy,
       amountOfDelivery: Number(parseFloat(formData.deliveredValue).toFixed(2)),
       currency: formData.currency,
       customerId: order.customerId,
@@ -265,12 +269,12 @@ export function EditOrderModal({
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
               <div className="flex justify-between">
                 <span className="font-medium text-gray-700">Invoice Number:</span>
-                <span className="text-gray-900">{order.invoiceNumber}</span>
+                <span className="text-gray-900">{order?.invoiceNumber}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium text-gray-700">Company Name:</span>
                 <span className="text-gray-900">
-                  {order.customer.companyName}
+                  {order?.customer?.companyName}
                 </span>
               </div>
             </div>
@@ -281,36 +285,6 @@ export function EditOrderModal({
               </div>
             ) : (
               <>
-                <div className="space-y-3">
-                  <Label>Partial Delivery</Label>
-                  <div className="flex items-center space-x-6">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="status-yes"
-                        checked={formData.deliveryStatus === true}
-                        onCheckedChange={() =>
-                          setFormData(prev => ({...prev, deliveryStatus: true}))
-                        }
-                      />
-                      <Label htmlFor="status-yes" className="text-sm font-normal">
-                        Yes
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="status-no"
-                        checked={formData.deliveryStatus === false}
-                        onCheckedChange={() =>
-                          setFormData(prev => ({...prev, deliveryStatus: false}))
-                        }
-                      />
-                      <Label htmlFor="status-no" className="text-sm font-normal">
-                        No
-                      </Label>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">  
                   <div className="space-y-2">
                     <Label htmlFor="deliveredValue">Ordered Amount *</Label>
@@ -347,7 +321,50 @@ export function EditOrderModal({
                       </SelectContent>
                     </Select>
                   </div>
-                </div>  
+                </div> 
+              
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Partial Delivery</Label>
+                    <div className="flex items-center space-x-6">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="status-yes"
+                          checked={formData.deliveryStatus === true}
+                          onCheckedChange={() =>
+                            setFormData(prev => ({...prev, deliveryStatus: true}))
+                          }
+                        />
+                        <Label htmlFor="status-yes" className="text-sm font-normal">
+                          Yes
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="status-no"
+                          checked={formData.deliveryStatus === false}
+                          onCheckedChange={() =>
+                            setFormData(prev => ({...prev, deliveryStatus: false}))
+                          }
+                        />
+                        <Label htmlFor="status-no" className="text-sm font-normal">
+                          No
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Delivery By *</Label>
+                    <Input
+                      id="deliveredBy"
+                      placeholder="Enter name"
+                      value={formData.deliveredBy}
+                      onChange={(e) =>
+                        setFormData(prev => ({...prev, deliveredBy: e.target.value}))
+                      }
+                    />
+                  </div>
+                </div>
               </>
             )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -37,9 +37,13 @@ import { DeleteInvoiceDialog } from "../../components/invoices/delete-invoice-di
 import { LoadingSpinner } from "../../components/ui/loading-spinner";
 import { getIn } from "formik";
 import Tooltip from "@mui/material/Tooltip";
+import { useDebounce } from "../../hooks/use-debounce";
+import { useTranslation } from "react-i18next";
 
 export default function InvoicesPage() {
-  // const [searchQuery, setSearchQuery] = useState("")
+  const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState("")
+  const debouncedInvoiceSearch = useDebounce(searchQuery, 600)
   const [currentPage, setCurrentPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<any>(null);
@@ -54,14 +58,14 @@ export default function InvoicesPage() {
   // Check if user is admin
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
-  // Fetch invoices
   // Fetch invoices and payment status in parallel
   const { data: invoicesData, isLoading } = useQuery({
-    queryKey: ["invoices", currentPage],
+    queryKey: ["invoices", currentPage, debouncedInvoiceSearch],
     queryFn: () =>
       invoiceApi.getInvoices({
         page: currentPage,
         limit: 10,
+        search: debouncedInvoiceSearch,
       }),
   });
 
@@ -74,7 +78,7 @@ export default function InvoicesPage() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Invoice deleted successfully",
+        description: t("invoices.invoiceDeletedSuccessfully"),
         className: "bg-success text-white [&_button]:text-white",
       });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
@@ -86,7 +90,7 @@ export default function InvoicesPage() {
       toast({
         title: "Error",
         description:
-          error.response?.data?.message || "Failed to delete invoice",
+          error.response?.data?.message || t("invoices.failedToDeleteInvoice"),
         variant: "destructive",
       });
     },
@@ -117,6 +121,19 @@ export default function InvoicesPage() {
       );
     }
   };
+
+  // frontend sorting
+  const processedInvoice = useMemo(() => {
+    const sortedInvoices = [...invoices].sort((a, b) => {
+    const aValue = getIn(a, sortField);
+    const bValue = getIn(b, sortField);
+
+    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+  return sortedInvoices;
+  },[invoices, sortField, sortOrder]);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -302,43 +319,47 @@ export default function InvoicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Invoices
+            {t("invoices.title")}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage your invoices and track payments
+            {t("invoices.subTitle")}
           </p>
         </div>
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Invoice
-        </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 sm:gap-5">
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder={t("invoices.SearchInvoices")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-full sm:w-80 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+          <Button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {t("invoices.addInvoiceButton")}
+          </Button>
+        </div>
       </div>
 
-      {invoices?.length !== 0 ? (
+      {processedInvoice?.length !== 0 ? (
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-gray-900 dark:text-white">
-                Invoice List
+                {t("invoices.table.invoiceTableTitle")}
               </CardTitle>
               <div className="flex items-center space-x-2">
-                {/* <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search invoices..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                />
-              </div> */}
-                Total Invoices: &nbsp;
+              <div>
+                {t("invoices.totalInvoices")}: &nbsp;
                 <span className="font-semibold text-gray-900 dark:text-white">
                   {" "}
                   {invoicesData?.total || 0}
                 </span>
+              </div>
               </div>
             </div>
           </CardHeader>
@@ -347,107 +368,87 @@ export default function InvoicesPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-gray-700/50">
-                    <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("invoiceNumber")}
-                    >
+                    <TableHead>
                       <div className="flex items-center">
-                        Invoice Number
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceNumber")}
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        {t("invoices.table.invoiceCustomerEmailId")}
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        {t("invoices.table.invoiceCustomerMobileNo")}
                       </div>
                     </TableHead>
                     <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("customer")}
+                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("customer.companyName")}
                     >
                       <div className="flex items-center">
-                        Customer Email ID
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceCustomer")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
                       </div>
                     </TableHead>
                     <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("customer")}
-                    >
-                      <div className="flex items-center">
-                        Customer Mobile No.
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-                      </div>
-                    </TableHead>
-                    <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("customer")}
-                    >
-                      <div className="flex items-center">
-                        Customer
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-                      </div>
-                    </TableHead>
-                    <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
                       onClick={() => handleSort("amount")}
                     >
                       <div className="flex items-center">
-                        Amount
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceAmount")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
                       </div>
                     </TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">
-                      Currency
+                    <TableHead>
+                      {t("invoices.table.invoiceCurrency")}
                     </TableHead>
                     {/* <TableHead className="text-gray-700 dark:text-gray-300">
                       Units
                     </TableHead> */}
-                    <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("amount")}
-                    >
+                    <TableHead>
                       <div className="flex items-center">
-                        Total Amount in HKD
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceTotalAmount")} HKD
                       </div>
                     </TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">
-                      Total Paid Amt (HKD)
+                    <TableHead>
+                      {t("invoices.table.invoiceTotalPaidAmt")} (HKD)
                     </TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">
-                      Total Remiaining Amt (HKD)
+                    <TableHead>
+                      {t("invoices.table.invoiceTotalRemiainingAmt")} (HKD)
                     </TableHead>
                     <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("expectedAt")}
+                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("expectedPaymentDate")}
                     >
                       <div className="flex items-center">
-                        Expected Payment Date
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceExpectedPaymentDate")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
                       </div>
                     </TableHead>
-                    <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("paymentStatus")}
-                    >
+                    <TableHead>
                       <div className="flex items-center">
-                        Payment Status
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoicePaymentStatus")}
                       </div>
                     </TableHead>
                     <TableHead
-                      className="text-gray-700 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("createdAt")}
+                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("invoiceDate")}
                     >
                       <div className="flex items-center">
-                        Date
-                        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                        {t("invoices.table.invoiceDate")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
                       </div>
                     </TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">
-                      Actions
+                    <TableHead>
+                      {t("invoices.table.invoiceActions")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {invoices && invoices.length ? (
-                    invoices.map((invoice: any) => (
+                  {processedInvoice && processedInvoice.length ? (
+                    processedInvoice.map((invoice: any) => (
                       <TableRow
                         key={invoice.id}
                         className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
@@ -462,8 +463,7 @@ export default function InvoicesPage() {
                           {invoice.customer?.mobileNumber}
                         </TableCell>
                         <TableCell className="text-gray-700 dark:text-gray-300">
-                          {invoice.customer?.companyName ||
-                            invoice.customer?.contactPersonName}
+                          {invoice.customer?.companyName || invoice.customer?.contactPersonName}
                         </TableCell>
                         <TableCell className="text-gray-900 dark:text-gray-100 font-semibold">
                           {formatCurrency(invoice.amount)}
@@ -544,7 +544,7 @@ export default function InvoicesPage() {
                       </TableRow>
                     ))
                   ) : (
-                    <div className="p-5">No invoices found.</div>
+                    <div className="p-5">{t("invoices.NoInvoiceFound")}.</div>
                   )}
                 </TableBody>
               </Table>
@@ -554,8 +554,8 @@ export default function InvoicesPage() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-4">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Showing {(currentPage - 1) * 10 + 1} to{" "}
-                  {Math.min(currentPage * 10, invoicesData?.total || 0)} of{" "}
+                  {t("showing")} {(currentPage - 1) * 10 + 1} {t("to")}{" "}
+                  {Math.min(currentPage * 10, invoicesData?.total || 0)} {t("of")}{" "}
                   {invoicesData?.total || 0} results
                 </p>
                 <div className="flex items-center space-x-2">
@@ -568,10 +568,10 @@ export default function InvoicesPage() {
                     disabled={currentPage === 1}
                     className="border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                   >
-                    Previous
+                    {t("previous")}
                   </Button>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Page {currentPage} of {totalPages}
+                    {t("page")} {currentPage} {t("of")} {totalPages}
                   </span>
                   <Button
                     variant="outline"
@@ -582,7 +582,7 @@ export default function InvoicesPage() {
                     disabled={currentPage === totalPages}
                     className="border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                   >
-                    Next
+                    {t("next")}
                   </Button>
                 </div>
               </div>
@@ -593,17 +593,17 @@ export default function InvoicesPage() {
         <Card className="p-12 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No invoice found
+            {t("invoices.NoInvoiceFound")}
           </h3>
           <p className="text-gray-600 mb-4">
-            Get started by creating your first invoice
+            {t("invoices.getstartedByCreatingYourFirstInvoice")}
           </p>
           <Button
             onClick={() => setShowCreateModal(true)}
             className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Invoice
+            {t("invoices.addInvoiceButton")}
           </Button>
         </Card>
       )}

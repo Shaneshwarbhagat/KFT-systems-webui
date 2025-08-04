@@ -84,7 +84,7 @@ export const authApi = {
 
 // Order API
 export const orderApi = {
-  getOrders: async (params: { page: number; limit: number; search?: string }) => {
+  getOrders: async (params: { page: number; limit: number; search?: string, sortBy?: string }) => {
     const response = await api.get("/v1/order/list", { params })
     return response.data
   },
@@ -108,7 +108,7 @@ export const orderApi = {
 
 // Customer API
 export const customerApi = {
-  getCustomers: async (params?: { page: number; limit?: number}) => {
+  getCustomers: async (params?: { page: number; limit: number; search: string}) => {
     const response = await api.get("/v1/customer/list", { params })
     return response.data
   },
@@ -132,7 +132,7 @@ export const customerApi = {
 
 // Admin/Users API
 export const adminApi = {
-  getUsers: async (params: { page: number; limit?: number }) => {
+  getUsers: async (params?: { page: number; limit: number; search: string }) => {
     const response = await api.get(`/v1/users/list`, {params})
     return response.data
   },
@@ -164,7 +164,7 @@ export const currencyApi = {
 
 // Cash API
 export const cashApi = {
-  getCashList: async (params?: { page: number; limit: number}) => {
+  getCashList: async (params?: { page: number; limit: number; search: string}) => {
     const response = await api.get("/v1/cash/list", { params })
     return response.data
   },
@@ -200,7 +200,7 @@ export const expectedPaymentApi = {
 
 // Invoice API
 export const invoiceApi = {
-  getInvoices: async (params?: { page: number; limit: number }) => {
+  getInvoices: async (params?: { search:string; page: number; limit: number }) => {
     const response = await api.get("/v1/invoice/list", { params })
     return response.data
   },

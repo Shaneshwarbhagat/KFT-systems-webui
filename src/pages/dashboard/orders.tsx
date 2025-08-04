@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderApi, invoiceApi, cashApi } from "../../lib/api";
+import { orderApi, invoiceApi } from "../../lib/api";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -33,6 +33,7 @@ import { DeleteOrderDialog } from "../../components/orders/delete-order-dialog";
 import { useAuth } from "../../hooks/use-auth";
 import { formatCurrency, formatDate } from "../../lib/utils";
 import Tooltip from "@mui/material/Tooltip";
+import { useDebounce } from "../../hooks/use-debounce";
 
 interface Order {
   id: string;
@@ -42,6 +43,7 @@ interface Order {
   amountOfDelivery: string;
   currency: string;
   deliveredUnits: number;
+  deliveredBy: string;
   amountInHkd: string;
   customerId: string;
   createdAt: string;
@@ -62,6 +64,7 @@ interface Order {
 export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedOrderSearch = useDebounce(searchTerm, 300);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -79,19 +82,14 @@ export default function OrdersPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["orders", currentPage, searchTerm],
+    queryKey: ["orders", currentPage, debouncedOrderSearch], // sortField, sortOrder
     queryFn: () =>
       orderApi.getOrders({
         page: currentPage,
         limit,
-        search: searchTerm || undefined,
+        search: debouncedOrderSearch || undefined,
+        sortBy: "createdAt",
       }),
-  });
-
-  // Fetch all cash list, remove this if reciving pickedBy from get orderlist api.
-  const { data: cashListData } = useQuery({
-    queryKey: ["cash"],
-    queryFn: () => cashApi.getCashList(),
   });
 
   // Fetch invoices for create modal (fetch all, no limit)
@@ -122,19 +120,9 @@ export default function OrdersPage() {
     },
   });
 
-  
   const orders = ordersData?.orders || [];
   const total = ordersData?.total || 0;
   const totalPages = Math.ceil(total / limit);
-
-  // Merge pickedBy from cashListData into orders
-  const ordersWithPickedBy = orders.map((order:any) => {
-    const cashItem = cashListData?.data?.find((cash: any) => cash.invoiceNumber === order.invoiceNumber);
-    return {
-      ...order,
-      pickedBy: cashItem?.pickedBy || "--",
-    };
-  });
 
   const handleEdit = (order: Order) => {
     setSelectedOrder(order);
@@ -351,13 +339,13 @@ export default function OrdersPage() {
       {/* Search and Stats */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-96">
-          {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Search orders..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
-          /> */}
+          />
         </div>
         <div className="flex gap-4">
           <Badge variant="outline" className="text-sm">
@@ -405,7 +393,7 @@ export default function OrdersPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ordersWithPickedBy.map((order: Order & { pickedBy?: string }) => {
+          {orders.map((order: Order) => {
              const deliveredValue = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).remainingAmount;
              const totalPaidAmount = invoicesData?.invoices?.find((ele:any) => ele.invoiceNumber === order.invoiceNumber).totalPaidAmount;
 
@@ -450,7 +438,6 @@ export default function OrdersPage() {
                       </Badge>
                     </Tooltip>
                   </div>
-                  
                 </div>
               </CardHeader>
 
@@ -460,10 +447,10 @@ export default function OrdersPage() {
                   <Building className="h-4 w-4 text-gray-400" />
                   <div>
                     <p className="font-medium text-sm text-gray-900">
-                      {order.customer.companyName}
+                      {order?.customer?.companyName}
                     </p>
                     <p className="text-xs text-gray-600">
-                      Contact Person: {order.customer.contactPersonName}
+                      Contact Person: {order?.customer?.contactPersonName}
                     </p>
                   </div>
                 </div>
@@ -474,7 +461,7 @@ export default function OrdersPage() {
                   <div>
                     <span className="text-sm text-gray-600">Delivered by: </span>
                     <span className="font-medium text-sm text-gray-900">
-                      {order.pickedBy}
+                      {order?.deliveredBy || "--"}
                     </span>
                   </div>
                 </div>
@@ -485,7 +472,7 @@ export default function OrdersPage() {
                   <div>
                     <span className="text-sm text-gray-600">Amount of delivery: </span>
                     <span className="font-medium text-sm text-gray-900">
-                      {formatCurrency(Number(order.amountOfDelivery))} {order.currency}
+                      {formatCurrency(Number(order?.amountOfDelivery))} {order.currency}
                     </span>
                     {/* <p className="text-xs text-gray-600">
                       Delivered: {order.deliveredUnits} units
@@ -504,7 +491,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    Amount in HKD: {formatCurrency(Number(order.amountInHkd))}
+                    Amount in HKD: {formatCurrency(Number(order?.amountInHkd))}
                   </p>
                 </div>
 
