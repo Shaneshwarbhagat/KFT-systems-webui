@@ -84,7 +84,7 @@ export function UpdateCurrencySection() {
                   type="number"
                   step="0.0001"
                   placeholder="Enter MOP rate"
-                  className={errors.hkdToMop && touched.hkdToMop ? "border-red-500" : ""}
+                  className={`no-arrows ${errors.hkdToMop && touched.hkdToMop ? "border-red-500" : ""}`}
                 />
                 {errors.hkdToMop && touched.hkdToMop && <p className="text-sm text-red-500">{errors.hkdToMop}</p>}
               </div>
@@ -98,7 +98,7 @@ export function UpdateCurrencySection() {
                   type="number"
                   step="0.0001"
                   placeholder="Enter CNY rate"
-                  className={errors.hkdToCny && touched.hkdToCny ? "border-red-500" : ""}
+                  className={`no-arrows ${errors.hkdToCny && touched.hkdToCny ? "border-red-500" : ""}`}
                 />
                 {errors.hkdToCny && touched.hkdToCny && <p className="text-sm text-red-500">{errors.hkdToCny}</p>}
               </div>

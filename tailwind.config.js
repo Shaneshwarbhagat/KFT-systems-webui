@@ -105,5 +105,25 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }) {
+      const newUtilities = {
+        ".no-arrows": {
+          // For Chrome, Safari, Edge, Opera
+          "&::-webkit-outer-spin-button": {
+            "-webkit-appearance": "none",
+            "margin": "0",
+          },
+          "&::-webkit-inner-spin-button": {
+            "-webkit-appearance": "none",
+            "margin": "0",
+          },
+          // For Firefox
+          "-moz-appearance": "textfield",
+        },
+      };
+      addUtilities(newUtilities, ["responsive"]);
+    },
+  ],
 }

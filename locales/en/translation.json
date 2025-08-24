@@ -49,9 +49,9 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Welcome ! Here's what's happening with your business.",
-    "cardTotalOrders": "Total Orders",
-    "cardDeliveredOrders": "Delivered Orders",
-    "cardNonDeliveredOrders": "Non-Delivered Orders",
+    "cardTotalOrders": "Total Invoice",
+    "cardDeliveredOrders": "Total Delivered Value",
+    "cardNonDeliveredOrders": "Non-Delivered",
     "cardTotalOrderValue": "Total Order Value",
     "cardCashPickedUp": "Cash Picked Up",
     "cardCashNotPickedUp": "Cash Not Picked Up"

@@ -296,7 +296,7 @@ useEffect(() => {
                         const rounded = parseFloat(e.target.value).toFixed(2);
                         setFieldValue("amount", rounded);
                       }}
-                      className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
+                      className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 no-arrows ${
                         errors.amount && touched.amount ? "border-red-500" : ""
                       }`}
                     />
@@ -375,7 +375,7 @@ useEffect(() => {
                           },
                         }}
                         format="dd/MM/yyyy"
-                        disablePast
+                        // disablePast
                       />
                   </div>
                   {/* <div className="space-y-2">

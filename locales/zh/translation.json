@@ -49,8 +49,8 @@
   "dashboard": {
     "title": "仪表板",
     "subtitle": "欢迎！这是您业务的最新动态。",
-    "cardTotalOrders": "总订单",
-    "cardDeliveredOrders": "已交付订单",
+    "cardTotalOrders": "发票总额",
+    "cardDeliveredOrders": "总交付价值",
     "cardNonDeliveredOrders": "未交付订单",
     "cardTotalOrderValue": "总订单价值",
     "cardCashPickedUp": "已提取现金",

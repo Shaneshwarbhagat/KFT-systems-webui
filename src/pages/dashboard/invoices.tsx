@@ -228,12 +228,9 @@ export default function InvoicesPage() {
           <div class="header">
             <div class="company-name">Korean-fashion International Trading Limited</div>
             <div class="company-details">
-              Address: 9970981030.175006112547@gmail.com<br>
-              Phone: 9970981031<br>
+              Address: Flat L, 7/F, Block 2, ED. KeckSeng Industrial Building, 146-173 Avenida.de Venceslau De Morais, Macau<br>
+              Contact No: +853 - 62074090<br>
               Date: ${new Date().toLocaleDateString()}<br>
-              Business Registration#: ${
-                invoice.customer.businessRegistrationNumber || "--"
-              }<br>
               Invoice#: ${invoice.invoiceNumber}
             </div>
           </div>
@@ -270,7 +267,7 @@ export default function InvoicesPage() {
             <tbody>
               <tr>
                 <td>${new Date(invoice.createdAt).toLocaleDateString()}</td>
-                <td>${invoice.description || "Service Charge"}</td>
+                <td>Cognac/Whiskey/Wine</td>
                 <td>${invoice.units || 1}</td>
                 <td>${formatCurrency(invoice.amount || 0)}</td>
                 <td>${formatCurrency(invoice.amountInHkd || 0)}</td>
@@ -279,8 +276,6 @@ export default function InvoicesPage() {
           </table>
 
           <div class="footer-info">
-            <p>Unless otherwise agreed, all invoices are payable within 10 days by wire transfer to our bank account</p>
-            
             <div class="totals">
               <div><strong>SUB TOTAL: ${formatCurrency(invoice.amount || 0)}</strong></div>
               <div><strong>DISCOUNT: -</strong></div>
@@ -288,10 +283,6 @@ export default function InvoicesPage() {
                 invoice.currency || "HKD"
               }: ${formatCurrency(invoice.amountInHkd || 0)}</strong></div>
             </div>
-          </div>
-
-          <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
-            Generated on ${new Date().toLocaleString()}
           </div>
         </body>
       </html>
@@ -368,21 +359,30 @@ export default function InvoicesPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-gray-700/50">
+                    <TableHead
+                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
+                      onClick={() => handleSort("invoiceDate")}
+                    >
+                      <div className="flex items-center">
+                        {t("invoices.table.invoiceDate")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableHead>
                     <TableHead>
                       <div className="flex items-center">
                         {t("invoices.table.invoiceNumber")}
                       </div>
                     </TableHead>
-                    <TableHead>
+                    {/* <TableHead>
                       <div className="flex items-center">
                         {t("invoices.table.invoiceCustomerEmailId")}
                       </div>
-                    </TableHead>
-                    <TableHead>
+                    </TableHead> */}
+                    {/* <TableHead>
                       <div className="flex items-center">
                         {t("invoices.table.invoiceCustomerMobileNo")}
                       </div>
-                    </TableHead>
+                    </TableHead> */}
                     <TableHead
                       className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
                       onClick={() => handleSort("customer.companyName")}
@@ -432,15 +432,7 @@ export default function InvoicesPage() {
                         {t("invoices.table.invoicePaymentStatus")}
                       </div>
                     </TableHead>
-                    <TableHead
-                      className="cursor-pointer hover:text-gray-900 dark:hover:text-gray-100"
-                      onClick={() => handleSort("invoiceDate")}
-                    >
-                      <div className="flex items-center">
-                        {t("invoices.table.invoiceDate")}
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                      </div>
-                    </TableHead>
+                   
                     <TableHead>
                       {t("invoices.table.invoiceActions")}
                     </TableHead>
@@ -453,15 +445,20 @@ export default function InvoicesPage() {
                         key={invoice.id}
                         className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
                       >
+                        <TableCell className="text-gray-700 dark:text-gray-300">
+                          {new Date(invoice.invoiceDate).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </TableCell>
                         <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                           {invoice.invoiceNumber}
                         </TableCell>
-                        <TableCell className="text-gray-700 dark:text-gray-300">
+                        {/* <TableCell className="text-gray-700 dark:text-gray-300">
                           {invoice.customer?.emailId}
-                        </TableCell>
-                        <TableCell className="text-gray-700 dark:text-gray-300">
+                        </TableCell> */}
+                        {/* <TableCell className="text-gray-700 dark:text-gray-300">
                           {invoice.customer?.mobileNumber}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell className="text-gray-700 dark:text-gray-300">
                           {invoice.customer?.companyName || invoice.customer?.contactPersonName}
                         </TableCell>
@@ -499,11 +496,6 @@ export default function InvoicesPage() {
                           {getStatus(
                             invoice.remainingAmount,
                             invoice.totalPaidAmount
-                          )}
-                        </TableCell>
-                        <TableCell className="text-gray-700 dark:text-gray-300">
-                          {new Date(invoice.invoiceDate).toLocaleDateString(
-                            "en-GB"
                           )}
                         </TableCell>
                         <TableCell>

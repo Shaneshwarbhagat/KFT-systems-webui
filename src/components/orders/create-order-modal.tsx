@@ -331,6 +331,7 @@ export function CreateOrderModal({
                         onChange={handleAmountChange}
                         onBlur={handleAmountBlur}
                         step="0.01"
+                        className="no-arrows"
                       />
                       {selectedInvoice && (
                         <div className="text-xs text-gray-500">

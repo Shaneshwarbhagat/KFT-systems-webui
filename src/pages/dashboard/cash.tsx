@@ -246,10 +246,8 @@ export default function CashPage() {
           <div class="receipt-container">
             <div class="header">
               <div class="company-name">Korean-fashion International Trading Limited</div>
-              <div class="company-details">Address: 9970981030.175006112547@gmail.com<br>
-              Phone: 9970981031</div>
-              <div class="company-details">Email: ______________________  | Website: ___________________</div>
-              <div>Business Registration#:: ${cash.customer.businessRegistrationNumber || "--"}</div>
+              <div class="company-details">Address: Flat L, 7/F, Block 2, ED. KeckSeng Industrial Building, 146-173 Avenida.de Venceslau De Morais, Macau</div>
+              <div class="company-details">Contact No: +853 - 62074090</div>
               <div class="receipt-title">CASH RECEIPT</div>
             </div>
             

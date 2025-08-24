@@ -220,11 +220,10 @@ export default function OrdersPage() {
           <div class="header">
             <div class="company-name">Korean-fashion International Trading Limited</div>
             <div class="company-details">
-              Address: 9970981030.175006112547@gmail.com<br>
-              Phone: 9970981031<br>
+              Address: Flat L, 7/F, Block 2, ED. KeckSeng Industrial Building, 146-173 Avenida.de Venceslau De Morais, Macau<br>
+              Contact No: +853 - 62074090<br>
               Date: ${new Date().toLocaleDateString()}<br>
               Invoice: ${order.invoiceNumber}<br>
-              Business Registration#: ${order.customer?.businessRegistrationNumber}<br>
               Order#: ${order.orderNumber}
             </div>
           </div>
@@ -257,32 +256,25 @@ export default function OrdersPage() {
             <tbody>
               <tr>
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-                <td>Order Processing</td>
+                <td>Cognac/Whiskey/Wine</td>
                 <td>${order.deliveredUnits || 0}</td>
                 <td>${formatCurrency(Number(order.amountOfDelivery || "0"))} ${order.currency}</td>
                 <td>${formatCurrency(Number(order.amountInHkd || "0"))}</td>
                 <td>${order?.partialDelivery ? "Partial Delivery" : "Full Delivery"}</td>
-                <td>${expectedPaymentDate || "--"} </td>
+                <td>${" "} </td>
               </tr>
             </tbody>
           </table>
 
           <div class="footer-info">
-            <p>Unless otherwise agreed, all orders are processed within standard delivery timeframes.</p>
-            
             <div class="totals">
               <div><strong>SUB TOTAL: ${formatCurrency(
                 Number(order.amountOfDelivery || "0")
               )}</strong></div>
-              <div><strong>DISCOUNT: -</strong></div>
               <div><strong>Amount due ${
                 order.currency || "HKD"
               }: ${formatCurrency(Number(order.amountOfDelivery || "0"))}</strong></div>
             </div>
-          </div>
-
-          <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
-            Generated on ${new Date().toLocaleString()}
           </div>
         </body>
       </html>

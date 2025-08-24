@@ -296,6 +296,7 @@ export function EditOrderModal({
                       value={formData.deliveredValue}
                       onChange={handleAmountChange}
                       onBlur={handleAmountBlur}
+                      className="no-arrows"
                     />
                     <div className="text-xs text-gray-500">
                       Remaining Amount: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}

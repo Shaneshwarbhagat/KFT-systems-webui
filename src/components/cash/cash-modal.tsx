@@ -430,7 +430,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                         (!selectedInvoiceDetails.customerName && !cash) || 
                         selectedInvoiceDetails.remainingAmount <= 0
                       }
-                      className={`
+                      className={`no-arrows 
                         ${errors.amount && touched.amount ? "border-red-500" : ""} 
                         ${(selectedInvoiceDetails.paymentStatus === "complete" && !cash) || 
                           (!selectedInvoiceDetails.customerName && !cash) || 
