@@ -52,6 +52,7 @@
     "date-fns": "latest",
     "embla-carousel-react": "8.5.1",
     "formik": "latest",
+    "http-proxy-middleware": "^3.0.5",
     "i18next": "^25.2.1",
     "input-otp": "1.4.1",
     "jiti": "latest",

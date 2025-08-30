@@ -84,6 +84,7 @@ export default function InvoicesPage() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["cash"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       setDeletingInvoice(null);
     },
     onError: (error: any) => {
@@ -606,6 +607,7 @@ export default function InvoicesPage() {
         onOpenChange={setShowCreateModal}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ["invoices"] });
+          queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
           setShowCreateModal(false);
         }}
       />
@@ -616,6 +618,7 @@ export default function InvoicesPage() {
         invoice={editingInvoice}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ["invoices"] });
+          queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
           setEditingInvoice(null);
         }}
       />

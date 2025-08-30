@@ -203,7 +203,7 @@ export default function ExpectedPaymentsPage() {
                                     : "text-gray-900 dark:text-gray-100"
                                 }`}
                               >
-                                {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && `(${t("fulfilled")})`}
+                                {invoice.invoiceNumber} {invoice.remainingAmount <= 0 && t("fulfilled")}
                               </SelectItem>
                             ))
                           ) : (

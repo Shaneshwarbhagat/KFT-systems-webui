@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslation } from "react-i18next"
 import { Button } from "../../components/ui/button"
 import {
   Dialog,
@@ -20,6 +21,7 @@ interface DeleteOrderDialogProps {
 }
 
 export function DeleteOrderDialog({ isOpen, onClose, onConfirm, orderNumber, isLoading }: DeleteOrderDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -29,9 +31,9 @@ export function DeleteOrderDialog({ isOpen, onClose, onConfirm, orderNumber, isL
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-semibold text-gray-900">Delete Order</DialogTitle>
+              <DialogTitle className="text-lg font-semibold text-gray-900">{t("Orders.deleteOrder")}</DialogTitle>
               <DialogDescription className="text-sm text-gray-600 mt-1">
-                This action cannot be undone.
+                {t("Orders.thisActionCannotBeUndone")}
               </DialogDescription>
             </div>
           </div>
@@ -39,17 +41,17 @@ export function DeleteOrderDialog({ isOpen, onClose, onConfirm, orderNumber, isL
 
         <div className="py-4">
           <p className="text-sm text-gray-700">
-            Are you sure you want to delete order <span className="font-semibold text-gray-900">{orderNumber}</span>?
-            This will permanently remove the order from your system.
+            {t("Orders.orderDeleteConfirmText1")} <span className="font-semibold text-gray-900">{orderNumber}</span>?
+            {t("Orders.orderDeleteConfirmText2")}
           </p>
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? "Deleting..." : "Delete Order"}
+            {isLoading ? t("deletingText") : t("Orders.deleteOrder")}
           </Button>
         </DialogFooter>
       </DialogContent>

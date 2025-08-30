@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface Order {
   id: string;
@@ -48,6 +49,7 @@ export function EditOrderModal({
   onClose,
   order,
 }: EditOrderModalProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     deliveryStatus: false,
     deliveredBy: "",
@@ -92,7 +94,7 @@ export function EditOrderModal({
       }).catch(error => {
         toast({
           title: "Error",
-          description: "Failed to load invoice details",
+          description: t("Orders.failedLoadInvoiceDetails"),
           variant: "destructive",
         });
       }).finally(() => {
@@ -131,9 +133,10 @@ export function EditOrderModal({
       orderApi.updateOrder(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Order updated successfully",
+        description: t("Orders.OrderSuccess"),
         className: "bg-success text-white [&_button]:text-white",
       });
       onClose();
@@ -141,7 +144,7 @@ export function EditOrderModal({
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update order",
+        description: error.response?.data?.message || t("Orders.FailedToUpdateOrder"),
         variant: "destructive",
       });
     },
@@ -153,7 +156,7 @@ export function EditOrderModal({
     if (!order || !formData.deliveredValue || !formData.currency || !formData.deliveredBy ) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: t("Orders.modal.pleasefillAllRequiredFields"),
         variant: "destructive",
       });
       return;
@@ -162,7 +165,7 @@ export function EditOrderModal({
     if (formData.deliveredValue === "0.00" || formData.deliveredValue === "0") {
       toast({
         title: "Error",
-        description: "Delivery amount cannot be 0.",
+        description: t("Orders.deliveryAmountCannotbe0"),
         variant: "destructive",
       });
       return;
@@ -171,7 +174,7 @@ export function EditOrderModal({
     if (remainingAmountHKD <= 0) {
       toast({
         title: "Error",
-        description: "Cannot update order. Invoice is already fulfilled.",
+        description: t("Orders.cannotUpdateOrder"),
         variant: "destructive",
       });
       return;
@@ -182,7 +185,7 @@ export function EditOrderModal({
       const maxInCurrency = convertFromHKD(remainingAmountHKD, formData.currency);
       toast({
         title: "Error",
-        description: `Amount exceeds remaining balance. Maximum allowed is ${maxInCurrency.toFixed(2)} ${formData.currency} (${remainingAmountHKD.toFixed(2)} HKD)`,
+        description: `${t("Orders.amountExceedsRemainingBalance")} ${maxInCurrency.toFixed(2)} ${formData.currency} (${remainingAmountHKD.toFixed(2)} HKD)`,
         variant: "destructive",
       });
       return;
@@ -238,7 +241,7 @@ export function EditOrderModal({
       value = maxInCurrency;
       toast({
         title: "Warning",
-        description: `Amount adjusted to maximum allowed value of ${maxInCurrency.toFixed(2)} ${formData.currency}`,
+        description: `${t("Orders.amountAdjustedToMaximumValue")} ${maxInCurrency.toFixed(2)} ${formData.currency}`,
         variant: "destructive",
       });
     }
@@ -256,7 +259,7 @@ export function EditOrderModal({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            Edit Order
+            {t("Orders.modal.editOrder")}
           </DialogTitle>
         </DialogHeader>
 
@@ -268,11 +271,11 @@ export function EditOrderModal({
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
               <div className="flex justify-between">
-                <span className="font-medium text-gray-700">Invoice Number:</span>
+                <span className="font-medium text-gray-700">{t("Orders.modal.editOrderinvoiceNumber")}:</span>
                 <span className="text-gray-900">{order?.invoiceNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium text-gray-700">Company Name:</span>
+                <span className="font-medium text-gray-700">{t("Orders.modal.editOrderCompanyName")}:</span>
                 <span className="text-gray-900">
                   {order?.customer?.companyName}
                 </span>
@@ -281,13 +284,13 @@ export function EditOrderModal({
 
             {remainingAmountHKD <= 0 ? (
               <div className="bg-red-50 p-3 rounded-md text-red-600">
-                Cannot update order. This invoice is already fulfilled.
+                {t("Orders.cannotUpdateOrder")}
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4">  
                   <div className="space-y-2">
-                    <Label htmlFor="deliveredValue">Ordered Amount *</Label>
+                    <Label htmlFor="deliveredValue">{t("Orders.modal.orderedAmount")}</Label>
                     <Input
                       id="deliveredValue"
                       type="number"
@@ -299,7 +302,7 @@ export function EditOrderModal({
                       className="no-arrows"
                     />
                     <div className="text-xs text-gray-500">
-                      Remaining Amount: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
+                      {t("remainingAmount")}: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
                       {formData.currency !== "HKD" && (
                         <span> ({remainingAmountHKD.toFixed(2)} HKD)</span>
                       )}
@@ -307,13 +310,13 @@ export function EditOrderModal({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="currency">Currency *</Label>
+                    <Label htmlFor="currency">{t("Orders.modal.selectCurrency")}</Label>
                     <Select
                       value={formData.currency}
                       onValueChange={handleCurrencyChange}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select currency" />
+                        <SelectValue placeholder={t("Orders.modal.selectCurrencyPlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="HKD">HKD</SelectItem>
@@ -326,7 +329,7 @@ export function EditOrderModal({
               
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Partial Delivery</Label>
+                    <Label>{t("partialDelivery")}</Label>
                     <div className="flex items-center space-x-6">
                       <div className="flex items-center space-x-2">
                         <Checkbox
@@ -337,7 +340,7 @@ export function EditOrderModal({
                           }
                         />
                         <Label htmlFor="status-yes" className="text-sm font-normal">
-                          Yes
+                          {t("Orders.modal.orderPartialDelivery.yes")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -349,16 +352,16 @@ export function EditOrderModal({
                           }
                         />
                         <Label htmlFor="status-no" className="text-sm font-normal">
-                          No
+                        {t("Orders.modal.orderPartialDelivery.no")}
                         </Label>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Delivery By *</Label>
+                    <Label>{t("Orders.modal.orderDeliveredBy")}</Label>
                     <Input
                       id="deliveredBy"
-                      placeholder="Enter name"
+                      placeholder={t("Orders.modal.OrderEnterName")}
                       value={formData.deliveredBy}
                       onChange={(e) =>
                         setFormData(prev => ({...prev, deliveredBy: e.target.value}))
@@ -376,14 +379,14 @@ export function EditOrderModal({
                 onClick={onClose}
                 disabled={updateMutation.isPending}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 type="submit"
                 disabled={updateMutation.isPending || remainingAmountHKD <= 0}
                 className="bg-brand-primary hover:bg-brand-dark text-white"
               >
-                {updateMutation.isPending ? "Updating..." : "Update Order"}
+                {updateMutation.isPending ? t("updatingText") : t("Orders.update Order")}
               </Button>
             </div>
           </form>

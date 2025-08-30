@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const stats = [
     {
       title: t("dashboard.cardTotalOrders"),
-      value: dashboardData?.totalOrderValue || 0,
+      value: dashboardData?.totalInvoice || 0,
       icon: Package,
       color: "from-blue-500 to-blue-600",
     },

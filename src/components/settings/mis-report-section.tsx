@@ -55,23 +55,36 @@ export function MisReportSection() {
     mutationFn: misApi.generateReport,
     onSuccess: (data, variables) => {
       if (data.url) {
-        // Download the file
-        const link = document.createElement("a")
-        link.href = data.url
-        link.download = `MIS_Report_${Date.now()}.xlsx`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-
-        toast({
-          title: "Success",
-          description: `MIS report generated and downloaded successfully for ${
-            variables?.customerId
-              ? customersData?.customers?.find((c: any) => c.id === variables.customerId)?.companyName || data.customerId
-              : "all customers"
-          }.`,
-          className: "bg-success text-white [&_button]:text-white",
-        })
+        // Download the file via proxy to avoid mixed http and https content
+  fetch(`/.netlify/functions/download-mis-report?url=${encodeURIComponent(data.url)}`)
+          .then(async (response) => {
+            if (!response.ok) throw new Error('Failed to download MIS report')
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `MIS_Report_${Date.now()}.xlsx`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+            toast({
+              title: 'Success',
+              description: `MIS report generated and downloaded successfully for ${
+                variables?.customerId
+                  ? customersData?.customers?.find((c: any) => c.id === variables.customerId)?.companyName || data.customerId
+                  : 'all customers'
+              }.`,
+              className: 'bg-success text-white [&_button]:text-white',
+            })
+          })
+          .catch(() => {
+            toast({
+              title: 'Error',
+              description: 'Failed to download MIS report',
+              variant: 'destructive',
+            })
+          })
       }
     },
     onError: (error: any) => {

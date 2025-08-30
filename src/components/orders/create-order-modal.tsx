@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface Invoice {
   id: string;
@@ -47,6 +48,7 @@ export function CreateOrderModal({
   onClose,
   invoices,
 }: CreateOrderModalProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     invoiceNumber: "",
     partialDelivery: false,
@@ -119,9 +121,10 @@ export function CreateOrderModal({
     mutationFn: orderApi.createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Order created successfully",
+        description: t("Orders.orderCreatedSuccessfully"),
         className: "bg-success text-white [&_button]:text-white",
       });
       onClose();
@@ -130,7 +133,7 @@ export function CreateOrderModal({
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create order",
+        description: error.response?.data?.message || t("Orders.failedToCreateOrder"),
         variant: "destructive",
       });
     },
@@ -154,7 +157,7 @@ export function CreateOrderModal({
     if (!formData.invoiceNumber || !formData.currency || !formData.amountOfDelivery || !formData.deliveredBy) {
       toast({
         title: "Error",
-        description: "Please fill in all * required fields",
+        description: t("Orders.modal.pleasefillAllRequiredFields"),
         variant: "destructive",
       });
       return;
@@ -163,7 +166,7 @@ export function CreateOrderModal({
     if (formData.amountOfDelivery == "0" || formData.amountOfDelivery == "0.00") {
       toast({
         title: "Error",
-        description: "Delivery amount cannot be 0.",
+        description: t("Orders.deliveryAmountCannotbe0"),
         variant: "destructive",
       });
       return;
@@ -172,7 +175,7 @@ export function CreateOrderModal({
     if (!selectedInvoice || selectedInvoice.remainingAmount <= 0) {
       toast({
         title: "Error",
-        description: "Cannot create order. Invoice is already fulfilled.",
+        description: t("Orders.cannotCreateOrder"),
         variant: "destructive",
       });
       return;
@@ -183,7 +186,7 @@ export function CreateOrderModal({
       const maxInCurrency = convertFromHKD(selectedInvoice.remainingAmount, formData.currency);
       toast({
         title: "Error",
-        description: `Amount exceeds remaining balance. Maximum allowed is ${maxInCurrency.toFixed(2)} ${formData.currency} (${selectedInvoice.remainingAmount.toFixed(2)} HKD)`,
+        description: `${t("Orders.amountExceedsRemainingBalance")} ${maxInCurrency.toFixed(2)} ${formData.currency} (${selectedInvoice.remainingAmount.toFixed(2)} HKD)`,
         variant: "destructive",
       });
       return;
@@ -248,7 +251,7 @@ export function CreateOrderModal({
         value = maxInCurrency;
         toast({
           title: "Warning",
-          description: `Amount adjusted to maximum allowed value of ${maxInCurrency.toFixed(2)} ${formData.currency}`,
+          description: `${t("Orders.amountAdjustedToMaximumValue")} ${maxInCurrency.toFixed(2)} ${formData.currency}`,
           variant: "destructive",
         });
       }
@@ -265,13 +268,13 @@ export function CreateOrderModal({
       <DialogContent className="sm:max-w-[500px] max-h-[98vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            Create New Order
+            {t("Orders.modal.title")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="invoice">Invoice Number *</Label>
+            <Label htmlFor="invoice">{t("Orders.modal.orderSelectInvoice")}</Label>
             <Select
               value={formData.invoiceNumber}
               onValueChange={(value) => {
@@ -283,7 +286,7 @@ export function CreateOrderModal({
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select an invoice" />
+                <SelectValue placeholder={t("Orders.modal.orderSelectInvoicePlaceholder")} />
               </SelectTrigger>
               <SelectContent className="max-h-60 overflow-y-auto">
                 {invoices.map((invoice) => (
@@ -292,7 +295,7 @@ export function CreateOrderModal({
                     value={invoice.invoiceNumber}
                     disabled={invoice.remainingAmount <= 0}
                   >
-                    {invoice.invoiceNumber} {invoice.remainingAmount <= 0 || invoice.remainingAmount <= 0.00 && "(Fulfilled)"}
+                    {invoice.invoiceNumber} {invoice.remainingAmount <= 0.00 || invoice.remainingAmount <= 0 ? t("fulfilled") : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -303,12 +306,12 @@ export function CreateOrderModal({
             <>
               {selectedInvoice.remainingAmount <= 0 ? (
                 <div className="bg-red-50 p-3 rounded-md text-red-600">
-                  Cannot create order. This invoice is already fulfilled.
+                  {t("Orders.cannotCreateOrder")}
                 </div>
               ) : (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="customer">Customer Name</Label>
+                    <Label htmlFor="customer">{t("Orders.modal.orderCustomerName")}</Label>
                     <Input
                       id="customer"
                       value={
@@ -322,7 +325,7 @@ export function CreateOrderModal({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="amountOfDelivery">Amount of Delivery *</Label>
+                      <Label htmlFor="amountOfDelivery">{t("Orders.modal.orderAmountOfDelivery")}</Label>
                       <Input
                         id="amountOfDelivery"
                         type="number"
@@ -335,7 +338,7 @@ export function CreateOrderModal({
                       />
                       {selectedInvoice && (
                         <div className="text-xs text-gray-500">
-                          Remaining Amount: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
+                          {t("remainingAmount")}: {getRemainingAmountInCurrency(formData.currency).toFixed(2)} {formData.currency}
                           {formData.currency !== "HKD" && (
                             <span> ({selectedInvoice.remainingAmount.toFixed(2)} HKD)</span>
                           )}
@@ -344,7 +347,7 @@ export function CreateOrderModal({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="currency">Currency *</Label>
+                      <Label htmlFor="currency">{t("Orders.modal.selectCurrency")}</Label>
                       <Select
                         value={formData.currency}
                         onValueChange={handleCurrencyChange}
@@ -371,17 +374,17 @@ export function CreateOrderModal({
                             setFormData(prev => ({...prev, partialDelivery: !!checked}))
                           }
                         />
-                        <Label htmlFor="partialDelivery">Partial Delivery</Label>
+                        <Label htmlFor="partialDelivery">{t("partialDelivery")}</Label>
                       </div>
                       <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4 mt-2">
-                        Checkmark if partial delivery and add amount.
+                        {t("Orders.modal.checkmarkIfPartiaDeliveryAndAddAmount")}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="deliveredBy">Delivered By *</Label>
+                      <Label htmlFor="deliveredBy">{t("Orders.modal.orderDeliveredBy")}</Label>
                       <Input
                         id="deliveredBy"
-                        placeholder="Enter name"
+                        placeholder={t("Orders.modal.OrderEnterName")}
                         value={formData.deliveredBy}
                         onChange={(e) =>
                           setFormData(prev => ({...prev, deliveredBy: e.target.value}))
@@ -401,14 +404,14 @@ export function CreateOrderModal({
               onClick={handleClose}
               disabled={createMutation.isPending}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
               disabled={createMutation.isPending || !selectedInvoice || selectedInvoice.remainingAmount <= 0}
               className="bg-brand-primary hover:bg-brand-dark text-white"
             >
-              {createMutation.isPending ? "Creating..." : "Create Order"}
+              {createMutation.isPending ? t("creatingText") : t("Orders.createOrder")}
             </Button>
           </div>
         </form>

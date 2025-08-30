@@ -152,7 +152,7 @@ useEffect(() => {
       return companyName.includes(searchTerm) || contactName.includes(searchTerm)
     })
     return result
-  }, [debouncedCustomerSearch]);
+  }, [debouncedCustomerSearch, customers]);
 
   // Reset search when modal closes
   useEffect(() => {

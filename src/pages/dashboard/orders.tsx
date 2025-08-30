@@ -34,6 +34,7 @@ import { useAuth } from "../../hooks/use-auth";
 import { formatCurrency, formatDate } from "../../lib/utils";
 import Tooltip from "@mui/material/Tooltip";
 import { useDebounce } from "../../hooks/use-debounce";
+import { useTranslation } from "react-i18next";
 
 interface Order {
   id: string;
@@ -62,6 +63,7 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedOrderSearch = useDebounce(searchTerm, 300);
@@ -103,9 +105,10 @@ export default function OrdersPage() {
     mutationFn: orderApi.deleteOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Order deleted successfully",
+        description: t("orders.OrderDeletedSuccessfully"),
         className: "bg-success text-white [&_button]:text-white",
       });
       setIsDeleteDialogOpen(false);
@@ -114,7 +117,7 @@ export default function OrdersPage() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete order",
+        description: error.response?.data?.message || t("orders.failedToDeleteOrder"),
         variant: "destructive",
       });
     },
@@ -299,9 +302,9 @@ export default function OrdersPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            Error loading orders
+            {t("Orders.ErrorloadingOrders")}
           </h3>
-          <p className="text-gray-600">Please try again later</p>
+          <p className="text-gray-600">{t("pleaseTryAgainLater")}</p>
         </div>
       </div>
     );
@@ -313,10 +316,10 @@ export default function OrdersPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Orders
+            {t("Orders.title")}
           </h1>
           <p className="text-gray-600">
-            Manage your orders and track deliveries
+            {t("Orders.subTitle")}
           </p>
         </div>
         <Button
@@ -324,7 +327,7 @@ export default function OrdersPage() {
           className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create Order
+          {t("Orders.createOrder")}
         </Button>
       </div>
 
@@ -333,7 +336,7 @@ export default function OrdersPage() {
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search orders..."
+            placeholder={t("Orders.searchOrders")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -341,10 +344,10 @@ export default function OrdersPage() {
         </div>
         <div className="flex gap-4">
           <Badge variant="outline" className="text-sm">
-            Total: {total} orders
+            {t("total")}: {total} {t("Orders.title")}
           </Badge>
           <Badge variant="outline" className="text-sm">
-            Page: {currentPage} of {totalPages}
+            {t("page")}: {currentPage} {t("of")} {totalPages}
           </Badge>
         </div>
       </div>
@@ -370,17 +373,17 @@ export default function OrdersPage() {
         <Card className="p-12 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No orders found
+            {t("Orders.NoOrdersFound")}
           </h3>
           <p className="text-gray-600 mb-4">
-            Get started by creating your first order
+            {t("Orders.GeStartedByCreatingYourFirstOrder")}
           </p>
           <Button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Create Order
+            {t("Orders.createOrder")}
           </Button>
         </Card>
       ) : (
@@ -400,11 +403,11 @@ export default function OrdersPage() {
                       {order.orderNumber}
                     </CardTitle>
                     <p className="text-sm text-gray-600 mt-1 break-words">
-                      Invoice: {order.invoiceNumber}
+                      {t("invoice").charAt(0).toUpperCase() + t("invoice").slice(1)}: {order.invoiceNumber}
                     </p>
                   </div>
                   <div className="w-[40%] text-right">
-                    <Tooltip title="Order Delivery status" placement="top">
+                    <Tooltip title={t("Orders.orderDeliveryStatus")} placement="top">
                       <Badge
                         variant={order.partialDelivery ? "default" : "secondary"}
                         className={
@@ -442,7 +445,7 @@ export default function OrdersPage() {
                       {order?.customer?.companyName}
                     </p>
                     <p className="text-xs text-gray-600">
-                      Contact Person: {order?.customer?.contactPersonName}
+                      {t("Orders.ordersContactPerson")}: {order?.customer?.contactPersonName}
                     </p>
                   </div>
                 </div>
@@ -451,7 +454,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4 text-gray-400" />
                   <div>
-                    <span className="text-sm text-gray-600">Delivered by: </span>
+                    <span className="text-sm text-gray-600">{t("Orders.ordersDeliveredBy")}: </span>
                     <span className="font-medium text-sm text-gray-900">
                       {order?.deliveredBy || "--"}
                     </span>
@@ -462,7 +465,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <CoinsIcon className="h-4 w-4 text-gray-400" />
                   <div>
-                    <span className="text-sm text-gray-600">Amount of delivery: </span>
+                    <span className="text-sm text-gray-600">{t("AmountofDelivery")}: </span>
                     <span className="font-medium text-sm text-gray-900">
                       {formatCurrency(Number(order?.amountOfDelivery))} {order.currency}
                     </span>
@@ -476,14 +479,14 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    Created at: {formatDate(order.createdAt)}
+                    {t("Orders.createdAt")}: {formatDate(order.createdAt)}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-gray-400" />
                   <p className="text-sm text-gray-600">
-                    Amount in HKD: {formatCurrency(Number(order?.amountInHkd))}
+                  {t("Orders.amountIn")} HKD: {formatCurrency(Number(order?.amountInHkd))}
                   </p>
                 </div>
 
@@ -531,8 +534,8 @@ export default function OrdersPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Showing {(currentPage - 1) * limit + 1} to{" "}
-            {Math.min(currentPage * limit, total)} of {total} orders
+            {t("showing")} {(currentPage - 1) * limit + 1} {t("to")}{" "}
+            {Math.min(currentPage * limit, total)} {t("of")} {total} {t("Orders.title").toLowerCase()}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -542,10 +545,10 @@ export default function OrdersPage() {
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("previous")}
             </Button>
             <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
+              {t("page")} {currentPage} {t("of")} {totalPages}
             </span>
             <Button
               variant="outline"
@@ -555,7 +558,7 @@ export default function OrdersPage() {
               }
               disabled={currentPage === totalPages}
             >
-              Next
+              {t("next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
