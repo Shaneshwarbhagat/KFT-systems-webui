@@ -81,6 +81,7 @@
     "tsx": "latest",
     "vaul": "^0.9.6",
     "vite": "latest",
+    "webidl-conversions": "^7.0.0",
     "whatwg-url": "^14.2.0",
     "yaml": "latest",
     "yup": "latest",
