@@ -60,6 +60,7 @@
     "lightningcss": "latest",
     "lucide-react": "^0.454.0",
     "node-fetch": "^2.7.0",
+    "whatwg-url": "^14.2.0",
     "path": "latest",
     "react": "^19",
     "react-day-picker": "latest",
