@@ -8,6 +8,7 @@ import { useToast } from "../../hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
+import { useTranslation } from "react-i18next"
 
 interface Customer {
   id: string
@@ -41,6 +42,7 @@ const customerSchema = Yup.object().shape({
 })
 
 export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModalProps) {
+  const { t } = useTranslation();
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -62,7 +64,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
       queryClient.invalidateQueries({ queryKey: ["customers"] })
       toast({
         title: "Success",
-        description: "Customer created successfully",
+        description: t('addCustomer.customerCreatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       })
       onClose()
@@ -70,7 +72,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create customer",
+        description: error.response?.data?.message || t('addCustomer.failedToCreateCustomer'),
         variant: "destructive",
       })
     },
@@ -82,7 +84,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
       queryClient.invalidateQueries({ queryKey: ["customers"] })
       toast({
         title: "Success",
-        description: "Customer updated successfully",
+        description: t('addCustomer.customerUpdatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       })
       onClose()
@@ -90,7 +92,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update customer",
+        description: error.response?.data?.message || t('addCustomer.failedToUpdateCustomer'),
         variant: "destructive",
       })
     },
@@ -112,7 +114,7 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            {mode === "create" ? "Create New Customer" : "Edit Customer"}
+            {mode === "create" ? t('addCustomer.modal.customerTitle') : t('addCustomer.modal.customerEditTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -122,12 +124,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Company Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name *</Label>
+                  <Label htmlFor="companyName">{t('addCustomer.modal.inputCompanyName')}</Label>
                   <Field
                     as={Input}
                     id="companyName"
                     name="companyName"
-                    placeholder="Enter company name"
+                    placeholder={t('addCustomer.modal.enterCompanyName')}
                     className={errors.companyName && touched.companyName ? "border-red-500" : ""}
                   />
                   {errors.companyName && touched.companyName && (
@@ -137,12 +139,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Contact Person Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="contactPersonName">Contact Person Name *</Label>
+                  <Label htmlFor="contactPersonName">{t('addCustomer.modal.inputContactPersonName')}</Label>
                   <Field
                     as={Input}
                     id="contactPersonName"
                     name="contactPersonName"
-                    placeholder="Enter contact person name"
+                    placeholder={t('addCustomer.modal.enterContactPersonName')}
                     className={errors.contactPersonName && touched.contactPersonName ? "border-red-500" : ""}
                   />
                   {errors.contactPersonName && touched.contactPersonName && (
@@ -152,13 +154,13 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="emailId">Email *</Label>
+                  <Label htmlFor="emailId">{t('addCustomer.modal.inputEmail')}</Label>
                   <Field
                     as={Input}
                     id="emailId"
                     name="emailId"
                     type="email"
-                    placeholder="Enter email address"
+                    placeholder={t('addCustomer.modal.enterEmail')}
                     className={errors.emailId && touched.emailId ? "border-red-500" : ""}
                   />
                   {errors.emailId && touched.emailId && <p className="text-sm text-red-500">{errors.emailId}</p>}
@@ -166,12 +168,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Contact Number */}
                 <div className="space-y-2">
-                  <Label htmlFor="mobileNumber">Contact Number *</Label>
+                  <Label htmlFor="mobileNumber">{t('addCustomer.modal.inputContactNumber')}</Label>
                   <Field
                     as={Input}
                     id="mobileNumber"
                     name="mobileNumber"
-                    placeholder="Enter contact number"
+                    placeholder={t('addCustomer.modal.enterContactNumber')}
                     className={errors.mobileNumber && touched.mobileNumber ? "border-red-500" : ""}
                   />
                   {errors.mobileNumber && touched.mobileNumber && (
@@ -181,12 +183,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Business Registration Number */}
                 <div className="space-y-2">
-                  <Label htmlFor="businessRegistrationNumber">Business Registration Number (BRN)</Label>
+                  <Label htmlFor="businessRegistrationNumber">{t('addCustomer.modal.inputBrn')}</Label>
                   <Field
                     as={Input}
                     id="businessRegistrationNumber"
                     name="businessRegistrationNumber"
-                    placeholder="Enter BRN"
+                    placeholder={t('addCustomer.modal.enterBrn')}
                     className={
                       errors.businessRegistrationNumber && touched.businessRegistrationNumber ? "border-red-500" : ""
                     }
@@ -198,12 +200,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* City */}
                 <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
+                  <Label htmlFor="city">{t('addCustomer.modal.inputCity')}</Label>
                   <Field
                     as={Input}
                     id="city"
                     name="city"
-                    placeholder="Enter city"
+                    placeholder={t('addCustomer.modal.enterCity')}
                     className={errors.city && touched.city ? "border-red-500" : ""}
                   />
                   {errors.city && touched.city && <p className="text-sm text-red-500">{errors.city}</p>}
@@ -211,12 +213,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
                 {/* Country */}
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
+                  <Label htmlFor="country">{t('addCustomer.modal.inputCountry')}</Label>
                   <Field
                     as={Input}
                     id="country"
                     name="country"
-                    placeholder="Enter country"
+                    placeholder={t('addCustomer.modal.enterCountry')}
                     className={errors.country && touched.country ? "border-red-500" : ""}
                   />
                   {errors.country && touched.country && <p className="text-sm text-red-500">{errors.country}</p>}
@@ -225,12 +227,12 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
 
               {/* Address - Full Width */}
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address">{t('addCustomer.modal.inputAddress')}</Label>
                 <Field
                   as={Input}
                   id="address"
                   name="address"
-                  placeholder="Enter full address"
+                  placeholder={t('addCustomer.modal.enterAddress')}
                   className={errors.address && touched.address ? "border-red-500" : ""}
                 />
                 {errors.address && touched.address && <p className="text-sm text-red-500">{errors.address}</p>}
@@ -239,16 +241,16 @@ export function CustomerModal({ isOpen, onClose, customer, mode }: CustomerModal
               {/* Actions */}
               <div className="flex justify-end gap-3 pt-4">
                 <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button type="submit" disabled={isLoading} className="bg-brand-primary hover:bg-brand-dark text-white">
                   {isLoading
                     ? mode === "create"
-                      ? "Creating..."
-                      : "Updating..."
+                      ? t('creatingText')
+                      : t('updatingText')
                     : mode === "create"
-                      ? "Create Customer"
-                      : "Update Customer"}
+                      ? t('addCustomer.createCustomerButton')
+                      : t('addCustomer.updateCustomerButton')}
                 </Button>
               </div>
             </Form>

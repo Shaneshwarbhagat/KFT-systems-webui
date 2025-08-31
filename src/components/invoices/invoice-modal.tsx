@@ -206,7 +206,7 @@ useEffect(() => {
                         as={Input}
                         id="invoiceNumber"
                         name="invoiceNumber"
-                        placeholder="Enter invoice number"
+                        placeholder={t("invoices.modal.enterInvoiceNumber")}
                         className={`dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                           errors.invoiceNumber && touched.invoiceNumber
                             ? "border-red-500"
@@ -239,13 +239,13 @@ useEffect(() => {
                             errors.customerId && touched.customerId ? "border-red-500" : ""
                           }`}
                         >
-                          <SelectValue placeholder="Select customer" />
+                          <SelectValue placeholder={t('invoices.modal.selectCustomer')} />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                           <div className="flex items-center px-3 pb-2">
                             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                             <Input
-                              placeholder="Search customers..."
+                              placeholder={t('searchCustomer')}
                               value={customerSearch}
                               onChange={(e) => setCustomerSearch(e.target.value)}
                               className="h-8 w-full bg-transparent focus:ring-0 focus:outline-none"
@@ -264,7 +264,7 @@ useEffect(() => {
                               ))
                             ) : (
                               <div className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                                No customers found
+                                {t('noCustomersFound')}
                               </div>
                             )}
                           </div>

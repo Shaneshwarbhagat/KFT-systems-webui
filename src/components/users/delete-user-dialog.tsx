@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog"
 import { LoadingSpinner } from "../ui/loading-spinner"
+import { useTranslation } from "react-i18next"
 
 interface DeleteUserDialogProps {
   isOpen: boolean
@@ -22,20 +23,20 @@ interface DeleteUserDialogProps {
 }
 
 export function DeleteUserDialog({ isOpen, onClose, onConfirm, userName, isLoading }: DeleteUserDialogProps) {
+  const { t } = useTranslation();
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="modal-content">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-foreground">Delete User</AlertDialogTitle>
+          <AlertDialogTitle className="text-foreground">{t('addUser.deleteUser')}</AlertDialogTitle>
           <AlertDialogDescription className="text-muted-foreground">
-            Are you sure you want to delete user "<span className="font-semibold text-gray-900">{userName}</span>"? This action cannot be undone and will permanently remove
-            the user from the system.
+            {t('addUser.deleteUserDesc1')} "<span className="font-semibold text-gray-900">{userName}</span>"? {t('addUser.deleteUserDesc2')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
+              {t('cancel')}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -45,7 +46,7 @@ export function DeleteUserDialog({ isOpen, onClose, onConfirm, userName, isLoadi
               disabled={isLoading}
               className="bg-red-600 hover:bg-red-700 text-white min-w-24"
             >
-              {isLoading ? <LoadingSpinner size="sm" /> : "Delete"}
+              {isLoading ? <LoadingSpinner size="sm" /> : t('delete')}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

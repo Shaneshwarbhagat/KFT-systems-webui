@@ -34,6 +34,7 @@ import { CustomerModal } from "../../components/customers/customer-modal";
 import { DeleteCustomerDialog } from "../../components/customers/delete-customer-dialog";
 import { formatDate } from "../../lib/utils";
 import { useDebounce } from "../../hooks/use-debounce";
+import { useTranslation } from "react-i18next";
 
 interface Customer {
   id: string;
@@ -53,6 +54,7 @@ type SortField = keyof Customer | null;
 type SortDirection = "asc" | "desc";
 
 export default function CustomersPage() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedInvoiceSearch = useDebounce(searchTerm, 600)
@@ -137,7 +139,7 @@ export default function CustomersPage() {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({
         title: "Success",
-        description: "Customer deleted successfully",
+        description: t('addCustomer.customerDeletedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       });
       setIsDeleteDialogOpen(false);
@@ -147,7 +149,7 @@ export default function CustomersPage() {
       toast({
         title: "Error",
         description:
-          error.response?.data?.message || "Failed to delete customer",
+          error.response?.data?.message || t('addCustomer.failedToDeleteCustomer'),
         variant: "destructive",
       });
     },
@@ -181,9 +183,9 @@ export default function CustomersPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            Error loading customers
+            {t('addCustomer.errorLoadingCustomers')}
           </h3>
-          <p className="text-gray-600">Please try again later</p>
+          <p className="text-gray-600">{t('pleaseTryAgainLater')}</p>
         </div>
       </div>
     );
@@ -195,16 +197,16 @@ export default function CustomersPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Customers
+            {t('addCustomer.title')}
           </h1>
-          <p className="text-gray-600">Manage your customer database</p>
+          <p className="text-gray-600">{t('addCustomer.subtitle')}</p>
         </div>
         <Button
           onClick={handleCreate}
           className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create Customer
+          {t('addCustomer.createCustomerButton')}
         </Button>
       </div>
 
@@ -214,14 +216,14 @@ export default function CustomersPage() {
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search customers..."
+            placeholder={t('searchCustomer')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
         <div className="text-gray-900 dark:text-white">
-          Total: <span className="font-semibold">{total}</span> customers
+          {t('customers')} <span className="font-semibold">{total}</span> {t('customers')}
         </div>
       </div>
 
@@ -230,7 +232,7 @@ export default function CustomersPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Customer List
+            {t('addCustomer.table.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -247,17 +249,17 @@ export default function CustomersPage() {
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No customers found
+                {t('noCustomersFound')}
               </h3>
               <p className="text-gray-600 mb-4">
-                Get started by creating your first customer
+                {t('addCustomer.getStartedByCreatingYourFirstCustomer')}
               </p>
               <Button
                 onClick={handleCreate}
                 className="bg-brand-primary hover:bg-brand-dark text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Create Customer
+                {t('addCustomer.createCustomerButton')}
               </Button>
             </div>
           ) : (
@@ -270,29 +272,29 @@ export default function CustomersPage() {
                       onClick={() => handleSort("companyName")}
                     >
                       <div className="flex items-center">
-                        Company Name
+                        {t('addCustomer.table.cusotmerListcompanyName')}
                         <ArrowUpDown className="h-4 w-4 ml-1" />
                       </div>
                     </TableHead>
-                    <TableHead>Contact Person</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>City</TableHead>
+                    <TableHead>{t('addCustomer.table.cusotmerListcontactPerson')}</TableHead>
+                    <TableHead>{t('addCustomer.table.cusotmerListEmail')}</TableHead>
+                    <TableHead>{t('addCustomer.table.cusotmerListCity')}</TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("country")}
                     >
                       <div className="flex items-center">
-                        Country
+                        {t('addCustomer.table.cusotmerListCountry')}
                         <ArrowUpDown className="h-4 w-4 ml-1" />
                       </div>
                     </TableHead>
-                    <TableHead>BRN</TableHead>
+                    <TableHead>{t('addCustomer.table.cusotmerListBrn')}</TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("createdAt")}
                     >
                       <div className="flex items-center">
-                        Created
+                        {t('addCustomer.table.cusotmerListCreated')}
                         <ArrowUpDown className="h-4 w-4 ml-1" />
                       </div>
                     </TableHead>
@@ -301,11 +303,11 @@ export default function CustomersPage() {
                       onClick={() => handleSort("updatedAt")}
                     >
                       <div className="flex items-center">
-                        Updated
+                        {t('addCustomer.table.cusotmerListUpdated')}
                         <ArrowUpDown className="h-4 w-4 ml-1" />
                       </div>
                     </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">{t('addCustomer.table.cusotmerListActions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -356,8 +358,8 @@ export default function CustomersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-gray-600">
-                Showing {(currentPage - 1) * limit + 1} to{" "}
-                {Math.min(currentPage * limit, total)} of {total} customers
+                {t('showing')} {(currentPage - 1) * limit + 1} {t('to')}{" "}
+                {Math.min(currentPage * limit, total)} {t('of')} {total} {t('customers')}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -369,10 +371,10 @@ export default function CustomersPage() {
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {t('previous')}
                 </Button>
                 <span className="text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
+                  {t('page')} {currentPage} {t('of')} {totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -382,7 +384,7 @@ export default function CustomersPage() {
                   }
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  {t('next')}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

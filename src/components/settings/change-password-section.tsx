@@ -13,6 +13,7 @@ import * as Yup from "yup"
 import { Lock, Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../hooks/use-auth"
+import { useTranslation } from "react-i18next"
 
 const changePasswordSchema = Yup.object().shape({
   oldPassword: Yup.string().required("Current password is required"),
@@ -26,6 +27,7 @@ const changePasswordSchema = Yup.object().shape({
 })
 
 export function ChangePasswordSection() {
+  const { t } = useTranslation();
   const [showOldPassword, setShowOldPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -39,7 +41,7 @@ export function ChangePasswordSection() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Password changed successfully. Please login again with your new password.",
+        description: t('changePassword.passwordChangeSuccessfullyMessage'),
         duration: 3000,
         className: "bg-success text-white [&_button]:text-white",
       })
@@ -53,7 +55,7 @@ export function ChangePasswordSection() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to change password",
+        description: error.response?.data?.message || t('changePassword.failedToChangePassword'),
         variant: "destructive",
         duration: 5000,
       })
@@ -66,7 +68,7 @@ export function ChangePasswordSection() {
       setFieldError("newPassword", "New password must be different from current password")
       toast({
         title: "Error",
-        description: "New password must be different from current password",
+        description: t('changePassword.NewPasswordMustBeDifferentFromCurrentPassword'),
         variant: "destructive",
       })
       return
@@ -95,7 +97,7 @@ export function ChangePasswordSection() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lock className="h-5 w-5" />
-          Change Password
+          {t('changePassword.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -112,7 +114,7 @@ export function ChangePasswordSection() {
             <Form className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="oldPassword">
-                  Current Password *
+                  {t('changePassword.inputCurrentPassword')}
                 </Label>
                 <div className="relative">
                   <Field
@@ -120,7 +122,7 @@ export function ChangePasswordSection() {
                     id="oldPassword"
                     name="oldPassword"
                     type={showOldPassword ? "text" : "password"}
-                    placeholder="Enter current password"
+                    placeholder={t('changePassword.enterCurrentPassword')}
                     className={`pr-10 ${errors.oldPassword && touched.oldPassword ? "border-red-500" : ""}`}
                   />
                   <Button
@@ -140,7 +142,7 @@ export function ChangePasswordSection() {
 
               <div className="space-y-2">
                 <Label htmlFor="newPassword">
-                  New Password *
+                  {t('changePassword.inputNewPassword')}
                 </Label>
                 <div className="relative">
                   <Field
@@ -148,7 +150,7 @@ export function ChangePasswordSection() {
                     id="newPassword"
                     name="newPassword"
                     type={showNewPassword ? "text" : "password"}
-                    placeholder="Enter new password"
+                    placeholder={t('changePassword.enterNewPassword')}
                     className={`pr-10 ${errors.newPassword && touched.newPassword ? "border-red-500" : ""}`}
                   />
                   <Button
@@ -165,13 +167,13 @@ export function ChangePasswordSection() {
                   <p className="text-sm text-red-500">{errors.newPassword}</p>
                 )}
                 <p className="text-xs text-gray-500">
-                  Password must contain at least 8 characters with uppercase, lowercase, number and special character
+                  {t('changePassword.passworderrorText')}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">
-                  Confirm New Password *
+                  {t('changePassword.inputConfirmNewPassword')}
                 </Label>
                 <div className="relative">
                   <Field
@@ -179,7 +181,7 @@ export function ChangePasswordSection() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm new password"
+                    placeholder={t('changePassword.confirmNewPassowrd')}
                     className={`pr-10 ${
                       errors.confirmPassword && touched.confirmPassword ? "border-red-500" : ""
                     }`}
@@ -200,7 +202,7 @@ export function ChangePasswordSection() {
               </div>
 
               <Button type="submit" disabled={changePasswordMutation.isPending} className="w-full bg-brand-primary hover:bg-brand-dark text-white">
-                {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+                {changePasswordMutation.isPending ? t('changePassword.Changingtext') : t('changePassword.title')}
               </Button>
             </Form>
           )}

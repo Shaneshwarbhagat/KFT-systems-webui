@@ -13,6 +13,7 @@ import * as Yup from "yup"
 import { LoadingSpinner } from "../ui/loading-spinner"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 interface User {
   id: string
@@ -58,6 +59,7 @@ const createUserSchema = Yup.object().shape({
 })
 
 export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
+  const { t } = useTranslation();
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const [showPassword, setShowPassword] = useState(false)
@@ -77,7 +79,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       toast({
         title: "Success",
-        description: "User created successfully",
+        description: t('addUser.userCreatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white"
       })
       onClose()
@@ -85,7 +87,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create user",
+        description: error.response?.data?.message || t('addUser.failedToCreateUser'),
         variant: "destructive",
       })
     },
@@ -97,7 +99,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       toast({
         title: "Success",
-        description: "User updated successfully",
+        description: t('addUser.userUpdatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white"
       })
       onClose()
@@ -105,7 +107,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update user",
+        description: error.response?.data?.message || t('addUser.failedToUpdateUser'),
         variant: "destructive",
       })
     },
@@ -138,7 +140,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-            {mode === "create" ? "Create New User" : "Edit User"}
+            {mode === "create" ? t('addUser.modal.createUserTitle') : t('addUser.modal.editUserTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -149,13 +151,13 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                 {/* Name */}
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">
-                    Name *
+                    {t('addUser.modal.userInputName')}
                   </Label>
                   <Field
                     as={Input}
                     id="name"
                     name="name"
-                    placeholder="Enter full name"
+                    placeholder={t('addUser.modal.enterFullname')}
                     className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                       errors.name && touched.name ? "border-red-500" : ""
                     }`}
@@ -166,7 +168,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                 {/* Role */}
                 <div className="space-y-2">
                   <Label htmlFor="role" className="text-gray-700 dark:text-gray-300">
-                    Role *
+                    {t('addUser.modal.userRole')}
                   </Label>
                   <Select value={values.role} onValueChange={(value) => setFieldValue("role", value)}>
                     <SelectTrigger
@@ -174,7 +176,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                         errors.role && touched.role ? "border-red-500" : ""
                       }`}
                     >
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue placeholder={t('addUser.modal.selectRole')} />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                       <SelectItem value="Admin" className="text-gray-900 dark:text-gray-100">
@@ -191,13 +193,13 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                 {/* Phone Number */}
                 <div className="space-y-2">
                   <Label htmlFor="phoneNo" className="text-gray-700 dark:text-gray-300">
-                    Phone Number *
+                    {t('addUser.modal.userPhoneNumber')}
                   </Label>
                   <Field
                     as={Input}
                     id="phoneNo"
                     name="phoneNo"
-                    placeholder="Enter phone number"
+                    placeholder={t('addUser.modal.enterPhomeNumber')}
                     className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                       errors.phoneNo && touched.phoneNo ? "border-red-500" : ""
                     }`}
@@ -208,14 +210,14 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="emailId" className="text-gray-700 dark:text-gray-300">
-                    Email *
+                    {t('addUser.modal.userEmail')}
                   </Label>
                   <Field
                     as={Input}
                     id="emailId"
                     name="emailId"
                     type="email"
-                    placeholder="Enter email address"
+                    placeholder={t('addUser.modal.enterEmailAddress')}
                     className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 ${
                       errors.emailId && touched.emailId ? "border-red-500" : ""
                     }`}
@@ -227,7 +229,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
               {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">
-                  Password {mode === "create" ? "*" : "(Leave blank to keep current)"}
+                  {t('addUser.modal.password')} {mode === "create" ? "*" : t('addUser.modal.LeaveBlankToKeepCurrent')}
                 </Label>
                 <div className="relative">
                   <Field
@@ -235,7 +237,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder={mode === "create" ? "Enter password" : "Enter new password"}
+                    placeholder={mode === "create" ? t('addUser.modal.enterPassword') : t('addUser.modal.enterNewPassword')}
                     className={`bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 pr-10 ${
                       errors.password && touched.password ? "border-red-500" : ""
                     }`}
@@ -252,7 +254,7 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                 </div>
                 {errors.password && touched.password && <p className="text-sm text-red-500">{errors.password}</p>}
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Password must contain at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&).
+                    {t('addUser.modal.passwordErrorText1')}
                   </p>
               </div>
 
@@ -265,14 +267,14 @@ export function UserModal({ isOpen, onClose, user, mode }: UserModalProps) {
                   disabled={isLoading}
                   className="flex-1 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 bg-transparent"
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
                   className="flex-1 bg-brand-primary hover:bg-brand-dark text-white"
                 >
-                  {isLoading ? <LoadingSpinner size="sm" /> : mode === "create" ? "Create User" : "Update User"}
+                  {isLoading ? <LoadingSpinner size="sm" /> : mode === "create" ? t('addUser.createUserButton') : t('addUser.updateUserButton')}
                 </Button>
               </div>
             </Form>

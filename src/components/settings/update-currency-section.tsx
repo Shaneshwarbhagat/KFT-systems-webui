@@ -10,6 +10,7 @@ import { currencyApi } from "../../lib/api"
 import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 import { DollarSign } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 const currencySchema = Yup.object().shape({
   hkdToMop: Yup.number().positive("Rate must be positive").required("HKD to MOP rate is required"),
@@ -17,6 +18,7 @@ const currencySchema = Yup.object().shape({
 })
 
 export function UpdateCurrencySection() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -36,14 +38,14 @@ export function UpdateCurrencySection() {
       queryClient.invalidateQueries({ queryKey: ["currencies"] }) // triggers refetch
       toast({
         title: "Success",
-        description: "Currency rates updated successfully",
+        description: t('updateCurrency.CurrencyRatesUpdatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       })
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update currency rates",
+        description: error.response?.data?.message || t('updateCurrency.failedToUpdateCurrencyRates'),
         variant: "destructive",
       })
     },
@@ -61,7 +63,7 @@ export function UpdateCurrencySection() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
-          Currency Exchange Rates
+          {t('updateCurrency.currentExchangeRates')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -108,7 +110,7 @@ export function UpdateCurrencySection() {
                 disabled={updateCurrencyMutation.isPending}
                 className="w-full bg-brand-primary hover:bg-brand-dark text-white"
               >
-                {updateCurrencyMutation.isPending ? "Updating..." : "Update Rates"}
+                {updateCurrencyMutation.isPending ? t('updatingText') : t('updateCurrency.updateRates')}
               </Button>
             </Form>
           )}
@@ -117,7 +119,7 @@ export function UpdateCurrencySection() {
         {/* Currency List Display */}
         {currencyData?.currency?.length ? (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">Current Exchange Rates</h4>
+            <h4 className="font-medium text-gray-900 mb-3">{t('updateCurrency.currentExchangeRates')}</h4>
             <div className="space-y-2">
               {currencyData?.currency?.map((currency: any, index: number) => (
                 <div key={index} className="space-y-1 text-sm text-gray-600">
@@ -129,8 +131,8 @@ export function UpdateCurrencySection() {
           </div>
         ) : (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">Current Exchange Rates</h4>
-            <div className="space-y-2">No currency rate defined</div>
+            <h4 className="font-medium text-gray-900 mb-3">{t('updateCurrency.currentExchangeRates')}</h4>
+            <div className="space-y-2">{t('updateCurrency.noCurrencyRateDefined')}</div>
           </div>
         )}
       </CardContent>

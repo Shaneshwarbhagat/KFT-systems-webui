@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Card, CardContent } from "../ui/card"
 import { useAuth } from "../../hooks/use-auth"
 import { User, Mail, Phone, Shield, Calendar } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 interface ProfileModalProps {
   open: boolean
@@ -11,6 +12,7 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
+  const { t } = useTranslation();
   const { user } = useAuth()
 
   // Get user data from localStorage (from login response)
@@ -27,7 +29,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            User Profile
+            {t('profileModal.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -37,7 +39,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
               <div className="flex items-center space-x-3">
                 <User className="h-5 w-5 text-gray-500" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Name</p>
+                  <p className="text-sm font-medium text-gray-900">{t('profileModal.name')}</p>
                   <p className="text-sm text-gray-600">{userData.name}</p>
                 </div>
               </div>
@@ -45,7 +47,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-gray-500" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Email</p>
+                  <p className="text-sm font-medium text-gray-900">{t('profileModal.email')}</p>
                   <p className="text-sm text-gray-600">{userData.email}</p>
                 </div>
               </div>
@@ -53,7 +55,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
               <div className="flex items-center space-x-3">
                 <Shield className="h-5 w-5 text-gray-500" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Role</p>
+                  <p className="text-sm font-medium text-gray-900">{t('profileModal.role')}</p>
                   <p className="text-sm text-gray-600">{userData.role}</p>
                 </div>
               </div>
@@ -61,7 +63,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-gray-500" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Phone Number</p>
+                  <p className="text-sm font-medium text-gray-900">{t('profileModal.phoneNumber')}</p>
                   <p className="text-sm text-gray-600">{userData.phone}</p>
                 </div>
               </div>

@@ -12,8 +12,8 @@
   "print": "Print",
   "updated": "updated",
   "created": "created",
-  "update" : "update",
-  "create" : "create",
+  "update": "update",
+  "create": "create",
   "invoice": "invoice",
   "customers": "customers",
   "users": "users",
@@ -23,8 +23,9 @@
   "next": "Next",
   "total": "Total ",
   "page": "Page ",
-  "of" : "of ",
+  "of": "of ",
   "to": "to ",
+  "in": "in",
   "showing": "Showing ",
   "results": "results",
   "failedTo": "Failed to",
@@ -33,6 +34,8 @@
   "deletingText": "Deleting...",
   "updatingText": "Updating...",
   "creatingText": "Creating...",
+  "searchCustomer": "Search customers...",
+  "noCustomersFound": "No customers found",
   "fulfilled": "(Fulfilled)",
   "AmountofDelivery": "Amount of delivery",
   "partialDelivery": "Partial Delivery",
@@ -71,7 +74,7 @@
     "invoiceDeletedSuccessfully": "Invoice deleted successfully",
     "notAllowedToEditAsPaymentIsCompleted": "Not allowed to edit as payment is completed",
     "addInvoiceButton": "Add Invoice",
-    "createInvoiceButton" :"Create Invoice",
+    "createInvoiceButton":"Create Invoice",
     "NoInvoiceFound": "No invoice found",
     "getstartedByCreatingYourFirstInvoice": "Get started by creating your first invoice",
     "modal": {
@@ -90,7 +93,9 @@
       "invoiceEditInvoiceNumber": "Invoice Number",
       "invoiceEditCustomerName": "Customer Name",
       "invoiceDate": "Invoice Date *",
-      "invoiceDateError": "Invoice date is required"
+      "invoiceDateError": "Invoice date is required",
+      "enterInvoiceNumber": "Enter invoice number",
+      "selectCustomer": "Select customer"
     },
     "table": {
       "invoiceTableTitle": "Invoice List",
@@ -129,7 +134,7 @@
     "failedLoadInvoiceDetails": "Failed to load invoice details",
     "FailedToUpdateOrder": "Failed to update order",
     "OrderSuccess": "Order updated successfully",
-    "ErrorloadingOrders" : "Error loading orders",
+    "ErrorloadingOrders": "Error loading orders",
     "deleteOrder": "Delete Order",
     "thisActionCannotBeUndone": "This action cannot be undone.",
     "orderDeleteConfirmText1": "Are you sure you want to delete order",
@@ -151,7 +156,7 @@
         "no": "No"
       },
       "selectCurrency": "Currency *",
-      "selectCurrencyPlaceholder" : "Select currency",
+      "selectCurrencyPlaceholder": "Select currency",
       "orderAmountOfDelivery": "Amount of Delivery *",
       "orderedAmount": "Ordered Amount *",
       "orderDeliveredBy": "Delivered By *",
@@ -159,14 +164,15 @@
       "OrderEnterName": "Enter name",
       "checkmarkIfPartiaDeliveryAndAddAmount": "Checkmark if partial delivery and add amount.",
       "editOrder": "Edit Order",
-      "editOrderinvoiceNumber" : "Invoice Number",
+      "editOrderinvoiceNumber": "Invoice Number",
       "editOrderCompanyName": "Company Name",
       "pleasefillAllRequiredFields": "Please fill in all * required fields"
     }
   },
-  "cashManegement": {
+  "cashMangement": {
     "title": "Cash Management",
     "subTitle": "Manage cash receipts and transactions",
+    "searchCashReceipts": "Search cash receipts...",
     "totalReceipts": "Total Receipts",
     "noCashReceiptFound": "No cash receipt found",
     "getStartedByCreatingYourFirstCashReceipt": "Get started by creating your first cash receipt",
@@ -184,7 +190,7 @@
     "table": {
       "tableTitle": "Cash Receipts",
       "cashReceiptNumber": "Receipt Number",
-      "cashInvoicetNumber": "Invoice Number",
+      "cashInvoiceNumber": "Invoice Number",
       "cashCustomer": "Customer",
       "cashAmountReceived": "Amount Received",
       "amountIn": "Amount in",
@@ -198,7 +204,10 @@
       "editTitle": "Edit Cash Receipt",
       "cashReceiptNumber": "Receipt Number",
       "cashReceiptInvoiceNumber": "Invoice Number",
+      "selectInvoice": "Select invoice",
+      "pesronName": "Person Name",
       "cashReceiptCustomerName": "Customer Name",
+      "customerNamewillAutoPopulate": "Customer name will auto-populate",
       "CashAmount": "Amount",
       "inputCurrency": "Currency",
       "inputPickedBy": "Picked By",
@@ -208,7 +217,8 @@
       "totalAmountToPay": "Total Amount to Pay",
       "delvieredAmount": "Delivered Amount",
       "needToDeliverAmount": "Need to Deliver Amount",
-      "checkmarkIfPartialPaymentAndAddAmount.": "Checkmark if partial payment and add amount.",
+      "checkmarkIfPartialPaymentAndAddAmount": "Checkmark if partial payment and add amount.",
+      "fullPaymentDone": "Full payment done - Invoice is already fulfilled.",
       "cashInvoiceNumberIsRequired": "Invoice number is required",
       "cashAmountMustBePositive": "Amount must be positive",
       "cashAmountIsRequired": "Amount is required",
@@ -223,8 +233,9 @@
     "title": "Customers",
     "subtitle": "Manage your customer database",
     "createCustomerButton": "Create Customer",
-    "updateCustomer": "Update Customer",
+    "updateCustomerButton": "Update Customer",
     "deleteCustomerButton": "Delete Customer",
+    "getStartedByCreatingYourFirstCustomer": "Get started by creating your first customer",
     "customerListDeleteSubtitle": "This action cannot be undone.",
     "customerListDeleteDescription1": "Are you sure you want to delete customer ",
     "customerListDeleteDescription2": "This will permanently remove the customer from your system.",
@@ -234,7 +245,6 @@
     "failedToCreateCustomer": "Failed to create customer",
     "customerUpdatedSuccessfully": "Customer updated successfully",
     "failedToUpdateCustomer": "Failed to update customer",
-    "errorLoadingCustomers": "Error loading customers",
     "table": {
       "title": "Customer List",
       "cusotmerListcompanyName": "Company Name",
@@ -251,13 +261,21 @@
       "customerTitle": "Create New Customer",
       "customerEditTitle": "Edit Customer", 
       "inputCompanyName": "Company Name *",
+      "enterCompanyName": "Enter company name",
       "inputContactPersonName": "Contact Person Name *",
+      "enterContactPersonName": "Enter contact person name",
       "inputEmail": "Email *",
+      "enterEmail": "Enter email address",
       "inputContactNumber": "Contact Number *",
+      "enterContactNumber": "Enter contact number",
       "inputBrn": "Business Registration Number (BRN)",
+      "enterBrn": "Enter business registration number",
       "inputCity": "City *",
+      "enterCity": "Enter city",
       "inputCountry": "Country",
+      "enterCountry": "Enter country",
       "inputAddress": "Address",
+      "enterAddress": "Enter full address",
       "inputCompanyNameError": "Company name is required",
       "inputAddressError": "Address is required",
       "inputCityError": "City is required",
@@ -273,6 +291,7 @@
     "subtitle": "Manage system users and their permissions",
     "createUserButton": "Create User",
     "updateUserButton": "Update User",
+    "searchUser": "Search users by name, email, or username...",
     "deleteUser": "Delete User",
     "deleteUserDesc1": "Are you sure you want to delete user ",
     "deleteUserDesc2": "This action cannot be undone and will permanently remove the user from the system.",
@@ -287,19 +306,27 @@
     "GetStartedByCreatingYourFirstUser": "Get started by creating your first user",
     "table": {
       "UserListTableTitle": "User List",
-      "userName": "Name",
+      "name": "Name",
+      "userName": "Username",
       "userEmail": "Email",
       "userPhone": "Phone",
-      "userRole": "Role"
+      "userRole": "Role",
+      "actions": "Actions"
     },
     "modal": {
       "createUserTitle": "Create New User",
       "editUserTitle": "Edit User",
       "userInputName": "Name *",
+      "enterFullname": "Enter full name",
       "userRole": "Role *",
+      "selectRole": "Select role",
       "userPhoneNumber": "Phone Number *",
-      "userEmail": "Email * *",
-      "password": "Password *",
+      "enterPhomeNumber": "Enter phone number",
+      "userEmail": "Email *",
+      "enterEmailAddress": "Enter email address",
+      "password": "Password ",
+      "enterPassword": "Enter password",
+      "enterNewPassword": "Enter new password",
       "nameIsRequired": "Name is required",
       "roleIsRequired": "Role is required",
       "ple(@$!%*?&)aseEnterValidPhoneNumber": "Please enter a valid phone number",
@@ -334,14 +361,14 @@
     "updateCurrency": "Update Currency",
     "misReport": "MIS Report",
     "changePassword": "Change Password",
-    "language": "Language",
-    "createUser": "Create User"
+    "language": "Language"
   },
   "updateCurrency": {
     "title": "Currency Exchange Rates",
     "rateIsRequired": "rate is required",
     "updateRates": "Update Rates",
     "currentExchangeRates": "Current Exchange Rates",
+    "noCurrencyRateDefined": "No currency rate defined",
     "CurrencyRatesUpdatedSuccessfully": "Currency rates updated successfully",
     "failedToUpdateCurrencyRates": "Failed to update currency rates"
   },
@@ -350,15 +377,21 @@
     "MISselectStartDate": "Start Date *",
     "MISselectEndDate": "End Date *",
     "MISselectCustomerName": "Customer Name",
+    "noCustomersFound": "No customers found",
+    "selectCustomer": "Select customer",
     "selectReportType": "Report Type *",
+    "selectReportTypePlaceholder": "Select report type",
     "MISstartDateRequired": "Start date is required",
     "MISendDateRequired": "End date is required",
     "MISendDateMustBeAfterStartDate": "End date must be after start date",
     "MISCustomerNameRequired": "Customer name is required",
     "reportTypeRequired": "Report type is required",
-    "MISReportGeneratedAndDownloadedSuccessfully": "MIS report generated and downloaded successfully",
+    "MISReportGeneratedAndDownloadedSuccessfully1": "MIS report generated and downloaded successfully for",
+    "MISReportGeneratedAndDownloadedSuccessfully2": "all customers",
+    "failedToDownloadMISReport": "Failed to download MIS report",
     "failedtoGenerateMISReport": "Failed to generate MIS report",
-    "downloadButton": "Download Excel"
+    "downloadButton": "Download Excel",
+    "generatingText": "Generating..."
   },
   "changePassword": {
     "title": "Change Password",
@@ -378,12 +411,13 @@
     "passwordChangeSuccessfullyMessage": "Password changed successfully. Please login again with your new password.",
     "failedToChangePassword": "Failed to change password",
     "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password",
-    "changePasswordButton": "Change Password"
+    "changePasswordButton": "Change Password",
+    "Changingtext": "Changing..."
   },
   "language": {
     "title": "Language Settings",
     "selectLanguage": "Select Language",
-    "inputNote": "Note: Language changes will be applied to the entire application interface."
+    "inputNote": "Language changes will be applied to the entire application interface."
   },
   "menu": {
     "dashboard": "Dashboard",
@@ -393,5 +427,12 @@
     "customerManagement": "Customer Management",
     "userManagement": "User Management",
     "expectedPaymentDate": "Expected Payment Date"
+  },
+  "profileModal": {
+    "title": "User Profile",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "phoneNumber": "Phone Number"
   }
 }

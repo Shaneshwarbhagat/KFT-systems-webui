@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslation } from "react-i18next"
 import { Button } from "../../components/ui/button"
 import {
   Dialog,
@@ -26,6 +27,7 @@ export function DeleteCustomerDialog({
   customerName,
   isLoading,
 }: DeleteCustomerDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -35,9 +37,9 @@ export function DeleteCustomerDialog({
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-semibold text-gray-900">Delete Customer</DialogTitle>
+              <DialogTitle className="text-lg font-semibold text-gray-900">{t('addCustomer.deleteCustomerButton')}</DialogTitle>
               <DialogDescription className="text-sm text-gray-600 mt-1">
-                This action cannot be undone.
+                {t('addCustomer.customerListDeleteSubtitle')}
               </DialogDescription>
             </div>
           </div>
@@ -45,17 +47,17 @@ export function DeleteCustomerDialog({
 
         <div className="py-4">
           <p className="text-sm text-gray-700">
-            Are you sure you want to delete customer <span className="font-semibold text-gray-900">{customerName}</span>
-            ? This will permanently remove the customer from your system.
+            {t('addCustomer.customerListDeleteDescription1')} <span className="font-semibold text-gray-900">{customerName}</span>
+            ? {t('addCustomer.customerListDeleteDescription2')}
           </p>
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
-            {isLoading ? "Deleting..." : "Delete Customer"}
+            {isLoading ? t('deletingText') : t('addCustomer.deleteCustomerButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

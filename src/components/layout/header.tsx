@@ -16,7 +16,6 @@ import { Avatar, AvatarFallback } from "../ui/avatar"
 import { Badge } from "../ui/badge"
 import { useAuth } from "../../hooks/use-auth"
 import {
-  Bell,
   LogOut,
   Settings,
   User,
@@ -37,12 +36,14 @@ import { ChangePasswordSection } from "../settings/change-password-section"
 import { LanguageSection } from "../settings/language-section"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 interface HeaderProps {
   onSearch?: (query: string) => void
 }
 
 export function Header({ onSearch }: HeaderProps) {
+  const { t } = useTranslation();
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [showProfile, setShowProfile] = useState(false)
@@ -84,7 +85,7 @@ export function Header({ onSearch }: HeaderProps) {
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 flex-1">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Business Management</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t('businessManagement')}</h1>
 
             {/* <div className="hidden md:flex items-center space-x-4 ml-8">
               <div className="relative">
@@ -123,28 +124,28 @@ export function Header({ onSearch }: HeaderProps) {
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <DollarSign className="mr-2 h-4 w-4" />
-                  Update Currency
+                  {t('settings.updateCurrency')}
                 </DropdownMenuItem>}
                 <DropdownMenuItem
                   onClick={() => handleSettingClick("mis")}
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  MIS Report
+                  {t('settings.misReport')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSettingClick("password")}
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <Lock className="mr-2 h-4 w-4" />
-                  Change Password
+                  {t('settings.changePassword')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSettingClick("language")}
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <Globe className="mr-2 h-4 w-4" />
-                  Language
+                  {t('settings.language')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -183,7 +184,7 @@ export function Header({ onSearch }: HeaderProps) {
                   className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t('profile')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                 <DropdownMenuItem
@@ -191,7 +192,7 @@ export function Header({ onSearch }: HeaderProps) {
                   className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{t('logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -206,7 +207,7 @@ export function Header({ onSearch }: HeaderProps) {
       <Dialog open={!!activeSettingComponent} onOpenChange={() => setActiveSettingComponent(null)}>
         <DialogContent className="sm:max-w-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="text-gray-900 dark:text-white">Settings</DialogTitle>
+            <DialogTitle className="text-gray-900 dark:text-white">{t('settings.settingsTitle')}</DialogTitle>
           </DialogHeader>
           <div className="text-gray-900 dark:text-gray-100">{renderSettingComponent()}</div>
         </DialogContent>

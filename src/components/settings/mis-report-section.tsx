@@ -16,6 +16,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
+import { useTranslation } from "react-i18next"
 
 const misSchema = Yup.object().shape({
   startDate: Yup.date().required("Start date is required"),
@@ -32,6 +33,7 @@ const muiTheme = createTheme({
 })
 
 export function MisReportSection() {
+  const { t } = useTranslation();
   const { toast } = useToast()
   const currentDate = new Date()
   const [startDate, setStartDate] = useState<Date>(currentDate)
@@ -56,7 +58,7 @@ export function MisReportSection() {
     onSuccess: (data, variables) => {
       if (data.url) {
         // Download the file via proxy to avoid mixed http and https content
-  fetch(`/.netlify/functions/download-mis-report?url=${encodeURIComponent(data.url)}`)
+        fetch(`/.netlify/functions/download-mis-report?url=${encodeURIComponent(data.url)}`)
           .then(async (response) => {
             if (!response.ok) throw new Error('Failed to download MIS report')
             const blob = await response.blob()
@@ -70,10 +72,10 @@ export function MisReportSection() {
             window.URL.revokeObjectURL(url)
             toast({
               title: 'Success',
-              description: `MIS report generated and downloaded successfully for ${
+              description: `${t('misReport.MISReportGeneratedAndDownloadedSuccessfully1')} ${
                 variables?.customerId
                   ? customersData?.customers?.find((c: any) => c.id === variables.customerId)?.companyName || data.customerId
-                  : 'all customers'
+                  : t('misReport.MISReportGeneratedAndDownloadedSuccessfully2')
               }.`,
               className: 'bg-success text-white [&_button]:text-white',
             })
@@ -81,7 +83,7 @@ export function MisReportSection() {
           .catch(() => {
             toast({
               title: 'Error',
-              description: 'Failed to download MIS report',
+              description: t('misReport.failedToDownloadMISReport'),
               variant: 'destructive',
             })
           })
@@ -90,7 +92,7 @@ export function MisReportSection() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to generate MIS report",
+        description: error.response?.data?.message || t('misReport.failedtoGenerateMISReport'),
         variant: "destructive",
       })
     },
@@ -134,7 +136,7 @@ export function MisReportSection() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-foreground">
           <FileText className="h-5 w-5" />
-          MIS Report Generation
+          {t('misReport.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -155,7 +157,7 @@ export function MisReportSection() {
                 <Form className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="form-label">Start Date *</Label>
+                      <Label className="form-label">{t('misReport.MISselectStartDate')}</Label>
                       <DatePicker
                         value={startDate}
                         onChange={(newValue) => handleStartDateChange(newValue, setFieldValue)}
@@ -176,7 +178,7 @@ export function MisReportSection() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="form-label">End Date *</Label>
+                      <Label className="form-label">{t('misReport.MISselectEndDate')}</Label>
                       <DatePicker
                         value={endDate}
                         onChange={(newValue) => handleEndDateChange(newValue, setFieldValue)}
@@ -201,14 +203,14 @@ export function MisReportSection() {
 
                   <div className="space-y-2">
                     <Label htmlFor="customerName" className="form-label">
-                      Customer Name
+                      {t('misReport.MISselectCustomerName')}
                     </Label>
                     <Select value={values.customerName} onValueChange={(value) => setFieldValue("customerName", value)}>
                       <SelectTrigger
                         className={`form-input ${errors.customerName && touched.customerName ? "border-red-500" : ""}`}
                       >
                         <SelectValue
-                          placeholder={customersData?.customers?.length === 0 ? "No customer found" : "Select customer"}
+                          placeholder={customersData?.customers?.length === 0 ? t('misReport.noCustomersFound') : t('misReport.selectCustomer')}
                         />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border z-50 max-h-60 overflow-y-auto">
@@ -226,13 +228,13 @@ export function MisReportSection() {
 
                   <div className="space-y-2">
                     <Label htmlFor="reportType" className="form-label">
-                      Report Type *
+                      {t('misReport.selectReportType')}
                     </Label>
                     <Select value={values.reportType} onValueChange={(value) => setFieldValue("reportType", value)}>
                       <SelectTrigger
                         className={`form-input ${errors.reportType && touched.reportType ? "border-red-500" : ""}`}
                       >
-                        <SelectValue placeholder="Select report type" />
+                        <SelectValue placeholder={t('misReport.selectReportTypePlaceholder')} />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border z-50">
                         <SelectItem value="Invoice">Invoice</SelectItem>
@@ -252,7 +254,7 @@ export function MisReportSection() {
                       className="bg-brand-primary hover:bg-brand-dark text-white px-8"
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      {generateReportMutation.isPending ? "Generating..." : "Download Excel"}
+                      {generateReportMutation.isPending ? t('misReport.generatingText') : t('misReport.downloadButton')}
                     </Button>
                   </div>
                 </Form>

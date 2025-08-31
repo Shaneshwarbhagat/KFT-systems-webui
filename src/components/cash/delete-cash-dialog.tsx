@@ -14,6 +14,7 @@ import {
 import { useToast } from "../../hooks/use-toast"
 import { cashApi } from "../../lib/api"
 import { LoadingSpinner } from "../ui/loading-spinner"
+import { useTranslation } from "react-i18next"
 
 interface DeleteCashDialogProps {
   open: boolean
@@ -22,6 +23,7 @@ interface DeleteCashDialogProps {
 }
 
 export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogProps) {
+  const { t } = useTranslation();
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -33,7 +35,7 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Cash receipt deleted successfully",
+        description: t('cashMangement.cashReceiptDeletedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white"
       })
       onOpenChange(false)
@@ -41,7 +43,7 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete cash receipt",
+        description: t('cashMangement.failedToDeleteCashReceipt'),
         variant: "destructive",
       })
     },
@@ -57,14 +59,14 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>{t('cashMangement.cashReceiptDeleteDescription1')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the cash receipt
+            {t('cashMangement.cashReceiptDeleteDescription2')} 
             <strong> {cash?.receiptNumber}</strong>.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
@@ -73,10 +75,10 @@ export function DeleteCashDialog({ open, onOpenChange, cash }: DeleteCashDialogP
             {deleteMutation.isPending ? (
               <>
                 <LoadingSpinner size="sm" className="mr-2" />
-                Deleting...
+                {t('deletingText')}
               </>
             ) : (
-              "Delete"
+              t('delete')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

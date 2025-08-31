@@ -27,6 +27,7 @@ import { LoadingSpinner } from "../ui/loading-spinner";
 import { useEffect, useState } from "react";
 import { convertFromHKD, convertToHKD } from "../../lib/utils";
 import { Receipt } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const cashSchema = Yup.object().shape({
   invoiceNumber: Yup.string().required("Invoice number is required"),
@@ -58,6 +59,7 @@ interface CashModalProps {
 }
 
 export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedInvoiceDetails, setSelectedInvoiceDetails] = useState({
@@ -119,7 +121,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Cash receipt created successfully",
+        description: t('cashMangement.cashReceiptCreatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       });
       onOpenChange(false);
@@ -127,7 +129,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create cash receipt",
+        description: error.response?.data?.message || t('cashMangement.failedToCreateCashReceipt'),
         variant: "destructive",
       });
     },
@@ -142,7 +144,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       toast({
         title: "Success",
-        description: "Cash receipt updated successfully",
+        description: t('cashMangement.cashReceiptUpdatedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white",
       });
       onOpenChange(false);
@@ -150,7 +152,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update cash receipt",
+        description: error.response?.data?.message || t('cashMangement.failedToUpdateCashReceipt'),
         variant: "destructive",
       });
     },
@@ -223,7 +225,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
       setFieldValue("partialDelivery", false);
       toast({
         title: "Warning",
-        description: `Amount exceeds remaining balance. Maximum allowed is ${maxAllowed.toFixed(2)} ${values.currency} (${remainingAmountHKD.toFixed(2)} HKD)`,
+        description: `${t('cashMangement.amounExceedsRemainingBalance1')} ${maxAllowed.toFixed(2)} ${values.currency} (${remainingAmountHKD.toFixed(2)} HKD)`,
         variant: "destructive",
       });
       return;
@@ -279,7 +281,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
       <DialogContent className="sm:max-w-[600px] sm:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {cash ? "Edit Cash Receipt" : "Create Cash Receipt"}
+            {cash ? t('cashMangement.modal.editTitle') : t('cashMangement.modal.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -334,7 +336,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       if (cash) {
                         toast({
                           title: "Warning",
-                          description: `Amount adjusted to maximum allowed value of ${maxAllowed.toFixed(2)} ${values.currency}`,
+                          description: `${t('cashMangement.amountAdjustedToMaximumAllowedValueOf')} ${maxAllowed.toFixed(2)} ${values.currency}`,
                           variant: "destructive",
                         });
                       }
@@ -348,7 +350,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
               <Form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="invoiceNumber">Invoice Number</Label>
+                    <Label htmlFor="invoiceNumber">{t('cashMangement.modal.cashReceiptInvoiceNumber')}</Label>
                     <Select
                       value={values.invoiceNumber}
                       onValueChange={(value) => {
@@ -358,7 +360,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       disabled={!!cash}
                     >
                       <SelectTrigger className={`${cash ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
-                        <SelectValue placeholder="Select invoice" />
+                        <SelectValue placeholder={t('cashMangement.modal.selectInvoice')} />
                       </SelectTrigger>
                       <SelectContent>
                         {invoices?.invoices?.map((invoice: any) => (
@@ -380,12 +382,12 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pickedBy">Picked By</Label>
+                    <Label htmlFor="pickedBy">{t('cashMangement.modal.inputPickedBy')}</Label>
                     <Field
                       as={Input}
                       id="pickedBy"
                       name="pickedBy"
-                      placeholder="Person name"
+                      placeholder={t('cashMangement.modal.pesronName')}
                       disabled={selectedInvoiceDetails.paymentStatus === "complete" || !selectedInvoiceDetails.customerName}
                       className={
                         `${errors.pickedBy && touched.pickedBy ? "border-red-500" : ""} 
@@ -399,10 +401,10 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="customerId">Customer Name</Label>
+                  <Label htmlFor="customerId">{t('cashMangement.modal.cashReceiptCustomerName')}</Label>
                   <Input
                     value={selectedInvoiceDetails.customerName}
-                    placeholder="Customer name will auto-populate"
+                    placeholder={t('cashMangement.modal.customerNamewillAutoPopulate')}
                     readOnly
                     disabled
                     className="bg-gray-100 dark:bg-gray-800"
@@ -412,7 +414,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="amount">
-                      {cash ? values.partialDelivery ? "Delivered Amount" : "Need to Deliver Amount" : values.partialDelivery ? "Amount" : "Total Amount to Pay"} in {values.currency}
+                      {cash ? values.partialDelivery ? t('cashMangement.modal.delvieredAmount') : t('cashMangement.modal.needToDeliverAmount') : values.partialDelivery ? t('cashMangement.modal.CashAmount') : t('cashMangement.modal.totalAmountToPay')} {t('in')} {values.currency}
                     </Label>
                     <Field
                       as={Input}
@@ -441,7 +443,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                     />
                     {selectedInvoiceDetails.remainingAmount > 0 && (
                       <div className="text-xs text-gray-500">
-                        Remaining Amount: {getMaxAllowedAmount(values.currency, selectedInvoiceDetails.remainingAmount).toFixed(2)} {values.currency}
+                        {t('remainingAmount')}: {getMaxAllowedAmount(values.currency, selectedInvoiceDetails.remainingAmount).toFixed(2)} {values.currency}
                         {values.currency !== "HKD" && (
                           <span> ({selectedInvoiceDetails.remainingAmount.toFixed(2)} HKD)</span>
                         )}
@@ -453,7 +455,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="currency">Currency</Label>
+                    <Label htmlFor="currency">{t('cashMangement.modal.inputCurrency')}</Label>
                     <Select
                       value={values.currency}
                       onValueChange={(newCurrency) => {
@@ -499,14 +501,14 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                       // )
                     }
                   />
-                  <Label htmlFor="partialDelivery">Partial Payment</Label>
+                  <Label htmlFor="partialDelivery">{t('partialPayment')}</Label>
                 </div>
                 <div className="text-xs italic text-gray-600 dark:text-gray-400 mb-4">
-                  Checkmark if partial payment and add amount.
+                  {t('cashMangement.modal.checkmarkIfPartialPaymentAndAddAmount')}
                 </div>
                 {selectedInvoiceDetails.paymentStatus === "complete" && (
                   <div className="text-xs text-green-600">
-                    Full payment done - Invoice is already fulfilled
+                    {t('cashMangement.modal.fullPaymentDone')}
                   </div>
                 )}
 
@@ -557,7 +559,7 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                     variant="outline"
                     onClick={() => onOpenChange(false)}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -570,9 +572,9 @@ export function CashModal({ open, onOpenChange, cash }: CashModalProps) {
                         {cash ? "Updating..." : "Creating..."}
                       </>
                     ) : cash ? (
-                      "Update"
+                      t('update')
                     ) : (
-                      "Create"
+                      t('create')
                     )}
                   </Button>
                 </div>

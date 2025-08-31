@@ -25,6 +25,7 @@ import { UserModal } from "../../components/users/user-modal"
 import { DeleteUserDialog } from "../../components/users/delete-user-dialog"
 import { Badge } from "../../components/ui/badge"
 import { useDebounce } from "../../hooks/use-debounce"
+import { useTranslation } from "react-i18next"
 
 interface User {
   id: string
@@ -39,6 +40,7 @@ interface User {
 }
 
 export default function UserManagementPage() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedUserSearch = useDebounce(searchTerm, 300)
@@ -76,7 +78,7 @@ export default function UserManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       toast({
         title: "Success",
-        description: "User deleted successfully",
+        description: t('addUser.userDeletedSuccessfully'),
         className: "bg-success text-white [&_button]:text-white"
       })
       setIsDeleteDialogOpen(false)
@@ -85,7 +87,7 @@ export default function UserManagementPage() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete user",
+        description: error.response?.data?.message || t('addUser.failedToDeleteUser'),
         variant: "destructive",
       })
     },
@@ -161,8 +163,8 @@ export default function UserManagementPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-foreground">Error loading users</h3>
-          <p className="text-muted-foreground">Please try again later</p>
+          <h3 className="text-lg font-semibold text-foreground">{t('addUser.errorLoadingUsers')}</h3>
+          <p className="text-muted-foreground">{t('pleaseTryAgainLater')}</p>
         </div>
       </div>
     )
@@ -173,12 +175,12 @@ export default function UserManagementPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">User Management</h1>
-          <p className="text-muted-foreground">Manage system users and their permissions</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('addUser.title')}</h1>
+          <p className="text-muted-foreground">{t('addUser.subtitle')}</p>
         </div>
         <Button onClick={handleCreate} className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg">
           <Plus className="h-4 w-4 mr-2" />
-          Create User
+          {t('addUser.createUserButton')}
         </Button>
       </div>
 
@@ -187,13 +189,13 @@ export default function UserManagementPage() {
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Search users by name, email, or username..."
+            placeholder={t('addUser.searchUser')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 form-input"
           />
         </div>
-        <div className="text-gray-900 dark:text-white">Total: <span className="font-semibold">{total}</span> users</div>
+        <div className="text-gray-900 dark:text-white">{t('total')}: <span className="font-semibold">{total}</span> {t('users')}</div>
       </div>
 
       {/* Users Table */}
@@ -201,7 +203,7 @@ export default function UserManagementPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Users className="h-5 w-5" />
-            User List
+            {t('addUser.table.UserListTableTitle')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -212,11 +214,11 @@ export default function UserManagementPage() {
           ) : processedUserData.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No users found</h3>
-              <p className="text-muted-foreground mb-4">Get started by creating your first user</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{t('addUser.noUsersFound')}</h3>
+              <p className="text-muted-foreground mb-4">{t('addUser.GetStartedByCreatingYourFirstUser')}</p>
               <Button onClick={handleCreate} className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg">
                 <Plus className="h-4 w-4 mr-2" />
-                Create User
+                {t('addUser.createUserButton')}
               </Button>
             </div>
           ) : (
@@ -226,34 +228,34 @@ export default function UserManagementPage() {
                   <TableRow className="bg-gray-50 dark:bg-gray-700/50">
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("name")}>
                       <div className="flex items-center">
-                        Name
+                        {t('addUser.table.name')}
                         {getSortIcon("name")}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground">
                       <div className="flex items-center">
-                        Username
+                        {t('addUser.table.userName')}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground">
                       <div className="flex items-center">
-                        Email
+                        {t('addUser.table.userEmail')}
                       </div>
                     </TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead>{t('addUser.table.userPhone')}</TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("role")}>
                       <div className="flex items-center">
-                        Role
+                        {t('addUser.table.userRole')}
                         {getSortIcon("role")}
                       </div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:text-foreground" onClick={() => handleSort("createdAt")}>
                       <div className="flex items-center">
-                        Created
+                        {t('created').split('')[0].toUpperCase() + t('created').slice(1) }
                         {getSortIcon("createdAt")}
                       </div>
                     </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">{t('addUser.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -280,7 +282,8 @@ export default function UserManagementPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
+                          {/* Uncomment to have delete function for user management */}
+                          {/* <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDelete(user)}
@@ -288,7 +291,7 @@ export default function UserManagementPage() {
                             title="Delete User"
                           >
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -302,7 +305,7 @@ export default function UserManagementPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
-                Showing {(currentPage - 1) * limit + 1} to {Math.min(currentPage * limit, total)} of {total} users
+                {t('showing')} {(currentPage - 1) * limit + 1} {t('to')} {Math.min(currentPage * limit, total)} {t('of')} {total} {t('users')}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -312,10 +315,10 @@ export default function UserManagementPage() {
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  {t('previous')}
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
+                  {t('page')} {currentPage} {t('of')} {totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -323,7 +326,7 @@ export default function UserManagementPage() {
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  {t('next')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>

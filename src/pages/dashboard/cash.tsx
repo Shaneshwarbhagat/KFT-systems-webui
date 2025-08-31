@@ -40,8 +40,10 @@ import { LoadingSpinner } from "../../components/ui/loading-spinner";
 import { useAuth } from "../../hooks/use-auth";
 import { formatCurrency } from "../../lib/utils";
 import { useDebounce } from "../../hooks/use-debounce";
+import { useTranslation } from "react-i18next";
 
 export default function CashPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("")
   const debouncedCashSearch = useDebounce(search, 500);
@@ -364,17 +366,17 @@ export default function CashPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Cash Management
+            {t("cashMangement.title")}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage cash receipts and transactions
+            {t("cashMangement.subTitle")}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 sm:gap-5">
           <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search receipts..."
+                placeholder={t("cashMangement.searchCashReceipts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10 w-full sm:w-80"
@@ -385,7 +387,7 @@ export default function CashPage() {
             className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Cash Receipt
+            {t("cashMangement.addCashReceipt")}
           </Button>
         </div>
       </div>
@@ -394,9 +396,9 @@ export default function CashPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Cash Receipts</CardTitle>
+              <CardTitle>{t('cashMangement.table.tableTitle')}</CardTitle>
               <div className="flex items-center space-x-2">
-                Total Receipts: &nbsp;
+                {t('cashMangement.modal.totalReceipts')}: &nbsp;
                 <span className="font-semibold">{cashData?.total || 0}</span>
               </div>
             </div>
@@ -406,28 +408,27 @@ export default function CashPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-gray-700/50">
-                    <TableHead>Receipt Number</TableHead>
-                    <TableHead>Invoice Number
-                    </TableHead>
-                    <TableHead>Customer</TableHead>
+                    <TableHead>{t("cashMangement.table.cashReceiptNumber")}</TableHead>
+                    <TableHead>{t("cashMangement.table.cashInvoiceNumber")}</TableHead>
+                    <TableHead>{t("cashMangement.table.cashCustomer")}</TableHead>
                     <TableHead onClick={() => handleSort("amount")} className="cursor-pointer flex items-center justify-between">
-                      Amount Received {getSortIcon("amount")}
+                      {t("cashMangement.table.cashAmountReceived")} {getSortIcon("amount")}
                     </TableHead>
-                    <TableHead>Amount in HKD</TableHead>
+                    <TableHead>{t("cashMangement.table.amountIn")} HKD</TableHead>
                     <TableHead onClick={() => handleSort("pickedBy")}>
                       <div className="cursor-pointer flex items-center justify-between flex-diredction-row">
-                        Picked By <span className="ml-1">{getSortIcon("pickedBy")}</span>
+                        {t("cashMangement.table.cashPickedBy")} <span className="ml-1">{getSortIcon("pickedBy")}</span>
                       </div>
                     </TableHead>
                     <TableHead onClick={() => handleSort("cashPickupDate")} className="cursor-pointer flex items-center justify-between">
-                      Pickup Date {getSortIcon("cashPickupDate")}
+                      {t("cashMangement.table.cashPickedDate")} {getSortIcon("cashPickupDate")}
                     </TableHead>
                     <TableHead onClick={() => handleSort("partialDelivery")}>
                       <div className="cursor-pointer flex items-center justify-between flex-diredction-row">
-                        Status <span>{getSortIcon("partialDelivery")}</span>
+                        {t("cashMangement.table.cashPickedStatus")} <span>{getSortIcon("partialDelivery")}</span>
                       </div>
                     </TableHead>
-                    {isAdmin && <TableHead>Actions</TableHead>}
+                    {isAdmin && <TableHead>{t("cashMangement.table.cashActions")}</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -505,7 +506,7 @@ export default function CashPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
-                Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} users
+                {t('showing')} {(page - 1) * limit + 1} {t('to')} {Math.min(page * limit, total)} {t('of')} {total} {t('users')}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -515,10 +516,10 @@ export default function CashPage() {
                   disabled={page === 1}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  {t('previous')}
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {page} of {totalPages}
+                  {t('page')} {page} {t('of')} {totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -526,7 +527,7 @@ export default function CashPage() {
                   onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={page === totalPages}
                 >
-                  Next
+                  {t('next')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
@@ -538,17 +539,17 @@ export default function CashPage() {
         <Card className="p-12 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No cash receipt found
+            {t('cashMangement.noCashReceiptFound')}
           </h3>
           <p className="text-gray-600 mb-4">
-            Get started by creating your first cash receipt
+            {t('cashMangement.getStartedByCreatingYourFirstCashReceipt')}
           </p>
           <Button
             onClick={() => setShowModal(true)}
             className="bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white shadow-lg"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Cash Receipt
+            {t('cashMangement.addCashReceipt')}
           </Button>
         </Card>
       )}
