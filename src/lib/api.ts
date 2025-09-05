@@ -1,7 +1,6 @@
 import axios from "axios"
 
-// const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api' : "http://8.218.174.70:3000/api"
-const API_BASE_URL =  process.env.NODE_ENV === 'production' ? '/api' : import.meta.env.VITE_API_BASE_URL || "http://8.218.174.70:3000/api";
+const API_BASE_URL = "http://8.218.174.70:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
